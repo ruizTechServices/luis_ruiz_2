@@ -17,7 +17,7 @@ export default function NavBar({ items }: NavBarProps) {
       <div className="container mx-auto flex items-center justify-between px-6 py-4">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2 text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-purple-700 transition-all duration-300">
-          24Hour-AI
+          Luis-Ruiz
         </Link>
         {/* I think I want to change this logo brand with the actual logo of 24hourgpt */}
 
@@ -37,7 +37,7 @@ export default function NavBar({ items }: NavBarProps) {
         {/* Call to action */}
         <div className="hidden md:block">
           <Button asChild>
-            <Link href="/">Get Started</Link>
+            <Link href="/">Login</Link>
           </Button>
         </div>
 
