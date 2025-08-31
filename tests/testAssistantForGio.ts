@@ -1,7 +1,4 @@
-// testClaudeMessage.ts
-
-import { createMessage } from '../lib/functions/anthropic/messages'
-import { tools as anthropicTools } from '../lib/functions/anthropic/messages'
+import { createMessage, tools as gioTools } from '../lib/functions/anthropic/assistant_for_gio'
 import { getCurrentTimestamp } from '../lib/functions/getCurrentTimestamp'
 import crypto from 'crypto'
 import type { ContentBlock, ToolUseBlock, TextBlock } from '@anthropic-ai/sdk/resources/messages'
@@ -9,44 +6,39 @@ import type { ContentBlock, ToolUseBlock, TextBlock } from '@anthropic-ai/sdk/re
 const isToolUse = (b: ContentBlock): b is ToolUseBlock => b.type === 'tool_use'
 const isText = (b: ContentBlock): b is TextBlock => b.type === 'text'
 
-const userInput = 'What time is it? Give me the result in 12 hour format & 00/00/0000. Also, give me a random uuid.'
+const userInput = process.argv.slice(2).join(' ') ||
+  'Gio wants a pep talk and the current time in ET (and then in UTC). Also generate a random uuid.'
 
 const messages: any[] = [
-  {
-    role: 'user',
-    content: userInput,
-  },
-];
+  { role: 'user', content: userInput },
+]
 
 async function run() {
-  const model = 'claude-opus-4-1-20250805'
+  const model = 'claude-3-5-sonnet-20240620'
 
-  // First turn: allow tool use
   const first = await createMessage({
     model,
-    max_tokens: 200,
-    temperature: 1,
+    max_tokens: 400,
+    temperature: 0.7,
     messages,
-    tools: anthropicTools,
+    tools: gioTools,
   })
 
-  // Keep transcript up to date
   messages.push({ role: 'assistant', content: first.content })
 
-  // Find tool_use blocks
   const toolUses = ((first.content || []) as ContentBlock[]).filter(isToolUse)
 
   if (toolUses.length > 0) {
-    const toolResults = [] as any[]
-
+    const toolResults: any[] = []
     for (const tu of toolUses) {
-      const name = tu.name as string
-      const id = tu.id as string
+      const name = tu.name
+      const id = tu.id
       let result: string | object = ''
 
       switch (name) {
         case 'get_current_timestamp': {
           const tz = (tu as any)?.input?.timeZone as string | undefined
+          // If the assistant asked for two zones in one call, ignore and default here.
           result = getCurrentTimestamp(tz)
           break
         }
@@ -59,34 +51,27 @@ async function run() {
         }
       }
 
-      toolResults.push({
-        type: 'tool_result',
-        tool_use_id: id,
-        content: typeof result === 'string' ? result : JSON.stringify(result),
-      })
+      toolResults.push({ type: 'tool_result', tool_use_id: id, content: String(result) })
     }
 
-    // Second turn: send tool_result back to the model
     messages.push({ role: 'user', content: toolResults })
 
     const second = await createMessage({
       model,
-      max_tokens: 200,
-      temperature: 1,
+      max_tokens: 400,
+      temperature: 0.7,
       messages,
-      tools: anthropicTools,
+      tools: gioTools,
     })
 
     const finalText = ((second.content || []) as ContentBlock[])
       .filter(isText)
       .map((b) => b.text)
       .join('\n')
-
     console.log('Final assistant text:', finalText)
     return
   }
 
-  // If no tools were requested, just print any text from the first response
   const text = ((first.content || []) as ContentBlock[])
     .filter(isText)
     .map((b) => b.text)
@@ -95,6 +80,8 @@ async function run() {
 }
 
 run().catch((err) => {
-  console.error('testClaudeMessage failed:', err)
+  console.error('testAssistantForGio failed:', err)
   process.exit(1)
 })
+
+ 
