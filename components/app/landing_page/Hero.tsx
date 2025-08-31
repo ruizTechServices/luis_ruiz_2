@@ -1,87 +1,83 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+"use client";
+
+import Image from "next/image";
+import { ChevronRightIcon } from "@heroicons/react/20/solid";
+
 
 export default function Hero() {
+
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-40 left-40 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        {/* Main heading */}
-        <div className="animate-fade-in-up">
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-            Welcome to{" "}
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent animate-pulse">
-              Amazing
-            </span>
-          </h1>
-        </div>
-
-        {/* Subtitle */}
-        <div className="animate-fade-in-up animation-delay-200">
-          <p className="text-lg sm:text-xl lg:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Experience the future of innovation with our cutting-edge platform designed to transform your ideas into reality
-          </p>
-        </div>
-
-        {/* CTA buttons */}
-        <div className="animate-fade-in-up animation-delay-400 flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-          <Button 
-            size="lg" 
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-          >
-            Get Started
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-          <Button 
-            variant="outline" 
-            size="lg"
-            className="border-2 border-gray-300 dark:border-gray-600 px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
-          >
-            Learn More
-          </Button>
-        </div>
-
-        {/* Feature highlights */}
-        <div className="animate-fade-in-up animation-delay-600 grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
-          <div className="flex flex-col items-center p-6 rounded-lg bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg hover:scale-105">
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-4">
-              <span className="text-blue-600 dark:text-blue-400 text-xl">⚡</span>
+    <div className="bg-white dark:bg-gray-900">
+      <div className="relative isolate pt-14">
+        <svg
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 size-full stroke-gray-200 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)] dark:stroke-white/10"
+        >
+          <defs>
+            <pattern
+              x="50%"
+              y={-1}
+              id="83fd4e5a-9d52-42fc-97b6-718e5d7ee527"
+              width={200}
+              height={200}
+              patternUnits="userSpaceOnUse"
+            >
+              <path d="M100 200V.5M.5 .5H200" fill="none" />
+            </pattern>
+          </defs>
+          <svg x="50%" y={-1} className="overflow-visible fill-gray-50 dark:fill-gray-800/50">
+            <path
+              d="M-100.5 0h201v201h-201Z M699.5 0h201v201h-201Z M499.5 400h201v201h-201Z M-300.5 600h201v201h-201Z"
+              strokeWidth={0}
+            />
+          </svg>
+          <rect fill="url(#83fd4e5a-9d52-42fc-97b6-718e5d7ee527)" width="100%" height="100%" strokeWidth={0} />
+        </svg>
+        <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:flex lg:items-center lg:gap-x-10 lg:px-8 lg:py-40">
+          <div className="mx-auto max-w-2xl lg:mx-0 lg:flex-auto">
+            <div className="flex">
+              <div className="relative flex items-center gap-x-4 rounded-full bg-white px-4 py-1 text-sm/6 text-gray-600 ring-1 ring-gray-900/10 hover:ring-gray-900/20 dark:bg-white/5 dark:text-gray-300 dark:ring-white/10 dark:hover:ring-white/20">
+                <span className="font-semibold text-indigo-600 dark:text-indigo-400">Luis Ruiz</span>
+                <span aria-hidden="true" className="h-4 w-px bg-gray-900/10 dark:bg-white/10" />
+                <a href="#" className="flex items-center gap-x-1">{/* TODO: Add link to LinkedIn or hire form */}
+                  <span aria-hidden="true" className="absolute inset-0" />
+                  Available for hire
+                  <ChevronRightIcon aria-hidden="true" className="-mr-2 size-5 text-gray-400" />
+                </a>
+              </div>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Lightning Fast</h3>
-            <p className="text-gray-600 dark:text-gray-300 text-center">Experience blazing fast performance with our optimized platform</p>
-          </div>
-          
-          <div className="flex flex-col items-center p-6 rounded-lg bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg hover:scale-105">
-            <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mb-4">
-              <span className="text-purple-600 dark:text-purple-400 text-xl">🎨</span>
+            <h1 className="mt-10 text-pretty text-5xl font-semibold tracking-tight text-gray-900 sm:text-7xl dark:text-white">
+              Luis Ruiz: Full-Stack Developer
+            </h1>
+            <p className="mt-8 text-pretty text-lg font-medium text-gray-500 sm:text-xl/8 dark:text-gray-400">
+              I'm a full-stack developer with a passion for creating innovative and user-friendly applications. With a strong foundation in both frontend and backend development, I'm dedicated to delivering high-quality solutions that meet the needs of my clients.
+            </p>
+            <div className="mt-10 flex items-center gap-x-6">
+              <a
+                href="#"
+                className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500"
+              >
+                Contact me
+              </a>
+              <a href="#" className="text-sm/6 font-semibold text-gray-900 dark:text-white">
+                Learn more <span aria-hidden="true">→</span>
+              </a>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Beautiful Design</h3>
-            <p className="text-gray-600 dark:text-gray-300 text-center">Stunning interfaces that delight users and drive engagement</p>
           </div>
-          
-          <div className="flex flex-col items-center p-6 rounded-lg bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg hover:scale-105">
-            <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mb-4">
-              <span className="text-green-600 dark:text-green-400 text-xl">🚀</span>
+          <div className="mt-16 sm:mt-24 lg:mt-0 lg:shrink-0 lg:grow">
+            <div className="mx-auto w-[22.875rem] max-w-full drop-shadow-xl">
+              <Image
+                src="/luis_businessman-2.png"
+                alt="Luis Ruiz portrait"
+                width={366}
+                height={729}
+                className="rounded-3xl border border-black/5 shadow-2xl"
+                priority
+              />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Easy to Use</h3>
-            <p className="text-gray-600 dark:text-gray-300 text-center">Intuitive design that makes complex tasks simple and enjoyable</p>
           </div>
-        </div>
-      </div>
-
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 border-2 border-gray-400 dark:border-gray-600 rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-gray-400 dark:bg-gray-600 rounded-full mt-2 animate-ping"></div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

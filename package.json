@@ -12,6 +12,8 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.57.0",
     "@google/generative-ai": "^0.24.1",
+    "@headlessui/react": "^2.2.7",
+    "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.2.1",
     "@huggingface/inference": "^4.6.1",
     "@mistralai/mistralai": "^1.7.5",

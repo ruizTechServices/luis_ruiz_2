@@ -1,8 +1,8 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Sheet, SheetTrigger, SheetContent } from '@/components/ui/sheet'
-import { Menu, X } from 'lucide-react'
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { Menu } from 'lucide-react'
 
 interface HamburgerMenuProps {
   items: { label: string; href: string }[]
@@ -12,21 +12,18 @@ export function HamburgerMenu({ items }: HamburgerMenuProps) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" className="md:hidden p-2" aria-label="Open menu">
-          <Menu size={24} />
+        <Button variant="default" className="md:hidden p-2" aria-label="Open menu">
+          <Menu size={30} />
         </Button>
       </SheetTrigger>
 
       <SheetContent side="left" className="w-3/4 sm:w-1/2">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold">24Hour-AI</h2>
-          <SheetTrigger asChild>
-            <Button variant="ghost" aria-label="Close menu">
-              <X size={24} />
-            </Button>
-          </SheetTrigger>
-        </div>
-        <nav className="flex flex-col space-y-4">
+        <SheetHeader className="m-2">
+          <SheetTitle className="text-lg font-bold">
+            Luis Ruiz: Full-Stack Developer
+          </SheetTitle>
+        </SheetHeader>
+        <nav className="flex flex-col space-y-4 p-6">
           {items.map((item) => (
             <a
               key={item.href}
