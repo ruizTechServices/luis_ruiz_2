@@ -37,7 +37,7 @@ export default function NavBar({ items }: NavBarProps) {
         {/* Call to action */}
         <div className="hidden md:block">
           <Button asChild>
-            <Link href="/">Login</Link>
+            <Link href="/">Login</Link>{/* TODO: change this to the actual login page. THe auth must be made with NextAuth and Supabase and Google ONLY */}
           </Button>
         </div>
 
