@@ -13,7 +13,7 @@ import 'dotenv/config';
   
   try {
     const { runWebSearch } = await import('@/lib/functions/search');
-    const query = "TypeScript best practices";
+    const query = "5 best sandwiches NYC";
     const results = await runWebSearch(query);
     
     console.log(`Query: "${query}"`);
