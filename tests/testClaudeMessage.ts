@@ -1,5 +1,6 @@
 // testClaudeMessage.ts
 
+import 'dotenv/config'
 import { createMessage } from '../lib/functions/anthropic/messages'
 import { tools as anthropicTools } from '../lib/functions/anthropic/messages'
 import { getCurrentTimestamp } from '../lib/functions/getCurrentTimestamp'
@@ -17,6 +18,12 @@ const messages: any[] = [
     content: userInput,
   },
 ];
+
+// Skip when Anthropic key is not provided
+if (!process.env.ANTHROPIC_API_KEY) {
+  console.log('⏭️ Skipping Claude message test (no ANTHROPIC_API_KEY).')
+  process.exit(0)
+}
 
 async function run() {
   const model = 'claude-opus-4-1-20250805'

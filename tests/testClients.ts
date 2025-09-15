@@ -19,7 +19,7 @@ const tests: Array<{ name: string; client: any; keyEnv: string }> = [
     { name: 'Anthropic', client: anthropicClient, keyEnv: 'ANTHROPIC_API_KEY' },
     { name: 'HuggingFace', client: huggingfaceClient, keyEnv: 'HF_API_KEY' },
     { name: 'xAI', client: xaiClient, keyEnv: 'XAI_API_KEY' },
-    { name: 'Supabase', client: supabaseClient, keyEnv: 'SUPABASE_API_KEY' },
+    { name: 'Supabase', client: supabaseClient, keyEnv: 'NEXT_PUBLIC_SUPABASE_ANON_KEY' },
 ]
 
 console.log('🧠 Unified client initialization test')

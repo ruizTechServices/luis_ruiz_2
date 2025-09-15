@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import { createMessage, tools as gioTools } from '../lib/functions/anthropic/assistant_for_gio'
 import { getCurrentTimestamp } from '../lib/functions/getCurrentTimestamp'
 import crypto from 'crypto'
@@ -12,6 +13,12 @@ const userInput = process.argv.slice(2).join(' ') ||
 const messages: any[] = [
   { role: 'user', content: userInput },
 ]
+
+// Skip when Anthropic key is not provided
+if (!process.env.ANTHROPIC_API_KEY) {
+  console.log('⏭️ Skipping Anthropic assistant test (no ANTHROPIC_API_KEY).')
+  process.exit(0)
+}
 
 async function run() {
   const model = 'claude-3-5-sonnet-20240620'

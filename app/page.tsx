@@ -1,7 +1,6 @@
 import NavBar from "@/components/app/landing_page/Navbar";
 import { items } from "@/components/app/landing_page/Navbar";
 import Hero from "../components/app/landing_page/Hero"
-import CTA from "../components/app/landing_page/cta"
 
 export default function Home() {
   return (
@@ -9,7 +8,6 @@ export default function Home() {
       <NavBar items={items} />
       <Hero />
       <br className="h-[100vh]"/>
-      <CTA />
     </div>
   )
 }
