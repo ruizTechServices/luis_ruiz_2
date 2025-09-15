@@ -1,12 +1,18 @@
 // lib/functions/openai/responses.ts
 import openai from '@/lib/clients/openai/client'
+type MinimalResponseCreate = {
+  model: string
+  input: string
+  instructions?: string
+  max_output_tokens?: number
+}
 
 export async function getOpenAICompletion(
   message: string,
   model = 'gpt-4o',
   options?: { system?: string; maxOutputTokens?: number }
 ): Promise<string> {
-  const payload: any = {
+  const payload: MinimalResponseCreate = {
     model,
     input: message,
   }

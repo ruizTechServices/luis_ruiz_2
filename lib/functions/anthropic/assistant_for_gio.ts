@@ -1,4 +1,5 @@
 import client from "../../clients/anthropic/client";
+import type { MessageParam, Tool } from "@anthropic-ai/sdk/resources/messages";
 
 const DEFAULT_SYSTEM = `
 TONE PREFERENCES:
@@ -39,7 +40,7 @@ USER INFORMATION:
 - Always address as "Gio", or “Daddy"
 `;
 
-export const tools = [
+export const tools: Tool[] = [
   {
     name: 'get_current_timestamp',
     description: 'Get the current timestamp. Optionally specify an IANA time zone (e.g., "UTC", "Europe/London"). Defaults to Eastern Time (America/New_York).',
@@ -49,7 +50,7 @@ export const tools = [
         timeZone: { type: 'string', description: 'IANA time zone, e.g., America/New_York, UTC, Europe/London' },
       },
       required: [],
-    },
+    } as const,
   },
   {
     name: 'generate_uuid',
@@ -58,7 +59,7 @@ export const tools = [
       type: 'object',
       properties: {},
       required: [],
-    },
+    } as const,
   },
 ]
 
@@ -73,9 +74,9 @@ export async function createMessage({
   model: string;
   max_tokens: number;
   temperature: number;
-  messages: any[];
+  messages: MessageParam[];
   system?: string;
-  tools?: any[];
+  tools?: Tool[];
 }) {
   const msg = await client.messages.create({
     model,

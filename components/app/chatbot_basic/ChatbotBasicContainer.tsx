@@ -3,7 +3,7 @@
 import EmbedInput from "@/components/app/chatbot_basic/EmbedInput";
 import ChatContext, { ChatMessage } from "@/components/app/chatbot_basic/ChatContext";
 import generateUUID from "@/lib/functions/generateUUID";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 
@@ -11,6 +11,12 @@ export default function ChatbotBasicContainer() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [models, setModels] = useState<string[]>([]);
   const [selectedModel, setSelectedModel] = useState<string>("gpt-4o");
+
+  const allowModel = useCallback((id: string) => {
+    const blacklist = ["embedding", "whisper", "tts", "realtime", "moderation", "audio", "clip"];
+    const lower = id.toLowerCase();
+    return !blacklist.some(b => lower.includes(b));
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -32,13 +38,7 @@ export default function ChatbotBasicContainer() {
       }
     })();
     return () => { cancelled = true; };
-  }, []);
-
-  function allowModel(id: string) {
-    const blacklist = ["embedding", "whisper", "tts", "realtime", "moderation", "audio", "clip"];
-    const lower = id.toLowerCase();
-    return !blacklist.some(b => lower.includes(b));
-  }
+  }, [selectedModel, allowModel]);
 
   const handleSubmitText = async (text: string) => {
     // 1) Show user message

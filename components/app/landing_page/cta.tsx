@@ -1,10 +1,13 @@
+
+import Image from 'next/image'
+
 export default function CTA() {
   return (
     <section className="py-20 bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900">
       <div className="container mx-auto px-6 text-center">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
-            <img 
+            <Image 
               src="/portrait-gio.jpg" 
               alt="Portrait of Gio (Luis Giovanni Ruiz)" 
               className="w-32 h-32 rounded-full mx-auto mb-6 border-4 border-white shadow-lg"
@@ -34,7 +37,7 @@ export default function CTA() {
             </div>
             
             <blockquote className="text-2xl font-semibold text-white mb-6 italic">
-              "Learn → Build → Ship → Iterate."
+              &quot;Learn → Build → Ship → Iterate.&quot;
             </blockquote>
             
             <div className="flex flex-wrap justify-center gap-3 mb-8">

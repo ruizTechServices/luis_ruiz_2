@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { ChevronRightIcon, SparklesIcon, CodeBracketIcon, ServerIcon, DevicePhoneMobileIcon, CloudIcon, CommandLineIcon } from '@heroicons/react/20/solid';
+import { ChevronRightIcon, SparklesIcon, CodeBracketIcon, ServerIcon, DevicePhoneMobileIcon, CloudIcon } from '@heroicons/react/20/solid';
 import { ArrowDownIcon } from '@heroicons/react/24/outline';
 import NextImage from 'next/image';
 import { createClient as createSupabaseClient } from '@/lib/clients/supabase/client';
@@ -26,7 +26,7 @@ export default function Hero() {
   useEffect(() => {
     setIsVisible(true);
     
-    const handleMouseMove = (e: any) => {
+    const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
 
@@ -67,7 +67,7 @@ export default function Hero() {
           setAvailability(data.availability);
           setAvailabilityText(data.availability_text ?? 'Available for hire');
         }
-      } catch (e) {
+      } catch {
         // No-op: fall back to defaults
       }
     };
@@ -152,7 +152,7 @@ export default function Hero() {
             <p className="text-lg text-gray-300 mb-8 leading-relaxed">
               Crafting next-generation digital experiences with cutting-edge technologies. 
               Specialized in building scalable, performant applications that push the boundaries 
-              of what's possible on the web.
+              of what&#39;s possible on the web.
             </p>
 
             {/* Tech Stack Icons */}
@@ -180,7 +180,7 @@ export default function Hero() {
                 <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
                 <span className="relative flex items-center gap-2">
                   <SparklesIcon className="h-5 w-5" />
-                  Let's Connect
+                  Let&#39;s Connect
                 </span>
               </button>
               

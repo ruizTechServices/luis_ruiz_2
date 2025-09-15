@@ -13,7 +13,11 @@ export async function runWebSearch(query: string): Promise<string> {
 
   if (!res.ok) return `Search failed (${res.status})`;
 
-  const data = await res.json();
+  type BraveWebResult = { title?: string; url?: string };
+  type BraveWebResponse = { web?: { results?: BraveWebResult[] } };
+  const data: BraveWebResponse = await res.json();
   const results = data.web?.results?.slice(0, 3) ?? [];
-  return results.map((r: any) => `${r.title}: ${r.url}`).join("\n");
+  return results
+    .map((r) => `${r.title ?? "Untitled"}: ${r.url ?? ""}`)
+    .join("\n");
 }

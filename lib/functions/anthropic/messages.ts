@@ -1,4 +1,5 @@
 import client from "../../clients/anthropic/client";
+import type { MessageParam, Tool } from "@anthropic-ai/sdk/resources/messages";
 
 const DEFAULT_SYSTEM = `
   You are a helpful assistant. You may call tools when needed.
@@ -33,7 +34,7 @@ export const tools = [
         timeZone: { type: 'string', description: 'IANA time zone, e.g., America/New_York, UTC, Europe/London' },
       },
       required: [],
-    },
+    } as const,
   },
   {
     name: 'generate_uuid',
@@ -42,9 +43,9 @@ export const tools = [
       type: 'object',
       properties: {},
       required: [],
-    },
+    } as const,
   },
-]
+] satisfies Tool[]
 
 export async function createMessage({
   model,
@@ -57,9 +58,9 @@ export async function createMessage({
   model: string;
   max_tokens: number;
   temperature: number;
-  messages: any[];
+  messages: MessageParam[];
   system?: string;
-  tools?: any[];
+  tools?: Tool[];
 }) {
   const msg = await client.messages.create({
     model,

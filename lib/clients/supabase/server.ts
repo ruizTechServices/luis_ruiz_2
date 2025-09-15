@@ -13,7 +13,7 @@ export const createClient = (cookieStore: Awaited<ReturnType<typeof cookies>>) =
         getAll() {
           return cookieStore.getAll()
         },
-        setAll(cookiesToSet: { name: any; value: any; options: any; }[]) {
+        setAll(cookiesToSet: { name: string; value: string; options: Parameters<typeof cookieStore.set>[2] }[]) {
           try {
             cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
           } catch {

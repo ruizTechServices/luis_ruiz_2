@@ -20,8 +20,9 @@ export async function POST(req: NextRequest) {
         for await (const chunk of ollamaStream({ model, messages, temperature })) {
           controller.enqueue(encoder.encode(chunk));
         }
-      } catch (e: any) {
-        controller.enqueue(encoder.encode(`[error] ${e?.message ?? "stream failed"}`));
+      } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : typeof e === "string" ? e : "stream failed";
+        controller.enqueue(encoder.encode(`[error] ${message}`));
       } finally {
         controller.close();
       }
