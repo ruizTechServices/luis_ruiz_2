@@ -1,10 +1,7 @@
-import NavBar from "../components/app/landing_page/Navbar"
+import NavBar from "@/components/app/landing_page/Navbar";
+import { items } from "@/components/app/landing_page/Navbar";
 import Hero from "../components/app/landing_page/Hero"
-const items = [
-  { label: "Home", href: "/" },
-  { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
-]
+
 
 export default function Home() {
   return (

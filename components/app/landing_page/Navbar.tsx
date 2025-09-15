@@ -11,6 +11,11 @@ interface NavBarProps {
   items: NavItem[]
 }
 
+export const items: NavItem[] = [
+  { label: 'Home', href: '/' },
+  { label: 'Gio-Dash', href: '/gio_dash' },
+]
+
 export default function NavBar({ items }: NavBarProps) {
   return (
     <header className="sticky top-0 z-20 bg-white shadow-sm">
