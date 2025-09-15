@@ -14,6 +14,7 @@ interface NavBarProps {
 export const items: NavItem[] = [
   { label: 'Home', href: '/' },
   { label: 'Gio-Dash', href: '/gio_dash' },
+  { label: 'Blog', href: '/blog' },
 ]
 
 export default function NavBar({ items }: NavBarProps) {
