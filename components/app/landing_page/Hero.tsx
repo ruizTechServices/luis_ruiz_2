@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronRightIcon, SparklesIcon, CodeBracketIcon, ServerIcon, DevicePhoneMobileIcon, CloudIcon } from '@heroicons/react/20/solid';
 import { ArrowDownIcon } from '@heroicons/react/24/outline';
 import NextImage from 'next/image';
-import { createClient as createSupabaseClient } from '@/lib/clients/supabase/client';
+ 
 
 // Slideshow images from public/edited
 const SLIDESHOW_IMAGES = [
@@ -53,25 +53,23 @@ export default function Hero() {
     };
   }, []);
 
-  // Fetch availability settings from Supabase
+  // Fetch availability settings from API (server-proxied Supabase)
   useEffect(() => {
+    let active = true;
     const fetchSettings = async () => {
       try {
-        const supabase = createSupabaseClient();
-        const { data, error } = await supabase
-          .from('site_settings')
-          .select('availability, availability_text')
-          .limit(1)
-          .single();
-        if (!error && data) {
-          setAvailability(data.availability);
-          setAvailabilityText(data.availability_text ?? 'Available for hire');
-        }
+        const res = await fetch('/api/site_settings/availability', { cache: 'no-store' });
+        if (!res.ok) throw new Error(`Failed to fetch settings (${res.status})`);
+        const data = await res.json();
+        if (!active) return;
+        setAvailability(!!data.availability);
+        setAvailabilityText(data.availability_text ?? 'Available for hire');
       } catch {
         // No-op: fall back to defaults
       }
     };
     fetchSettings();
+    return () => { active = false };
   }, []);
 
   const isAvailable = availability ?? true;
