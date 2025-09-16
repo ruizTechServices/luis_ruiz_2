@@ -5,18 +5,17 @@ import type { BlogPost } from '@/lib/types/blog'
 
 export const revalidate = 0
 
-type Props = { params: { id: string } }
+export default async function BlogPostPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const idNum = Number(id)
+  if (Number.isNaN(idNum)) return notFound()
 
-export default async function BlogPostPage({ params }: Props) {
-  const id = Number(params.id)
-  if (Number.isNaN(id)) return notFound()
-
-  const post: BlogPost | null = await getPostById(id)
+  const post: BlogPost | null = await getPostById(idNum)
   if (!post) return notFound()
 
   const [comments, votes] = await Promise.all([
-    getComments(id),
-    getVoteCounts(id),
+    getComments(idNum),
+    getVoteCounts(idNum),
   ])
 
   return (
