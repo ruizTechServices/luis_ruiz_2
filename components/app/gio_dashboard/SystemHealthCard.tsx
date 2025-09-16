@@ -1,13 +1,23 @@
 import { cookies } from "next/headers";
-import { createClient as createServerClient } from "@/lib/clients/supabase/server";
+import { createServerClient as createSupabaseServerClient } from "@supabase/ssr";
 import DeepHealthButton from "@/components/app/gio_dashboard/DeepHealthButton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 type ServiceStatus = "operational" | "down" | "not_configured";
 
 type Tier0Result = {
-  supabase: { status: ServiceStatus; latencyMs?: number };
-  pinecone: { status: ServiceStatus; vectors?: number | null };
+  supabase: { status: ServiceStatus; latencyMs?: number; anonLatencyMs?: number; info?: string };
+  pinecone: {
+    status: ServiceStatus;
+    vectors?: number | null;
+    ready?: boolean;
+    dimension?: number | null;
+    namespaces?: number | null;
+    pods?: number | null;
+    replicas?: number | null;
+    podType?: string | null;
+    driftDelta?: number | null;
+  };
   ollama: { status: ServiceStatus; models?: number | null };
   routes: { embeddings: ServiceStatus; chat: ServiceStatus };
   envs: Record<string, ServiceStatus>;
@@ -15,6 +25,7 @@ type Tier0Result = {
 
 const TTL_MS = 5 * 60 * 1000;
 let cache: { ts: number; data: Tier0Result } | null = null;
+let lastPineconeVectors: number | null = null;
 
 function envConfigured(name: string, ok: boolean): ServiceStatus {
   return ok ? "operational" : "not_configured";
@@ -26,6 +37,35 @@ function getSiteUrl() {
   const vercel = process.env.VERCEL_URL;
   if (vercel) return vercel.startsWith("http") ? vercel : `https://${vercel}`;
   return "http://localhost:3000";
+}
+
+// Basic classification for Supabase connectivity issues to surface actionable hints
+function classifySupabaseIssueFromText(text: string): string {
+  const t = (text || "").toLowerCase();
+  if (t.includes("paused")) return "paused";
+  if (
+    t.includes("failed to fetch") ||
+    t.includes("getaddrinfo") ||
+    t.includes("enotfound") ||
+    t.includes("timeout") ||
+    t.includes("econ") ||
+    t.includes("network")
+  )
+    return "network";
+  if (t.includes("jwt") || t.includes("auth")) return "auth";
+  if (t.includes("permission") || t.includes("rls")) return "rls";
+  return "unknown";
+}
+
+function classifySupabaseIssue(err: unknown): string {
+  if (err && typeof err === "object") {
+    const anyErr = err as any;
+    const combo = [anyErr?.message, anyErr?.details, anyErr?.hint, anyErr?.code]
+      .filter(Boolean)
+      .join(" ");
+    if (combo) return classifySupabaseIssueFromText(combo);
+  }
+  return classifySupabaseIssueFromText(err instanceof Error ? err.message : String(err ?? ""));
 }
 
 async function checkRoutes(): Promise<{ embeddings: ServiceStatus; chat: ServiceStatus }> {
@@ -64,23 +104,88 @@ async function getTier0(): Promise<Tier0Result> {
     "Ollama URL": envConfigured("Ollama", !!process.env.OLLAMA_BASE_URL),
   };
 
-  // Supabase latency + status
+  // Supabase latency + status (service-role and anon)
   let supabaseStatus: ServiceStatus = "down";
-  let dbLatency: number | undefined;
+  let dbLatencySvc: number | undefined;
+  let dbLatencyAnon: number | undefined;
+  let supabaseInfo: string | undefined;
   try {
     const cookieStore = await cookies();
-    const supabase = createServerClient(cookieStore);
-    const t0 = Date.now();
-    const { error } = await supabase.from("blog_posts").select("id", { count: "exact" }).limit(0);
-    dbLatency = Date.now() - t0;
-    supabaseStatus = error ? "down" : "operational";
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const svcKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_API_KEY;
+
+    if (!url || (!anonKey && !svcKey)) {
+      supabaseStatus = "not_configured";
+    } else {
+      const build = (key: string) =>
+        createSupabaseServerClient(url, key, {
+          cookies: {
+            getAll() {
+              return cookieStore.getAll();
+            },
+            setAll(cookiesToSet: { name: string; value: string; options: any }[]) {
+              try {
+                cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+              } catch {
+                // ignore if called in a Server Component context where setting cookies is disallowed
+              }
+            },
+          },
+        });
+
+      // Service-role check (prefer this for overall status if available)
+      if (svcKey) {
+        try {
+          const supSvc = build(svcKey);
+          const t0 = Date.now();
+          const { error } = await supSvc.from("blog_posts").select("id", { count: "exact" }).limit(0);
+          dbLatencySvc = Date.now() - t0;
+          if (error) {
+            supabaseInfo = supabaseInfo ?? classifySupabaseIssue(error);
+            supabaseStatus = "down";
+          } else {
+            supabaseStatus = "operational";
+          }
+        } catch (e) {
+          supabaseInfo = supabaseInfo ?? classifySupabaseIssue(e);
+          supabaseStatus = "down";
+        }
+      }
+
+      // Anon check (should succeed for public tables; helps detect RLS/anon issues)
+      if (anonKey) {
+        try {
+          const supAnon = build(anonKey);
+          const t0 = Date.now();
+          const { error } = await supAnon.from("blog_posts").select("id", { count: "exact" }).limit(0);
+          dbLatencyAnon = Date.now() - t0;
+          if (error) {
+            // If service is operational, keep status operational but surface note; otherwise mark down
+            supabaseInfo = supabaseInfo ?? classifySupabaseIssue(error);
+            if (supabaseStatus !== "operational") supabaseStatus = "down";
+          }
+        } catch (e) {
+          supabaseInfo = supabaseInfo ?? classifySupabaseIssue(e);
+          if (supabaseStatus !== "operational") supabaseStatus = "down";
+        }
+      }
+    }
   } catch {
     supabaseStatus = "down";
+    supabaseInfo = supabaseInfo ?? "unknown";
   }
 
   // Pinecone connectivity + vectors
   let pineconeStatus: ServiceStatus = "not_configured";
   let pineconeVectors: number | null = null;
+  let pineconeReady: boolean | undefined;
+  let pineconeDimension: number | null = null;
+  let pineNamespacesCount: number | null = null;
+  let pinePods: number | null = null;
+  let pineReplicas: number | null = null;
+  let pinePodType: string | null = null;
+  let pineDriftDelta: number | null = null;
   const pineApi = process.env.PINECONE_API_KEY;
   const pineIdx = process.env.PINECONE_INDEX;
   if (pineApi && pineIdx) {
@@ -93,6 +198,50 @@ async function getTier0(): Promise<Tier0Result> {
       if (typeof stats?.totalRecordCount === "number") pineconeVectors = stats.totalRecordCount;
       else if (stats?.namespaces && typeof stats.namespaces === "object") {
         pineconeVectors = Object.values(stats.namespaces).reduce((acc: number, ns: any) => acc + (ns?.vectorCount || ns?.recordCount || 0), 0);
+      }
+      // namespaces count
+      if (stats?.namespaces && typeof stats.namespaces === "object") {
+        pineNamespacesCount = Object.keys(stats.namespaces).length;
+      }
+      // Describe index for readiness/spec details (best-effort)
+      try {
+        const desc: any = await (pc as any).describeIndex?.(pineIdx);
+        if (desc) {
+          // Dimension
+          pineconeDimension = (desc.dimension ?? desc?.spec?.dimension ?? null) as number | null;
+          // Status / readiness
+          const statusAny = desc.status as any;
+          const readyFromStatus = typeof statusAny?.ready === "boolean" ? statusAny.ready : undefined;
+          const readyFromIndexState =
+            typeof desc.indexState?.ready === "boolean"
+              ? (desc.indexState.ready as boolean)
+              : typeof desc?.index_state?.ready === "boolean"
+              ? (desc.index_state.ready as boolean)
+              : undefined;
+          const statusRawStr = (() => {
+            const s = (statusAny && typeof statusAny === "object" && typeof statusAny.state === "string") ? statusAny.state : (desc.status ?? desc?.indexState?.status ?? desc?.index_state?.status ?? "");
+            return ("" + s).toLowerCase();
+          })();
+          pineconeReady =
+            typeof readyFromStatus === "boolean"
+              ? readyFromStatus
+              : typeof readyFromIndexState === "boolean"
+              ? readyFromIndexState
+              : statusRawStr.includes("ready");
+          // Pods/replicas/podType
+          pinePods = (desc?.spec?.pods ?? desc?.pods ?? null) as number | null;
+          pineReplicas = (desc?.spec?.replicas ?? desc?.replicas ?? null) as number | null;
+          pinePodType = (desc?.spec?.podType ?? desc?.spec?.pod_type ?? null) as string | null;
+        }
+      } catch {
+        // ignore describeIndex errors; keep basic stats
+      }
+      // Drift detection vs last reading
+      if (typeof pineconeVectors === "number" && typeof lastPineconeVectors === "number") {
+        pineDriftDelta = pineconeVectors - lastPineconeVectors;
+      }
+      if (typeof pineconeVectors === "number") {
+        lastPineconeVectors = pineconeVectors;
       }
     } catch {
       pineconeStatus = "down";
@@ -121,8 +270,18 @@ async function getTier0(): Promise<Tier0Result> {
   const routes = await checkRoutes();
 
   const data: Tier0Result = {
-    supabase: { status: supabaseStatus, latencyMs: dbLatency },
-    pinecone: { status: pineconeStatus, vectors: pineconeVectors },
+    supabase: { status: supabaseStatus, latencyMs: dbLatencySvc ?? dbLatencyAnon, anonLatencyMs: dbLatencyAnon, info: supabaseInfo },
+    pinecone: {
+      status: pineconeStatus,
+      vectors: pineconeVectors,
+      ready: pineconeReady,
+      dimension: pineconeDimension,
+      namespaces: pineNamespacesCount,
+      pods: pinePods,
+      replicas: pineReplicas,
+      podType: pinePodType,
+      driftDelta: pineDriftDelta,
+    },
     ollama: { status: ollamaStatus, models: ollamaModels },
     routes,
     envs,
@@ -180,8 +339,32 @@ export default async function SystemHealthCard() {
               {typeof results.supabase.latencyMs === "number" && (
                 <div>DB latency: ~{results.supabase.latencyMs} ms</div>
               )}
+              {typeof results.supabase.anonLatencyMs === "number" && (
+                <div>DB latency (anon): ~{results.supabase.anonLatencyMs} ms</div>
+              )}
+              {results.supabase.info && (
+                <div>DB note: {results.supabase.info}</div>
+              )}
               {typeof results.pinecone.vectors === "number" && (
                 <div>Pinecone vectors: {results.pinecone.vectors}</div>
+              )}
+              {typeof results.pinecone.ready === "boolean" && (
+                <div>Pinecone ready: {results.pinecone.ready ? "yes" : "no"}</div>
+              )}
+              {typeof results.pinecone.dimension === "number" && (
+                <div>Pinecone dimension: {results.pinecone.dimension}</div>
+              )}
+              {typeof results.pinecone.namespaces === "number" && (
+                <div>Pinecone namespaces: {results.pinecone.namespaces}</div>
+              )}
+              {(typeof results.pinecone.pods === "number" || typeof results.pinecone.replicas === "number" || results.pinecone.podType) && (
+                <div>
+                  Pinecone pods/replicas: {results.pinecone.pods ?? "?"}/{results.pinecone.replicas ?? "?"}
+                  {results.pinecone.podType ? ` · ${results.pinecone.podType}` : ""}
+                </div>
+              )}
+              {typeof results.pinecone.driftDelta === "number" && results.pinecone.driftDelta !== 0 && (
+                <div>Pinecone drift: {results.pinecone.driftDelta > 0 ? "+" : ""}{results.pinecone.driftDelta}</div>
               )}
               {typeof results.ollama.models === "number" && (
                 <div>Ollama models available: {results.ollama.models}</div>
