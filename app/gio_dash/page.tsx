@@ -36,7 +36,7 @@ export default async function GioDashboard() {
         </div>
 
         {/* Blog posts */}
-        <div className="mt-6">
+        <div className="mt-6 w-1/2">
           <BlogCard />
         </div>
 
