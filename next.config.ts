@@ -15,10 +15,8 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  // Enable experimental features for better Replit compatibility
-  experimental: {
-    serverComponentsExternalPackages: [],
-  },
+  // Enable external packages configuration for better Replit compatibility
+  serverExternalPackages: [],
 };
 
 export default nextConfig;
