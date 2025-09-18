@@ -3,12 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { ChevronRightIcon, SparklesIcon, CodeBracketIcon, ServerIcon, DevicePhoneMobileIcon, CloudIcon } from '@heroicons/react/20/solid';
 import { ArrowDownIcon } from '@heroicons/react/24/outline';
 import NextImage from 'next/image';
+import Link from 'next/link';
  
 
 // Slideshow images from public/edited
 const SLIDESHOW_IMAGES = [
   '/edited/luis-4.png',
-  '/edited/luis-1.png',
   '/edited/luis-2.png',
   '/edited/luis-3-removebg-preview.png',
   '/edited/luis_businessman-2.png',
@@ -182,12 +182,14 @@ export default function Hero() {
                 </span>
               </button>
               
-              <button className="group px-8 py-4 rounded-lg bg-white/5 backdrop-blur-md border border-white/20 text-white font-semibold transition-all hover:bg-white/10 hover:scale-105 hover:border-white/40">
-                <span className="flex items-center gap-2">
-                  View Projects
-                  <ChevronRightIcon className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </button>
+              <Link href="/projects">
+                <button className="group px-8 py-4 rounded-lg bg-white/5 backdrop-blur-md border border-white/20 text-white font-semibold transition-all hover:bg-white/10 hover:scale-105 hover:border-white/40">
+                  <span className="flex items-center gap-2">
+                    View Projects
+                    <ChevronRightIcon className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </button>
+              </Link>
             </div>
 
             {/* Stats */}

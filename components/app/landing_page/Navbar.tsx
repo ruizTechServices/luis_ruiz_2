@@ -15,6 +15,8 @@ export const items: NavItem[] = [
   { label: 'Home', href: '/' },
   { label: 'Gio-Dash', href: '/gio_dash' },
   { label: 'Blog', href: '/blog' },
+  { label: 'Projects', href: '/projects' },
+  { label: 'Contact', href: '/contact' },
 ]
 
 export default function NavBar({ items }: NavBarProps) {

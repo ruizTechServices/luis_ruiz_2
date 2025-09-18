@@ -93,6 +93,8 @@ export default function QuickActionsCard() {
         </div>
         {message && <div className="mt-2 text-xs text-gray-500">{message}</div>}
       </div>
+
+      {/* Make a new post to my blog. A button that opens a new pageto create a new post. It has to post to the blog table. */}
     </div>
   );
 }
