@@ -1,16 +1,24 @@
-_# Luis-ruiz.com remake
+_# Luis-ruiz.com
 
-A Next.js-based AI chatbot application with vector search capabilities, built with modern web technologies and multiple AI provider integrations.
+The personal portfolio website of **Gio (Luis Giovanni Ruiz)** - a Bronx-born, bilingual full-stack AI engineer and founder of RuizTechServices LLC (est. 2024). This Next.js-powered site showcases Gio's expertise in AI engineering, his flagship product 24Hour-AI, and his proficiency across multiple programming languages and frameworks.
 
-## Features
+## About Gio
 
-- **Provider clients prepared**: OpenAI, Anthropic, Mistral, Google (Gemini), xAI, and HuggingFace clients in `lib/clients/*`.
-- **Vector search helpers**: Pinecone upsert/query in `lib/functions/pinecone/*` (index `chatbot-main-3`, namespace `first-user-1`).
-- **OpenAI utilities**: Embeddings (`text-embedding-3-small`) and Responses (`gpt-4o`) in `lib/functions/openai/*`.
-- **UI**: Landing page (`app/page.tsx`) and `/basic` route with `EmbedInput` placeholder; responsive navbar components.
-- **Text processing**: `chunkText()` helper for splitting long text.
-- **Supabase SSR helpers**: Browser/server clients and optional middleware are present, not yet wired into routes.
-- **Tests**: Scripts in `tests/` for clients, embeddings, chunking, and Pinecone operations.
+Gio specializes in scalable AI infrastructure and enterprise-grade solutions that deliver measurable business value. His flagship product **24Hour-AI** is a high-performance LLM platform achieving:
+- Sub-200ms latency
+- 99.9% uptime
+- 30% cost optimization
+- Support for 100+ concurrent users
+
+## Portfolio Features
+
+- **Personal Portfolio**: Professional landing page showcasing skills and experience
+- **Blog System**: Personal blog with markdown support and interactive features
+- **Project Showcase**: Display of technical projects and achievements
+- **Dashboard**: Administrative interface for content management
+- **AI Integration**: Multiple AI provider support showcasing technical expertise
+- **Contact System**: Professional contact forms and availability status
+- **Skills Display**: Interactive showcase of programming languages and frameworks
 
 ## Tech Stack
 
@@ -66,6 +74,9 @@ A Next.js-based AI chatbot application with vector search capabilities, built wi
 
 ## Available Routes
 
-- `/` - Landing page
-- `/basic` - Basic chatbot interface ($1 Chatbot)
+- `/` - Personal portfolio landing page
+- `/blog` - Personal blog and articles
+- `/projects` - Project showcase and portfolio
+- `/contact` - Professional contact information
+- `/gio_dash` - Administrative dashboard
 _
