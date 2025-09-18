@@ -1,4 +1,4 @@
-# AI Chatbot Application
+# Luis-ruiz.com remake
 
 A Next.js-based AI chatbot application with vector search capabilities, built with modern web technologies and multiple AI provider integrations.
 
