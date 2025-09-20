@@ -2,7 +2,12 @@
 import { parseNDJSON } from "../ollama/ndjson";
 import type { OllamaChatRequest, OllamaStreamEvent } from "../ollama/types";
 
-function getBaseUrl() {
+/**
+ * Returns the base URL for Ollama API requests.
+ * 
+ * Defaults to `http://localhost:11434` if `OLLAMA_BASE_URL` environment variable is not set.
+ */
+export function getBaseUrl() {
   return process.env.OLLAMA_BASE_URL?.replace(/\/+$/, "") || "http://localhost:11434";
 }
 

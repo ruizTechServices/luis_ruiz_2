@@ -1,3 +1,5 @@
+Ok, so, now its not rotating around the globe the way I wanted:
+```
 //C:\Users\giost\CascadeProjects\websites\luis-ruiz\luis_ruiz_2\components\app\landing_page\about.tsx
 'use client';
 import Image from "next/image";
@@ -250,3 +252,184 @@ export default function About() {
     </section>
   );
 }
+```
+
+
+Gio — the labels aren’t “orbiting” because in your ThreeJS version you’re almost certainly rotating **only the sphere mesh** (or the camera), while the labels (CSS2DObjects) sit in **world space**. They’ll stay put unless they’re in the **same rotating group**.
+
+Fix = put **sphere + labels** in one parent `globe` group and rotate **that group**. Also ensure you call `labelRenderer.render(scene, camera)` every frame and that you didn’t accidentally add `labelsGroup` to `scene` instead of to `globe`.
+
+Here’s a compact **Globe3D.tsx** you can drop in that does exactly that:
+
+```tsx
+// components/app/landing_page/Globe3D.tsx
+'use client';
+import { useEffect, useRef } from 'react';
+import * as THREE from 'three';
+import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+
+type Label = { name: string; lat: number; lon: number };
+export default function Globe3D({ labels }: { labels: Label[] }) {
+  const mountRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const mount = mountRef.current!;
+    mount.style.position = 'relative'; // required for CSS2D overlay
+
+    // sizes
+    const W = mount.clientWidth || 320;
+    const H = mount.clientHeight || 320;
+    const R = Math.max(60, Math.min(W, H) * 0.42);
+
+    // scene/camera
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(40, W / H, 0.1, 2000);
+    camera.position.set(0, 0, R * 2.8);
+    camera.lookAt(0, 0, 0);
+
+    // renderers
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(W, H);
+    mount.appendChild(renderer.domElement);
+
+    const labelRenderer = new CSS2DRenderer();
+    labelRenderer.setSize(W, H);
+    labelRenderer.domElement.style.position = 'absolute';
+    labelRenderer.domElement.style.left = '0';
+    labelRenderer.domElement.style.top = '0';
+    labelRenderer.domElement.style.pointerEvents = 'none';
+    mount.appendChild(labelRenderer.domElement);
+
+    // lighting
+    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+    const dir = new THREE.DirectionalLight(0xffffff, 0.9);
+    dir.position.set(1, 1, 2);
+    scene.add(dir);
+
+    // ---- GLOBE GROUP (rotate this!) ----
+    const globe = new THREE.Group();
+    scene.add(globe);
+
+    // sphere (visual globe)
+    const sphere = new THREE.Mesh(
+      new THREE.SphereGeometry(R, 48, 32),
+      new THREE.MeshPhongMaterial({
+        color: 0x4e75b3,
+        shininess: 28,
+        specular: 0xaaaaaa,
+        transparent: true,
+        opacity: 0.96,
+      })
+    );
+    globe.add(sphere);
+
+    // atmosphere (soft glow)
+    const glow = new THREE.Mesh(
+      new THREE.SphereGeometry(R * 1.03, 48, 32),
+      new THREE.MeshBasicMaterial({ color: 0x6aa0ff, transparent: true, opacity: 0.18 })
+    );
+    glow.renderOrder = 1;
+    globe.add(glow);
+
+    // helper: lat/lon → vec3
+    const latLonToVec3 = (latDeg: number, lonDeg: number, radius: number) => {
+      const lat = THREE.MathUtils.degToRad(latDeg);
+      const lon = THREE.MathUtils.degToRad(lonDeg);
+      const x = radius * Math.cos(lat) * Math.cos(lon);
+      const y = radius * Math.sin(lat);
+      const z = radius * Math.cos(lat) * Math.sin(lon);
+      return new THREE.Vector3(x, y, z);
+    };
+
+    // labels group (child of globe!)
+    const labelsGroup = new THREE.Group();
+    globe.add(labelsGroup);
+
+    // create DOM labels as CSS2DObjects positioned on sphere
+    labels.forEach(({ name, lat, lon }) => {
+      const pos = latLonToVec3(lat, lon, R);
+      const el = document.createElement('div');
+      el.className =
+        'px-3 py-1 rounded-full text-sm font-semibold text-gray-800 bg-white/90 border border-white/60 shadow';
+      el.textContent = name;
+
+      const label = new CSS2DObject(el);
+      label.position.copy(pos);
+      labelsGroup.add(label);
+    });
+
+    // initial tilt
+    globe.rotation.x = THREE.MathUtils.degToRad(18);
+
+    // animate: rotate the WHOLE globe group
+    let t = 0, raf = 0;
+    const camDir = new THREE.Vector3();
+    const tmp = new THREE.Vector3();
+
+    const tick = () => {
+      t += 1;
+      globe.rotation.y += 0.004 + 0.002 * Math.sin(t * 0.006); // spin
+      globe.rotation.x = THREE.MathUtils.degToRad(18) + THREE.MathUtils.degToRad(3) * Math.sin(t * 0.01); // precess
+
+      // frontness fade for clean occlusion
+      camDir.subVectors(camera.position, globe.position).normalize();
+      labelsGroup.children.forEach((obj) => {
+        const l = obj as CSS2DObject;
+        tmp.copy(l.position).normalize();
+        const front = tmp.dot(camDir);           // >0 front hemisphere
+        const tFront = Math.max(0, Math.min(1, (front - 0.1) / 0.9));
+        const eased = tFront * tFront;
+        (l.element as HTMLDivElement).style.opacity = String(eased);
+      });
+
+      renderer.render(scene, camera);
+      labelRenderer.render(scene, camera);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+
+    // resize
+    const onResize = () => {
+      const w = mount.clientWidth, h = mount.clientHeight;
+      camera.aspect = w / h; camera.updateProjectionMatrix();
+      renderer.setSize(w, h); labelRenderer.setSize(w, h);
+    };
+    window.addEventListener('resize', onResize);
+
+    // cleanup
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', onResize);
+      mount.removeChild(renderer.domElement);
+      mount.removeChild(labelRenderer.domElement);
+      renderer.dispose();
+      sphere.geometry.dispose();
+      (sphere.material as THREE.Material).dispose();
+      glow.geometry.dispose();
+      (glow.material as THREE.Material).dispose();
+    };
+  }, [labels]);
+
+  return <div ref={mountRef} className="relative w-72 h-72 sm:w-80 sm:h-80" />;
+}
+```
+
+### Wire it in `about.tsx`
+
+You’re already importing `<Globe3D labels={labels} />`. Make sure the parent container has a fixed height (you do: `h-96`) and that the **mount div** (`Globe3D` root) actually receives that size (the class above handles it).
+
+### Common gotchas (likely why yours didn’t move)
+
+* You added `labelsGroup` to `scene` instead of `globe` → labels won’t rotate.
+* You rotated `sphere` only (e.g., `sphere.rotation.y += …`) → labels still static. Rotate the **`globe` group**.
+* You forgot `labelRenderer.render(scene, camera)` each frame → labels won’t update.
+* Parent container has `overflow: hidden` and your label overlay isn’t absolutely positioned → labels look clipped/weird.
+
+### Optional polish
+
+* Add `OrbitControls` for drag-spin.
+* Swap DOM labels for `troika-three-text` if you want GPU text and perfect depth occlusion.
+* To make labels “hug” more, you can slightly **scale them down near the limb** or bend characters into an arc (DOM approach).
+
+**TL;DR:** Put the sphere **and** the label objects in the **same `globe` group** and rotate **that group**. Render both WebGL and CSS2D each frame. The snippet above is a working drop-in that makes the labels truly orbit around the globe’s face.
