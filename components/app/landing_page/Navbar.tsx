@@ -17,6 +17,7 @@ export const items: NavItem[] = [
   { label: 'Blog', href: '/blog' },
   { label: 'Projects', href: '/projects' },
   { label: 'Contact', href: '/contact' },
+  { label: 'Chat', href: '/ollama' },
 ]
 
 export default function NavBar({ items }: NavBarProps) {

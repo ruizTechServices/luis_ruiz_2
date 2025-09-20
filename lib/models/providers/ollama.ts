@@ -6,19 +6,23 @@ export type OllamaProviderOpts = {
   model: string;
   messages: OllamaMessage[];
   temperature?: number;
+  top_p?: number;
   signal?: AbortSignal;
 };
 
 /** Thin provider: converts Ollama events → plain text chunks */
 export async function* ollamaStream(opts: OllamaProviderOpts) {
-  const { model, messages, temperature, signal } = opts;
+  const { model, messages, temperature, top_p, signal } = opts;
 
   for await (const evt of chatStream({
     signal,
     body: {
       model,
       messages,
-      options: { temperature: temperature ?? 0.6 },
+      options: {
+        ...(temperature !== undefined ? { temperature } : {}),
+        ...(top_p !== undefined ? { top_p } : {}),
+      },
     },
   })) {
     const piece = evt?.message?.content ?? "";

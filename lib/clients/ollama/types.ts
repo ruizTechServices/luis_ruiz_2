@@ -12,6 +12,7 @@ export type OllamaChatRequest = {
   stream?: boolean;
   options?: {
     temperature?: number;
+    top_p?: number;
   };
 };
 

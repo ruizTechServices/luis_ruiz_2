@@ -5,10 +5,11 @@ import { ollamaStream } from "@/lib/models/providers/ollama";
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
-  const { model, messages, temperature } = (await req.json()) as {
+  const { model, messages, temperature, top_p } = (await req.json()) as {
     model: string;
     messages: OllamaMessage[];
     temperature?: number;
+    top_p?: number;
   };
 
   const encoder = new TextEncoder();
@@ -16,7 +17,7 @@ export async function POST(req: NextRequest) {
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       try {
-        for await (const chunk of ollamaStream({ model, messages, temperature })) {
+        for await (const chunk of ollamaStream({ model, messages, temperature, top_p })) {
           controller.enqueue(encoder.encode(chunk));
         }
       } catch (e: unknown) {

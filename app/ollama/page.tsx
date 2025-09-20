@@ -1,6 +1,12 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select'
+import { Label } from '@/components/ui/label'
+import { Slider } from '@/components/ui/slider'
+import EmbedInput from '@/components/app/chatbot_basic/EmbedInput'
 
 // Minimal chat UI for local Ollama via Next.js API routes
 export default function OllamaChatPage() {
@@ -12,6 +18,8 @@ export default function OllamaChatPage() {
   const [error, setError] = useState<string | null>(null)
   const controllerRef = useRef<AbortController | null>(null)
   const assistantBufferRef = useRef('')
+  const [temperature, setTemperature] = useState<number>(0.6)
+  const [topP, setTopP] = useState<number>(0.9)
 
   useEffect(() => {
     let active = true
@@ -22,8 +30,16 @@ export default function OllamaChatPage() {
         const list = Array.isArray(json.models) ? json.models : []
         if (!active) return
         setModels(list)
-        // Prefer a small local model if present, else first
-        const preferred = list.find(m => /llama3\.2:1b|phi3:mini|gemma3:1b/i.test(m)) || list[0] || ''
+        let preferred = list.find(m => /llama3\.2:1b|phi3:mini|gemma3:1b/i.test(m)) || list[0] || ''
+        try {
+          const raw = localStorage.getItem('ollama_settings')
+          if (raw) {
+            const s = JSON.parse(raw)
+            if (s && typeof s.model === 'string' && list.includes(s.model)) preferred = s.model
+            if (typeof s.temperature === 'number') setTemperature(s.temperature)
+            if (typeof s.topP === 'number') setTopP(s.topP)
+          }
+        } catch {}
         setModel(preferred)
       } catch (e) {
         if (!active) return
@@ -36,19 +52,44 @@ export default function OllamaChatPage() {
     }
   }, [])
 
-  async function handleSend() {
+  // Persist settings (model, temperature, topP)
+  useEffect(() => {
+    try {
+      localStorage.setItem('ollama_settings', JSON.stringify({ model, temperature, topP }))
+    } catch {}
+  }, [model, temperature, topP])
+
+  // Load messages for the current model on change
+  useEffect(() => {
+    if (!model) return
+    try {
+      const raw = localStorage.getItem(`ollama_chat_${model}`)
+      setMessages(raw ? (JSON.parse(raw) as Array<{ role: 'user' | 'assistant'; content: string }>) : [])
+    } catch {
+      setMessages([])
+    }
+  }, [model])
+
+  // Persist messages per model
+  useEffect(() => {
+    if (!model) return
+    try {
+      localStorage.setItem(`ollama_chat_${model}`, JSON.stringify(messages))
+    } catch {}
+  }, [messages, model])
+
+  async function sendPrompt(prompt: string) {
     setError(null)
-    const prompt = input.trim()
-    if (!prompt) return
+    const p = prompt.trim()
+    if (!p) return
     if (!model) {
       setError('No model selected.')
       return
     }
 
     // Append the user message
-    const nextMessages = [...messages, { role: 'user' as const, content: prompt }]
+    const nextMessages = [...messages, { role: 'user' as const, content: p }]
     setMessages(nextMessages)
-    setInput('')
 
     // Prepare to stream assistant reply
     setStreaming(true)
@@ -61,7 +102,8 @@ export default function OllamaChatPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model,
-          temperature: 0.6,
+          temperature,
+          top_p: topP,
           messages: nextMessages.map(m => ({ role: m.role, content: m.content })),
         }),
         signal: controllerRef.current.signal,
@@ -104,31 +146,67 @@ export default function OllamaChatPage() {
     }
   }
 
+  async function handleSend() {
+    const prompt = input.trim()
+    if (!prompt) return
+    setInput('')
+    sendPrompt(prompt)
+  }
+
   function handleStop() {
     controllerRef.current?.abort()
+  }
+
+  function handleClear() {
+    if (streaming) controllerRef.current?.abort()
+    setMessages([])
+    try { if (model) localStorage.removeItem(`ollama_chat_${model}`) } catch {}
   }
 
   return (
     <div className="mx-auto max-w-3xl p-4 space-y-4">
       <h1 className="text-2xl font-semibold">Local Ollama Chat</h1>
 
-      <div className="flex items-center gap-2">
-        <label className="text-sm text-gray-500">Model</label>
-        <select
-          className="border rounded px-2 py-1 text-sm"
-          value={model}
-          onChange={e => setModel(e.target.value)}
-        >
-          {models.length === 0 && <option value="">No local models found</option>}
-          {models.map(m => (
-            <option key={m} value={m}>{m}</option>
-          ))}
-        </select>
-        {streaming ? (
-          <button onClick={handleStop} className="ml-auto px-3 py-1 text-sm rounded bg-red-600 text-white hover:bg-red-700">
-            Stop
-          </button>
-        ) : null}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-2">
+          <Label className="text-sm text-muted-foreground">Model</Label>
+          <Select value={model} onValueChange={setModel}>
+            <SelectTrigger size="sm" className="min-w-[14rem]">
+              <SelectValue placeholder="Select a model" />
+            </SelectTrigger>
+            <SelectContent>
+              {models.length === 0 ? (
+                <div className="px-2 py-1.5 text-xs text-muted-foreground">No local models found</div>
+              ) : (
+                models.map(m => (
+                  <SelectItem key={m} value={m}>{m}</SelectItem>
+                ))
+              )}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Label htmlFor="temp" className="text-sm text-muted-foreground">Temperature</Label>
+            <div className="w-40">
+              <Slider id="temp" value={[temperature]} onValueChange={(v) => setTemperature(v[0] ?? 0.6)} min={0} max={1} step={0.01} />
+            </div>
+            <span className="text-xs text-muted-foreground w-10 text-right">{temperature.toFixed(2)}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="topp" className="text-sm text-muted-foreground">top_p</Label>
+            <div className="w-40">
+              <Slider id="topp" value={[topP]} onValueChange={(v) => setTopP(v[0] ?? 0.9)} min={0} max={1} step={0.01} />
+            </div>
+            <span className="text-xs text-muted-foreground w-10 text-right">{topP.toFixed(2)}</span>
+          </div>
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          {streaming && (
+            <Button variant="destructive" size="sm" onClick={handleStop}>Stop</Button>
+          )}
+          <Button variant="secondary" size="sm" onClick={handleClear}>Clear chat</Button>
+        </div>
       </div>
 
       <div className="border rounded p-3 h-80 overflow-y-auto bg-white/40">
@@ -152,27 +230,12 @@ export default function OllamaChatPage() {
         <div className="text-sm text-red-600">{error}</div>
       )}
 
+      {/* Combined input: computes embeddings (logs to console) AND triggers chat */}
       <div className="flex gap-2">
-        <textarea
-          className="flex-1 border rounded p-2 min-h-12"
-          placeholder="Type your message..."
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault()
-              if (!streaming) handleSend()
-            }
-          }}
-        />
-        <button
-          className="px-4 py-2 rounded bg-black text-white disabled:opacity-50"
-          onClick={handleSend}
-          disabled={streaming || !input.trim()}
-        >
-          Send
-        </button>
+        <EmbedInput onSubmitText={(text) => { sendPrompt(text) }} />
       </div>
+
+      
     </div>
   )
 }
