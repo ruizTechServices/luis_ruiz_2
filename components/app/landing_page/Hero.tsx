@@ -174,13 +174,15 @@ export default function Hero() {
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-4 mt-12">
-              <button className="group relative px-8 py-4 overflow-hidden rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold shadow-2xl transition-all hover:scale-105 hover:shadow-violet-500/25">
-                <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
-                <span className="relative flex items-center gap-2">
-                  <SparklesIcon className="h-5 w-5" />
-                  Let&#39;s Connect
-                </span>
-              </button>
+              <Link href="/contact">
+                <button className="group relative px-8 py-4 overflow-hidden rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold shadow-2xl transition-all hover:scale-105 hover:shadow-violet-500/25">
+                  <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
+                  <span className="relative flex items-center gap-2">
+                    <SparklesIcon className="h-5 w-5" />
+                    Let&#39;s Connect
+                  </span>
+                </button>
+              </Link> 
               
               <Link href="/projects">
                 <button className="group px-8 py-4 rounded-lg bg-white/5 backdrop-blur-md border border-white/20 text-white font-semibold transition-all hover:bg-white/10 hover:scale-105 hover:border-white/40">
