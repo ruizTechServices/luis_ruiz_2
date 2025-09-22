@@ -2,17 +2,19 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
+import { Switch } from '@/components/ui/switch'
+import { Input as NumberInput } from '@/components/ui/input'
 import EmbedInput from '@/components/app/chatbot_basic/EmbedInput'
+import NavBar, { items } from '@/components/app/landing_page/Navbar'
+import { Toaster, toast } from 'sonner'
 
 // Minimal chat UI for local Ollama via Next.js API routes
 export default function OllamaChatPage() {
   const [models, setModels] = useState<string[]>([])
   const [model, setModel] = useState<string>('')
-  const [input, setInput] = useState<string>('')
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([])
   const [streaming, setStreaming] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -20,6 +22,11 @@ export default function OllamaChatPage() {
   const assistantBufferRef = useRef('')
   const [temperature, setTemperature] = useState<number>(0.6)
   const [topP, setTopP] = useState<number>(0.9)
+  const [chatId, setChatId] = useState<number | null>(null)
+  const [useContext, setUseContext] = useState<boolean>(false)
+  const [topK, setTopK] = useState<number>(5)
+  const [minSim, setMinSim] = useState<number>(0.75)
+  const [dbPersist, setDbPersist] = useState<string | null>(null)
 
   useEffect(() => {
     let active = true
@@ -70,6 +77,32 @@ export default function OllamaChatPage() {
     }
   }, [model])
 
+  // Load chatId for the current model on change
+  useEffect(() => {
+    if (!model) return
+    try {
+      const raw = localStorage.getItem(`ollama_chatId_${model}`)
+      const parsed = raw ? Number(raw) : null
+      setChatId(Number.isFinite(parsed as number) ? parsed : null)
+    } catch {
+      setChatId(null)
+    }
+  }, [model])
+
+  // Load context settings for the current model
+  useEffect(() => {
+    if (!model) return
+    try {
+      const raw = localStorage.getItem(`ollama_ctx_${model}`)
+      if (raw) {
+        const s = JSON.parse(raw)
+        if (typeof s.useContext === 'boolean') setUseContext(s.useContext)
+        if (typeof s.topK === 'number') setTopK(s.topK)
+        if (typeof s.minSim === 'number') setMinSim(s.minSim)
+      }
+    } catch {}
+  }, [model])
+
   // Persist messages per model
   useEffect(() => {
     if (!model) return
@@ -77,6 +110,14 @@ export default function OllamaChatPage() {
       localStorage.setItem(`ollama_chat_${model}`, JSON.stringify(messages))
     } catch {}
   }, [messages, model])
+
+  // Persist context settings per model
+  useEffect(() => {
+    if (!model) return
+    try {
+      localStorage.setItem(`ollama_ctx_${model}`, JSON.stringify({ useContext, topK, minSim }))
+    } catch {}
+  }, [useContext, topK, minSim, model])
 
   async function sendPrompt(prompt: string) {
     setError(null)
@@ -104,6 +145,10 @@ export default function OllamaChatPage() {
           model,
           temperature,
           top_p: topP,
+          chat_id: chatId,
+          with_context: useContext,
+          top_k: topK,
+          min_similarity: minSim,
           messages: nextMessages.map(m => ({ role: m.role, content: m.content })),
         }),
         signal: controllerRef.current.signal,
@@ -111,6 +156,27 @@ export default function OllamaChatPage() {
 
       if (!res.ok || !res.body) {
         throw new Error(`Request failed (${res.status})`)
+      }
+
+      // Capture/remember chat session id from server
+      const hdr = res.headers.get('x-chat-id')
+      if (hdr) {
+        const id = Number(hdr)
+        if (!Number.isNaN(id)) {
+          setChatId(id)
+          try { localStorage.setItem(`ollama_chatId_${model}`, String(id)) } catch {}
+        }
+      }
+
+      // Read debug headers and toast when DB persistence is on
+      const persistHdr = res.headers.get('x-db-persist')
+      if (persistHdr) setDbPersist(persistHdr)
+      if (persistHdr === 'on') {
+        if (hdr) {
+          toast.success(`Saved to Supabase • Session ${hdr}`)
+        } else {
+          toast.success('Saved to Supabase')
+        }
       }
 
       const reader = res.body.getReader()
@@ -146,13 +212,6 @@ export default function OllamaChatPage() {
     }
   }
 
-  async function handleSend() {
-    const prompt = input.trim()
-    if (!prompt) return
-    setInput('')
-    sendPrompt(prompt)
-  }
-
   function handleStop() {
     controllerRef.current?.abort()
   }
@@ -161,9 +220,14 @@ export default function OllamaChatPage() {
     if (streaming) controllerRef.current?.abort()
     setMessages([])
     try { if (model) localStorage.removeItem(`ollama_chat_${model}`) } catch {}
+    try { if (model) localStorage.removeItem(`ollama_chatId_${model}`) } catch {}
+    setChatId(null)
   }
 
   return (
+    <>
+    <Toaster richColors position="top-right" />
+    <NavBar items={items} /> 
     <div className="mx-auto max-w-3xl p-4 space-y-4">
       <h1 className="text-2xl font-semibold">Local Ollama Chat</h1>
 
@@ -201,6 +265,38 @@ export default function OllamaChatPage() {
             <span className="text-xs text-muted-foreground w-10 text-right">{topP.toFixed(2)}</span>
           </div>
         </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Label className="text-sm text-muted-foreground">Use context</Label>
+            <Switch checked={useContext} onCheckedChange={setUseContext} />
+          </div>
+          {useContext && (
+            <>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="minsim" className="text-sm text-muted-foreground">Min sim</Label>
+                <div className="w-40">
+                  <Slider id="minsim" value={[minSim]} onValueChange={(v) => setMinSim(v[0] ?? 0.75)} min={0.5} max={0.95} step={0.01} />
+                </div>
+                <span className="text-xs text-muted-foreground w-12 text-right">{minSim.toFixed(2)}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="topk" className="text-sm text-muted-foreground">Top K</Label>
+                <NumberInput
+                  id="topk"
+                  type="number"
+                  value={topK}
+                  min={1}
+                  max={20}
+                  onChange={(e) => {
+                    const n = Number(e.target.value)
+                    setTopK(Number.isFinite(n) ? Math.max(1, Math.min(20, n)) : 5)
+                  }}
+                  className="w-20 h-8 text-sm"
+                />
+              </div>
+            </>
+          )}
+        </div>
         <div className="ml-auto flex items-center gap-2">
           {streaming && (
             <Button variant="destructive" size="sm" onClick={handleStop}>Stop</Button>
@@ -230,12 +326,16 @@ export default function OllamaChatPage() {
         <div className="text-sm text-red-600">{error}</div>
       )}
 
-      {/* Combined input: computes embeddings (logs to console) AND triggers chat */}
+      {dbPersist && (
+        <div className="text-xs text-muted-foreground">DB persist: {dbPersist} • Chat ID: {chatId ?? '—'}</div>
+      )}
+
+      {/* Primary input: triggers server-side save + embeddings + stream */}
       <div className="flex gap-2">
-        <EmbedInput onSubmitText={(text) => { sendPrompt(text) }} />
+        <EmbedInput onSubmitText={(text) => { sendPrompt(text) }} disabled={streaming} loading={streaming} />
       </div>
 
-      
     </div>
+    </>
   )
 }

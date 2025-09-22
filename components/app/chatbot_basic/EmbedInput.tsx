@@ -3,39 +3,23 @@
 import { useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 
 interface EmbedInputProps {
   onSubmitText?: (text: string) => void;
+  disabled?: boolean;
+  loading?: boolean; // show spinner when server is processing/streaming
 }
 
-export default function EmbedInput({ onSubmitText }: EmbedInputProps) {
+export default function EmbedInput({ onSubmitText, disabled, loading }: EmbedInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const isDisabled = !!disabled || !!loading;
 
-  const handleEmbedding = async (text: string) => {
-    try {
-      const res = await fetch('/api/embeddings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text }),
-      });
-      if (!res.ok) {
-        throw new Error(`Embeddings API error: ${res.status}`);
-      }
-      const data = await res.json();
-      console.log('Embedding vector length:', data?.embedding?.length);
-      console.log('Embedding:', data?.embedding);
-    } catch (err) {
-      console.error('Embedding error:', err);
-    }
-  };
-
-  const submitEmbedding = () => {
+  const submit = () => {
+    if (isDisabled) return;
     if (inputRef.current) {
       const value = inputRef.current.value.trim();
       if (value) {
-        // Call server to compute embedding and log to console
-        handleEmbedding(value);
-        // Bubble up the text so ChatContext (stateless) can display it via the container
         onSubmitText?.(value);
         inputRef.current.value = '';
       }
@@ -43,17 +27,21 @@ export default function EmbedInput({ onSubmitText }: EmbedInputProps) {
   };
 
   return (
-    <div className="flex flex-row items-center w-1/2">
+    <div className="flex flex-row items-center w-full">
       <Input
         ref={inputRef}
         placeholder="Input Query..."
+        disabled={isDisabled}
         onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            submitEmbedding();
+          if (e.key === 'Enter' && !isDisabled) {
+            submit();
           }
         }}
       />
-      <Button onClick={submitEmbedding}>Submit</Button>
+      <Button onClick={submit} disabled={isDisabled}>Submit</Button>
+      {loading && (
+        <Loader2 className="ml-2 h-4 w-4 animate-spin text-muted-foreground" aria-label="Submitting..." />
+      )}
     </div>
   );
 }
