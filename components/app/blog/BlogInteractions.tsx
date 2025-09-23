@@ -25,7 +25,11 @@ export function VoteControls({
       if (current === vote) {
         // no change
       } else if (current === null) {
-        vote === "up" ? setUp((v) => v + 1) : setDown((v) => v + 1);
+        if (vote === "up") {
+          setUp((v) => v + 1);
+        } else {
+          setDown((v) => v + 1);
+        }
         setCurrent(vote);
       } else {
         // switch vote

@@ -12,7 +12,7 @@ export default function ContactPage() {
         <div className="bg-white rounded-2xl shadow-xl p-8 sm:p-12">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Get In Touch</h1>
-            <p className="text-gray-600">We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+            <p className="text-gray-600">We&apos;d love to hear from you. Send us a message and we&apos;ll respond as soon as possible.</p>
           </div>
           
           <form 
@@ -36,15 +36,17 @@ export default function ContactPage() {
               console.log('Contact Form Submission:', data);
               
               // Show success message
-              const submitBtn = e.currentTarget.querySelector('button[type="submit"]');
-              const originalText = submitBtn.textContent;
-              submitBtn.textContent = 'Message Sent!';
-              submitBtn.className = submitBtn.className.replace('bg-indigo-600 hover:bg-indigo-700', 'bg-green-600');
-              setTimeout(() => {
-                submitBtn.textContent = originalText;
-                submitBtn.className = submitBtn.className.replace('bg-green-600', 'bg-indigo-600 hover:bg-indigo-700');
-                e.currentTarget.reset();
-              }, 2000);
+              const submitBtn = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+              if (submitBtn) {
+                const originalText = submitBtn.textContent ?? 'Send Message';
+                submitBtn.textContent = 'Message Sent!';
+                submitBtn.className = submitBtn.className.replace('bg-indigo-600 hover:bg-indigo-700', 'bg-green-600');
+                setTimeout(() => {
+                  submitBtn.textContent = originalText;
+                  submitBtn.className = submitBtn.className.replace('bg-green-600', 'bg-indigo-600 hover:bg-indigo-700');
+                  e.currentTarget.reset();
+                }, 2000);
+              }
             }}
           >
             {/* Name Fields */}

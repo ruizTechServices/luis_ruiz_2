@@ -22,7 +22,7 @@ export default function QuickActionsCard() {
         setAvailable(!!data.availability);
         setAvailabilityText(data.availability_text ?? "Available for hire");
         setLoaded(true);
-      } catch (e) {
+      } catch {
         setLoaded(true);
       }
     })();

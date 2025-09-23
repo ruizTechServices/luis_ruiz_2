@@ -36,7 +36,16 @@ export async function getRelevantContext(
     return [];
   }
 
-  return (data ?? []).map((r: any) => ({
+  type Row = {
+    id: number;
+    content: string;
+    role: string;
+    session_id: number | null;
+    message_id: number | null;
+    similarity: number;
+  };
+  const rows = (data ?? []) as Row[];
+  return rows.map((r) => ({
     id: r.id,
     content: r.content,
     role: r.role,

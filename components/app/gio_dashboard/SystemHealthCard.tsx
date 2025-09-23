@@ -59,9 +59,9 @@ function classifySupabaseIssueFromText(text: string): string {
 
 function classifySupabaseIssue(err: unknown): string {
   if (err && typeof err === "object") {
-    const anyErr = err as any;
-    const combo = [anyErr?.message, anyErr?.details, anyErr?.hint, anyErr?.code]
-      .filter(Boolean)
+    const maybe = err as { message?: unknown; details?: unknown; hint?: unknown; code?: unknown } | null | undefined;
+    const combo = [maybe?.message, maybe?.details, maybe?.hint, maybe?.code]
+      .filter((v): v is string => typeof v === "string")
       .join(" ");
     if (combo) return classifySupabaseIssueFromText(combo);
   }
@@ -124,7 +124,7 @@ async function getTier0(): Promise<Tier0Result> {
             getAll() {
               return cookieStore.getAll();
             },
-            setAll(cookiesToSet: { name: string; value: string; options: any }[]) {
+            setAll(cookiesToSet: { name: string; value: string; options: Record<string, unknown> | undefined }[]) {
               try {
                 cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
               } catch {
@@ -193,45 +193,66 @@ async function getTier0(): Promise<Tier0Result> {
       const { Pinecone } = await import("@pinecone-database/pinecone");
       const pc = new Pinecone({ apiKey: pineApi });
       const index = pc.index(pineIdx);
-      const stats: any = await index.describeIndexStats();
+      const stats = (await index.describeIndexStats()) as unknown;
       pineconeStatus = "operational";
-      if (typeof stats?.totalRecordCount === "number") pineconeVectors = stats.totalRecordCount;
-      else if (stats?.namespaces && typeof stats.namespaces === "object") {
-        pineconeVectors = Object.values(stats.namespaces).reduce((acc: number, ns: any) => acc + (ns?.vectorCount || ns?.recordCount || 0), 0);
+      const totalRecordCount = (stats as { totalRecordCount?: unknown })?.totalRecordCount;
+      if (typeof totalRecordCount === "number") {
+        pineconeVectors = totalRecordCount;
+      } else {
+        const namespaces = (stats as { namespaces?: unknown })?.namespaces;
+        if (namespaces && typeof namespaces === "object" && !Array.isArray(namespaces)) {
+          pineconeVectors = Object.values(namespaces as Record<string, unknown>).reduce((acc: number, ns: unknown) => {
+            if (ns && typeof ns === "object") {
+              const vec = (ns as { vectorCount?: unknown }).vectorCount;
+              const rec = (ns as { recordCount?: unknown }).recordCount;
+              const add = typeof vec === "number" ? vec : typeof rec === "number" ? rec : 0;
+              return acc + add;
+            }
+            return acc;
+          }, 0);
+        }
       }
       // namespaces count
-      if (stats?.namespaces && typeof stats.namespaces === "object") {
-        pineNamespacesCount = Object.keys(stats.namespaces).length;
+      {
+        const namespaces = (stats as { namespaces?: unknown })?.namespaces;
+        if (namespaces && typeof namespaces === "object" && !Array.isArray(namespaces)) {
+          pineNamespacesCount = Object.keys(namespaces as Record<string, unknown>).length;
+        }
       }
       // Describe index for readiness/spec details (best-effort)
       try {
-        const desc: any = await (pc as any).describeIndex?.(pineIdx);
-        if (desc) {
+        const describeIndex = (pc as unknown as { describeIndex?: (indexName: string) => Promise<unknown> }).describeIndex;
+        const desc = typeof describeIndex === "function" ? ((await describeIndex(pineIdx)) as unknown) : undefined;
+        if (desc && typeof desc === "object") {
           // Dimension
-          pineconeDimension = (desc.dimension ?? desc?.spec?.dimension ?? null) as number | null;
+          const dim = (desc as { dimension?: unknown })?.dimension ?? (desc as { spec?: { dimension?: unknown } })?.spec?.dimension ?? null;
+          pineconeDimension = typeof dim === "number" ? dim : null;
           // Status / readiness
-          const statusAny = desc.status as any;
-          const readyFromStatus = typeof statusAny?.ready === "boolean" ? statusAny.ready : undefined;
-          const readyFromIndexState =
-            typeof desc.indexState?.ready === "boolean"
-              ? (desc.indexState.ready as boolean)
-              : typeof desc?.index_state?.ready === "boolean"
-              ? (desc.index_state.ready as boolean)
-              : undefined;
-          const statusRawStr = (() => {
-            const s = (statusAny && typeof statusAny === "object" && typeof statusAny.state === "string") ? statusAny.state : (desc.status ?? desc?.indexState?.status ?? desc?.index_state?.status ?? "");
-            return ("" + s).toLowerCase();
-          })();
-          pineconeReady =
-            typeof readyFromStatus === "boolean"
-              ? readyFromStatus
-              : typeof readyFromIndexState === "boolean"
-              ? readyFromIndexState
-              : statusRawStr.includes("ready");
+          const status = (desc as { status?: unknown })?.status;
+          const statusReady = status && typeof status === "object" && typeof (status as { ready?: unknown }).ready === "boolean" ? (status as { ready: boolean }).ready : undefined;
+          const indexState = (desc as { indexState?: unknown })?.indexState ?? (desc as { index_state?: unknown })?.index_state;
+          const indexStateReady = indexState && typeof indexState === "object" && typeof (indexState as { ready?: unknown }).ready === "boolean" ? (indexState as { ready: boolean }).ready : undefined;
+          const stateStrCandidate =
+            (status && typeof status === "object" && typeof (status as { state?: unknown }).state === "string" ? (status as { state: string }).state : undefined) ??
+            ((status as unknown) as string | undefined) ??
+            (indexState && typeof indexState === "object" && typeof (indexState as { status?: unknown }).status === "string" ? (indexState as { status: string }).status : undefined) ??
+            "";
+          const statusRawStr = String(stateStrCandidate).toLowerCase();
+          pineconeReady = typeof statusReady === "boolean" ? statusReady : typeof indexStateReady === "boolean" ? indexStateReady : statusRawStr.includes("ready");
           // Pods/replicas/podType
-          pinePods = (desc?.spec?.pods ?? desc?.pods ?? null) as number | null;
-          pineReplicas = (desc?.spec?.replicas ?? desc?.replicas ?? null) as number | null;
-          pinePodType = (desc?.spec?.podType ?? desc?.spec?.pod_type ?? null) as string | null;
+          const spec = (desc as { spec?: unknown })?.spec;
+          const pods = (spec && typeof spec === "object" && typeof (spec as { pods?: unknown }).pods === "number")
+            ? (spec as { pods: number }).pods
+            : (typeof (desc as { pods?: unknown })?.pods === "number" ? (desc as { pods: number }).pods : null);
+          pinePods = pods ?? null;
+          const replicas = (spec && typeof spec === "object" && typeof (spec as { replicas?: unknown }).replicas === "number")
+            ? (spec as { replicas: number }).replicas
+            : (typeof (desc as { replicas?: unknown })?.replicas === "number" ? (desc as { replicas: number }).replicas : null);
+          pineReplicas = replicas ?? null;
+          const podType = (spec && typeof spec === "object" && typeof (spec as { podType?: unknown }).podType === "string")
+            ? (spec as { podType: string }).podType
+            : (spec && typeof spec === "object" && typeof (spec as { pod_type?: unknown }).pod_type === "string" ? (spec as { pod_type: string }).pod_type : null);
+          pinePodType = podType ?? null;
         }
       } catch {
         // ignore describeIndex errors; keep basic stats
@@ -255,8 +276,10 @@ async function getTier0(): Promise<Tier0Result> {
   try {
     const res = await fetch(`${base}/api/tags`, { cache: "no-store" });
     if (res.ok) {
-      const data: any = await res.json();
-      const list = Array.isArray(data?.models) ? data.models : Array.isArray(data?.data) ? data.data : [];
+      const data = (await res.json()) as unknown;
+      const modelsField = (data as { models?: unknown })?.models;
+      const dataField = (data as { data?: unknown })?.data;
+      const list = Array.isArray(modelsField) ? modelsField : Array.isArray(dataField) ? dataField : [];
       ollamaModels = list.length ?? 0;
       ollamaStatus = "operational";
     } else {

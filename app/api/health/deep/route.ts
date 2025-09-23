@@ -32,7 +32,6 @@ export async function GET() {
       const { default: Anthropic } = await import("@anthropic-ai/sdk");
       const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
       const list = await client.models.list();
-      // @ts-ignore SDK types may vary
       const count = Array.isArray(list?.data) ? list.data.length : 0;
       providers["Anthropic"] = { status: "operational", count };
     } else {
@@ -47,7 +46,6 @@ export async function GET() {
     if (process.env.MISTRAL_API_KEY) {
       const { Mistral } = await import("@mistralai/mistralai");
       const client = new Mistral({ apiKey: process.env.MISTRAL_API_KEY });
-      // @ts-ignore list models varies
       const list = await client.models.list();
       const count = Array.isArray(list?.data) ? list.data.length : 0;
       providers["Mistral"] = { status: "operational", count };
@@ -125,3 +123,4 @@ export async function GET() {
 
   return NextResponse.json({ providers, timestamp: Date.now() satisfies number } satisfies DeepResult);
 }
+

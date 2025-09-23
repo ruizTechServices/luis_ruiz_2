@@ -48,7 +48,7 @@ export default function OllamaChatPage() {
           }
         } catch {}
         setModel(preferred)
-      } catch (e) {
+      } catch {
         if (!active) return
         setModels([])
         setModel('')
@@ -202,7 +202,13 @@ export default function OllamaChatPage() {
         }
       }
     } catch (e: unknown) {
-      if ((e as any)?.name !== 'AbortError') {
+      const isAbort = (
+        typeof e === 'object' &&
+        e !== null &&
+        'name' in e &&
+        (e as { name?: unknown }).name === 'AbortError'
+      );
+      if (!isAbort) {
         const msg = e instanceof Error ? e.message : 'Stream failed'
         setError(msg)
       }

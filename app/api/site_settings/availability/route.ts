@@ -53,7 +53,7 @@ export async function POST(req: Request) {
 
     if (rows && rows.length > 0) {
       const id = rows[0].id as number;
-      const update: Record<string, any> = {};
+      const update: Partial<{ availability: boolean; availability_text: string }> = {};
       if (typeof nextAvailability === "boolean") update.availability = nextAvailability;
       if (typeof nextText === "string") update.availability_text = nextText;
 

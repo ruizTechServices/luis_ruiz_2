@@ -55,7 +55,7 @@ export default function About() {
       labels[i].lat = lat;
       labels[i].lon = lon;
     }
-  }, []);
+  }, [DISABLE_DOM_GLOBE, labels]);
 
   useEffect(() => {
     if (DISABLE_DOM_GLOBE) return;
@@ -67,9 +67,9 @@ export default function About() {
       const lat = (latDeg * Math.PI) / 180;
       const lon = (lonDeg * Math.PI) / 180 + spin;
       // Sphere to Cartesian
-      let x = R * Math.cos(lat) * Math.cos(lon);
-      let y = R * Math.sin(lat);
-      let z = R * Math.cos(lat) * Math.sin(lon);
+      const x = R * Math.cos(lat) * Math.cos(lon);
+      const y = R * Math.sin(lat);
+      const z = R * Math.cos(lat) * Math.sin(lon);
       // Apply global tilt around X axis
       const yT = y * Math.cos(tiltNow) - z * Math.sin(tiltNow);
       const zT = y * Math.sin(tiltNow) + z * Math.cos(tiltNow);
@@ -171,7 +171,7 @@ export default function About() {
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [labels]);
+  }, [DISABLE_DOM_GLOBE, labels, latAngles, lonAngles]);
 
   // Measure sphere radius responsively — disabled for Three.js version
   useEffect(() => {
@@ -183,7 +183,7 @@ export default function About() {
     measure();
     window.addEventListener('resize', measure);
     return () => window.removeEventListener('resize', measure);
-  }, []);
+  }, [DISABLE_DOM_GLOBE]);
 
   // Measure label widths to improve edge fading — disabled for Three.js version
   useEffect(() => {
@@ -201,7 +201,7 @@ export default function About() {
       clearTimeout(id);
       window.removeEventListener('resize', measure);
     };
-  }, []);
+  }, [DISABLE_DOM_GLOBE]);
   return (
     <section className="py-16 bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -222,14 +222,14 @@ export default function About() {
             </div>
             
             <p className="text-lg text-gray-700 leading-relaxed">
-              I'm a Bronx-born, bilingual full-stack AI engineer and founder of RuizTechServices LLC (est. 2024). 
+              I&apos;m a Bronx-born, bilingual full-stack AI engineer and founder of RuizTechServices LLC (est. 2024). 
               My flagship product 24Hour-AI is a high-performance LLM platform achieving sub-200ms latency, 
               99.9% uptime, and 30% cost optimization while supporting 100+ concurrent users. I specialize in 
               scalable AI infrastructure and enterprise-grade solutions that deliver measurable business value.
             </p>
             
             <blockquote className="text-xl font-semibold text-blue-600 border-l-4 border-blue-500 pl-4">
-              "Learn → Build → Ship → Iterate."
+              &quot;Learn → Build → Ship → Iterate.&quot;
             </blockquote>
           </div>
           

@@ -25,7 +25,7 @@ async function createPost(formData: FormData) {
     throw new Error("Title and body are required");
   }
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from("blog_posts")
     .insert({ title, summary, tags, references, body })
     .select("id")

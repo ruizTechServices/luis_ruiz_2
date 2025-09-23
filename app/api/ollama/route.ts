@@ -105,7 +105,8 @@ export async function POST(req: NextRequest) {
       );
       if (ctxErr) throw ctxErr;
       if (Array.isArray(ctxRows) && ctxRows.length > 0) {
-        const ctxText = ctxRows.map((r: any, i: number) => `(${i + 1}) ${r.content}`).join("\n---\n");
+        const rows = ctxRows as Array<{ content: string }>;
+        const ctxText = rows.map((r, i) => `(${i + 1}) ${r.content}`).join("\n---\n");
         const systemCtx: OllamaMessage = {
           role: "system",
           content: `Relevant context (most similar first):\n${ctxText}\n\nIf context is irrelevant, ignore it. Answer concisely.`,
