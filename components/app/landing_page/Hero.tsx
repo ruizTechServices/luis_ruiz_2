@@ -119,16 +119,20 @@ export default function Hero() {
         <div className="lg:grid lg:grid-cols-2 lg:gap-x-12 lg:items-center">
           {/* Left Content */}
           <div className={`transition-all duration-1000 ${isVisible ? 'translate-x-0 opacity-100' : '-translate-x-20 opacity-0'}`}>
-            {/* Status Badge */}
-            <div className={`inline-flex items-center gap-x-2 rounded-full px-4 py-2 backdrop-blur-md mb-8 group hover:scale-105 transition-transform cursor-pointer border 
-              ${isAvailable ? 'bg-gradient-to-r from-green-400/10 to-emerald-400/10 border-green-400/20' : 'bg-gradient-to-r from-rose-400/10 to-red-400/10 border-red-400/20'}`}>
-              <span className="relative flex h-2 w-2">
-                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isAvailable ? 'bg-green-400' : 'bg-red-400'}`}></span>
-                <span className={`relative inline-flex rounded-full h-2 w-2 ${isAvailable ? 'bg-green-500' : 'bg-red-500'}`}></span>
-              </span>
-              <span className={`text-sm font-medium ${isAvailable ? 'text-green-400' : 'text-red-400'}`}>{availabilityText}</span>{/* dynamic via Supabase site_settings */}
-              <ChevronRightIcon className={`h-4 w-4 group-hover:translate-x-1 transition-transform ${isAvailable ? 'text-green-400' : 'text-red-400'}`} />
-            </div>
+            {/* Status Badge (links to Contact when available; hidden when text says "not available") */}
+            {isAvailable && !availabilityText.toLowerCase().includes('not available') ? (
+              <Link href="/contact" className="inline-block">
+                <div className={`inline-flex items-center gap-x-2 rounded-full px-4 py-2 backdrop-blur-md mb-8 group hover:scale-105 transition-transform cursor-pointer border 
+                  ${isAvailable ? 'bg-gradient-to-r from-green-400/10 to-emerald-400/10 border-green-400/20' : 'bg-gradient-to-r from-rose-400/10 to-red-400/10 border-red-400/20'}`}>
+                  <span className="relative flex h-2 w-2">
+                    <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isAvailable ? 'bg-green-400' : 'bg-red-400'}`}></span>
+                    <span className={`relative inline-flex rounded-full h-2 w-2 ${isAvailable ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                  </span>
+                  <span className={`text-sm font-medium ${isAvailable ? 'text-green-400' : 'text-red-400'}`}>{availabilityText}</span>{/* dynamic via Supabase site_settings */}
+                  <ChevronRightIcon className={`h-4 w-4 group-hover:translate-x-1 transition-transform ${isAvailable ? 'text-green-400' : 'text-red-400'}`} />
+                </div>
+              </Link>
+            ) : null}
 
             {/* Main Heading */}
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6">

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { Switch } from "@/components/ui/switch";
+import Link from "next/link";
 
 export default function QuickActionsCard() {
   const [isPending, startTransition] = useTransition();
@@ -54,8 +55,8 @@ export default function QuickActionsCard() {
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Quick Actions</h3>
       <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">Create posts, moderate content, send notifications</p>
       <div className="flex gap-2 mb-4">
-        <button className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full text-xs">New Post</button>
-        <button className="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 rounded-full text-xs">Moderate</button>
+        {/* I want to make a new posts to my blog. A button that opens a new page to create a new post. It has to post to the blog_posts table. */}
+        <Link href="/gio_dash/blog/new" className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full text-xs hover:bg-blue-200 dark:hover:bg-blue-800" aria-label="Create a new blog post">New Post</Link>
       </div>
 
       {/* Availability toggle */}
@@ -94,7 +95,7 @@ export default function QuickActionsCard() {
         {message && <div className="mt-2 text-xs text-gray-500">{message}</div>}
       </div>
 
-      {/* Make a new post to my blog. A button that opens a new pageto create a new post. It has to post to the blog table. */}
+      
     </div>
   );
 }
