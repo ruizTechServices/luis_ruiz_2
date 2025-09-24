@@ -22,6 +22,8 @@ export default function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [availability, setAvailability] = useState<boolean | null>(null);
   const [availabilityText, setAvailabilityText] = useState<string>('Available for hire');
+  // Dynamically loaded slideshow images from Supabase (fallback to static defaults)
+  const [slides, setSlides] = useState<string[]>(SLIDESHOW_IMAGES);
 
   useEffect(() => {
     setIsVisible(true);
@@ -42,14 +44,8 @@ export default function Hero() {
     }));
     setParticles(generated);
 
-    // Rotate slideshow every 5s on client
-    const intervalId = window.setInterval(() => {
-      setCurrentSlide((idx) => (idx + 1) % SLIDESHOW_IMAGES.length);
-    }, 5000);
-
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      window.clearInterval(intervalId);
     };
   }, []);
 
@@ -71,6 +67,39 @@ export default function Hero() {
     fetchSettings();
     return () => { active = false };
   }, []);
+
+  // Fetch hero slideshow images from server API (Supabase-backed)
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const res = await fetch('/api/photos?prefix=hero&limit=10', { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        const urls: string[] = Array.isArray(data?.images)
+          ? (data.images as Array<{ url?: string }>)
+              .map((img) => img?.url ?? '')
+              .filter((u): u is string => !!u)
+          : [];
+        if (active && urls.length > 0) {
+          setSlides(urls);
+          setCurrentSlide(0);
+        }
+      } catch {
+        // ignore, fallback to static
+      }
+    })();
+    return () => { active = false };
+  }, []);
+
+  // Rotate slideshow every 5s based on current slides length
+  useEffect(() => {
+    if (!slides.length) return;
+    const intervalId = window.setInterval(() => {
+      setCurrentSlide((idx) => (idx + 1) % slides.length);
+    }, 5000);
+    return () => window.clearInterval(intervalId);
+  }, [slides]);
 
   const isAvailable = availability ?? true;
 
@@ -234,7 +263,7 @@ export default function Hero() {
                 {/* Profile image placeholder (slideshow) */}
                 <div className="relative aspect-square rounded-2xl bg-transparent overflow-hidden group">
                   <div className="absolute inset-0">
-                    {SLIDESHOW_IMAGES.map((src, idx) => (
+                    {slides.map((src, idx) => (
                       <NextImage
                         key={src}
                         src={src}

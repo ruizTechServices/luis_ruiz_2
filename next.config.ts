@@ -17,6 +17,16 @@ const nextConfig: NextConfig = {
   },
   // Enable external packages configuration for better Replit compatibility
   serverExternalPackages: [],
+  // Allow images from Supabase Storage (project: huyhgdsjpdjzokjwaspb)
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'huyhgdsjpdjzokjwaspb.supabase.co',
+        pathname: '/storage/v1/object/**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;
