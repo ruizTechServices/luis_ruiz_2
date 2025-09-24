@@ -10,6 +10,11 @@ export default function QuickActionsCard() {
   const [available, setAvailable] = useState<boolean>(true);
   const [availabilityText, setAvailabilityText] = useState("Available for hire");
   const [message, setMessage] = useState<string | null>(null);
+  // Project upload form state
+  const [projectUrl, setProjectUrl] = useState("");
+  const [projectTitle, setProjectTitle] = useState("");
+  const [projectDescription, setProjectDescription] = useState("");
+  const [projectMsg, setProjectMsg] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -46,6 +51,35 @@ export default function QuickActionsCard() {
         setMessage("Saved");
       } catch (e) {
         setMessage(e instanceof Error ? e.message : String(e));
+      }
+    });
+  };
+
+  const submitProject = () => {
+    setProjectMsg(null);
+    const url = projectUrl.trim();
+    const title = projectTitle.trim();
+    const description = projectDescription.trim();
+    if (!url) {
+      setProjectMsg("Please provide a URL.");
+      return;
+    }
+    startTransition(async () => {
+      try {
+        const res = await fetch("/api/projects", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url, title: title || undefined, description: description || undefined }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.error ?? `Upload failed (${res.status})`);
+        setProjectMsg("Project saved");
+        // Clear inputs on success
+        setProjectUrl("");
+        setProjectTitle("");
+        setProjectDescription("");
+      } catch (e) {
+        setProjectMsg(e instanceof Error ? e.message : String(e));
       }
     });
   };
@@ -96,11 +130,51 @@ export default function QuickActionsCard() {
           >
             {isPending ? 'Saving…' : 'Save'}
           </button>
+          {message && <div className="mt-2 text-xs text-gray-500">{message}</div>}
         </div>
-        {message && <div className="mt-2 text-xs text-gray-500">{message}</div>}
       </div>
 
-      
+      {/* Upload project button: this button takes a url, a title, and a description and submits this data to the `projects` table   */}
+      <div className="mt-4 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="text-sm font-medium text-gray-800 dark:text-gray-200 mb-2">Add Project</div>
+        <div className="flex flex-col gap-2">
+          <input
+            type="url"
+            placeholder="https://example.com"
+            className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-transparent text-sm"
+            value={projectUrl}
+            onChange={(e) => setProjectUrl(e.target.value)}
+            disabled={isPending}
+          />
+          <input
+            type="text"
+            placeholder="Title (optional)"
+            className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-transparent text-sm"
+            value={projectTitle}
+            onChange={(e) => setProjectTitle(e.target.value)}
+            disabled={isPending}
+          />
+          <textarea
+            placeholder="Description (optional)"
+            className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-transparent text-sm min-h-20"
+            value={projectDescription}
+            onChange={(e) => setProjectDescription(e.target.value)}
+            disabled={isPending}
+          />
+          <div className="flex items-center gap-2">
+            <button
+              onClick={submitProject}
+              disabled={isPending || !projectUrl}
+              className="px-3 py-2 rounded-md border text-xs hover:bg-gray-50 disabled:opacity-50"
+            >
+              {isPending ? "Saving…" : "Upload Project"}
+            </button>
+            {projectMsg && (
+              <span className="text-xs text-gray-500">{projectMsg}</span>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
