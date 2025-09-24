@@ -3,13 +3,112 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import NavBar, { items } from "@/components/app/landing_page/Navbar";
+import { TrashIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
+
+type Img = { name: string; path: string; url: string };
 
 export default function PhotosListPage() {
   const [prefix, setPrefix] = useState("hero");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [images, setImages] = useState<Array<{ name: string; path: string; url: string }>>([]);
+  const [images, setImages] = useState<Img[]>([]);
   const [seeding, setSeeding] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<Img | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const downloadImage = async (img: { name: string; url: string }) => {
+    try {
+      const res = await fetch(img.url);
+      if (!res.ok) throw new Error(`Download failed (${res.status})`);
+      const blob = await res.blob();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = img.name || 'image';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      // Revoke after a tick to allow the download to start
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    }
+  };
+
+  const requestDelete = (img: Img) => {
+    setPendingDelete(img);
+    setConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
+    setDeleting(true);
+    const img = pendingDelete;
+    // Fetch blob BEFORE delete so we can restore if Undo is clicked
+    let blob: Blob | null = null;
+    try {
+      const res = await fetch(img.url);
+      if (res.ok) blob = await res.blob();
+    } catch {
+      // ignore, we may fail to undo if we can't fetch the blob
+    }
+
+    // Optimistic update
+    const prev = images;
+    setImages((curr) => curr.filter((i) => i.path !== img.path));
+    try {
+      const res = await fetch(`/api/photos?path=${encodeURIComponent(img.path)}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || `Delete failed (${res.status})`);
+
+      // Show toast with Undo
+      toast.success(`${img.name} deleted`, {
+        action: blob
+          ? {
+              label: "Undo",
+              onClick: async () => {
+                try {
+                  const file = new File([blob!], img.name, { type: blob!.type || "application/octet-stream" });
+                  const form = new FormData();
+                  form.set("path", img.path);
+                  form.set("file", file);
+                  const r = await fetch('/api/photos/restore', { method: 'POST', body: form });
+                  const rd = await r.json();
+                  if (!r.ok) throw new Error(rd?.error || `Restore failed (${r.status})`);
+                  // Reinsert. We can reuse the same URL (likely still valid), or refetch list.
+                  await load(prefix);
+                } catch (e) {
+                  setError(e instanceof Error ? e.message : String(e));
+                  toast.error('Undo failed');
+                }
+              },
+            }
+          : undefined,
+        duration: 6000,
+      });
+    } catch (e) {
+      // Revert on failure
+      setImages(prev);
+      setError(e instanceof Error ? e.message : String(e));
+      toast.error('Delete failed');
+    } finally {
+      setDeleting(false);
+      setConfirmOpen(false);
+      setPendingDelete(null);
+    }
+  };
 
   const load = async (p = prefix) => {
     setLoading(true);
@@ -75,13 +174,54 @@ export default function PhotosListPage() {
       {error && <div className="mb-3 text-sm text-red-500">{error}</div>}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
         {images.map((img) => (
-          <div key={img.path} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200">
+          <div
+            key={img.path}
+            className="group relative aspect-square rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-white/5 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+          >
             <Image src={img.url} alt={img.name} fill className="object-cover" sizes="(max-width: 768px) 50vw, 33vw" />
-            <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[10px] px-1 py-0.5 truncate">{img.name}</div>
+            {/* Overlay gradient */}
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            {/* Filename */}
+            <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] px-1 py-0.5 truncate">{img.name}</div>
+            {/* Actions */}
+            <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button
+                onClick={() => downloadImage({ name: img.name, url: img.url })}
+                title="Download"
+                className="p-1.5 rounded-md bg-white/80 hover:bg-white text-gray-800 shadow border"
+                aria-label={`Download ${img.name}`}
+              >
+                <ArrowDownTrayIcon className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => requestDelete(img)}
+                title="Delete"
+                className="p-1.5 rounded-md bg-white/80 hover:bg-white text-red-600 shadow border"
+                aria-label={`Delete ${img.name}`}
+              >
+                <TrashIcon className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         ))}
       </div>
     </div>
+    {/* Delete Confirmation */}
+    <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete photo?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This will permanently remove {pendingDelete?.name ?? 'this photo'} from storage. You can Undo right after deletion.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={confirmDelete} disabled={deleting}>Delete</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    <Toaster richColors />
     </>
   );
 }

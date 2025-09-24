@@ -65,3 +65,32 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
+
+// DELETE /api/photos?path=hero/filename.png
+export async function DELETE(request: Request) {
+  try {
+    const url = new URL(request.url);
+    let path = url.searchParams.get('path') || '';
+    if (!path) {
+      try {
+        const body = await request.json();
+        if (body && typeof body.path === 'string') path = body.path;
+      } catch {
+        // ignore
+      }
+    }
+    path = String(path).replace(/^\/+|\/+$/g, '');
+    if (!path) return NextResponse.json({ error: 'Missing path' }, { status: 400 });
+
+    const cookieStore = await cookies();
+    const supabase = createClient(cookieStore);
+
+    const { error } = await supabase.storage.from(PHOTOS_BUCKET).remove([path]);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+    return NextResponse.json({ ok: true, path }, { status: 200 });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
+}

@@ -1,4 +1,4 @@
-_# Luis-ruiz.com
+# Luis-ruiz.com
 
 The personal portfolio website of **Gio (Luis Giovanni Ruiz)** - a Bronx-born, bilingual full-stack AI engineer and founder of RuizTechServices LLC (est. 2024). This Next.js-powered site showcases Gio's expertise in AI engineering, his flagship product 24Hour-AI, and his proficiency across multiple programming languages and frameworks.
 
@@ -24,7 +24,7 @@ Gio specializes in scalable AI infrastructure and enterprise-grade solutions tha
 
 - **Frontend**: Next.js 15 (App Router), React 19, TypeScript.
 - **Styling**: Tailwind CSS v4, shadcn/ui (Radix UI), `lucide-react`.
-- **AI SDKs**: `openai`, `@anthropic-ai/sdk`, `@mistralai/mistralai`, `@google/generative-ai`, `@huggingface/inference`, xAI (OpenAI-compatible).
+- **AI SDKs**: `openai`, `@anthropic-ai/sdk`, `@mistralai/mistralai`, `@google/generative-ai`, `@huggingface/inference`, xAI (OpenAI-compatible), & [new]`ollama`.
 - **Vector Database**: Pinecone JS v6; default index `chatbot-main-3`, namespace `first-user-1`.
 - **Supabase**: `@supabase/ssr` helpers (browser/server/middleware) present.
 - **Forms**: `react-hook-form` and `zod` are installed; not used in UI yet.
