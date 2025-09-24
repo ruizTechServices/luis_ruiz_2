@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import NavBar, { items } from "@/components/app/landing_page/Navbar";
 
 export default function UploadPhotosPage() {
   const [prefix, setPrefix] = useState("hero");
@@ -39,6 +40,8 @@ export default function UploadPhotosPage() {
   };
 
   return (
+    <>
+    <NavBar items={items} />
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Upload Photos</h1>
       <form onSubmit={onSubmit} className="space-y-4 max-w-xl">
@@ -79,5 +82,6 @@ export default function UploadPhotosPage() {
         )}
       </form>
     </div>
+    </>
   );
 }

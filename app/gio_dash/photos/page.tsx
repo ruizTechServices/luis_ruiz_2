@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import NavBar, { items } from "@/components/app/landing_page/Navbar";
 
 export default function PhotosListPage() {
   const [prefix, setPrefix] = useState("hero");
@@ -31,6 +32,8 @@ export default function PhotosListPage() {
   }, []);
 
   return (
+    <>
+    <NavBar items={items} />
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Photos</h1>
       <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -79,5 +82,6 @@ export default function PhotosListPage() {
         ))}
       </div>
     </div>
+    </>
   );
 }
