@@ -1,3 +1,4 @@
+//C:\Users\giost\CascadeProjects\websites\luis-ruiz\luis_ruiz_2\lib\clients\supabase\server.ts
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 

@@ -1,4 +1,4 @@
-
+//C:\Users\giost\CascadeProjects\websites\luis-ruiz\luis_ruiz_2\lib\clients\supabase\middleware.ts
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
