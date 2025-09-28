@@ -23,7 +23,7 @@ export function VoteControls({
     startTransition(async () => {
       // optimistic update
       if (current === vote) {
-        // no change
+        return; // no change
       } else if (current === null) {
         if (vote === "up") {
           setUp((v) => v + 1);

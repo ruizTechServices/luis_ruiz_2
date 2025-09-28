@@ -5,12 +5,17 @@ import Link from "next/link";
 import NavBar from "@/components/app/landing_page/NavbarClient";
 import { items } from "@/components/app/landing_page/navbarItems";
 
+type UploadResult = {
+  uploaded: Array<{ name: string; path: string; url: string | null }>;
+  errors: Array<{ name: string; message: string }>;
+};
+
 export default function UploadPhotosPage() {
   const [prefix, setPrefix] = useState("hero");
   const [files, setFiles] = useState<FileList | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<UploadResult | null>(null);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +60,7 @@ export default function UploadPhotosPage() {
             className="px-3 py-2 border rounded-md bg-transparent"
             placeholder="e.g., hero"
           />
-          <p className="text-xs text-gray-500">Images uploaded under this prefix will show in the Hero slideshow if prefix is 'hero'.</p>
+          <p className="text-xs text-gray-500">Images uploaded under this prefix will show in the Hero slideshow if prefix is &apos;hero&apos;.</p>
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium">Files</label>
@@ -78,7 +83,7 @@ export default function UploadPhotosPage() {
           <Link href="/gio_dash/photos" className="text-sm underline">View Photos</Link>
         </div>
         {message && <div className="text-sm">{message}</div>}
-        {result && (
+        {result !== null && (
           <pre className="text-xs bg-black/5 dark:bg-white/5 p-2 rounded-md overflow-auto max-h-64">{JSON.stringify(result, null, 2)}</pre>
         )}
       </form>

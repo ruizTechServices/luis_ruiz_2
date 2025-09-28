@@ -29,14 +29,16 @@ export default function NavBarClient({ items }: NavBarProps) {
       if (!mounted) return;
       const user = data?.user ?? null;
       setEmail(user?.email ?? null);
-      setAvatarUrl((user?.user_metadata as any)?.avatar_url as string | undefined);
+      const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
+      setAvatarUrl(typeof meta.avatar_url === 'string' ? (meta.avatar_url as string) : undefined);
     })();
 
     const { data: sub } = supabase.auth.onAuthStateChange(async () => {
       const { data } = await supabase.auth.getUser();
       const user = data?.user ?? null;
       setEmail(user?.email ?? null);
-      setAvatarUrl((user?.user_metadata as any)?.avatar_url as string | undefined);
+      const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
+      setAvatarUrl(typeof meta.avatar_url === 'string' ? (meta.avatar_url as string) : undefined);
     });
 
     return () => {

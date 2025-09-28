@@ -15,8 +15,12 @@ if (!supabaseUrl || !supabaseKey) {
   );
 }
 
+// Minimal cookie options compatible with Next.js setter
 export const createClient = () => {
-  const cookieStore: any = cookies() as any;
+  const cookieStore = cookies() as unknown as {
+    getAll: () => Array<{ name: string; value: string }>;
+    set: (name: string, value: string, options?: Record<string, unknown>) => void;
+  };
   return createServerClient(
     supabaseUrl!,
     supabaseKey!,
@@ -25,13 +29,11 @@ export const createClient = () => {
         getAll() {
           return cookieStore.getAll();
         },
-        setAll(cookiesToSet: { name: string; value: string; options: any }[]) {
+        setAll(cookiesToSet) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
+            cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
           } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
+            // Called in Server Component where setting cookies may be disallowed; ignore.
           }
         },
       },

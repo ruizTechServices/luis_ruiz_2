@@ -17,7 +17,8 @@ export default async function NavBar({ items }: NavBarProps) {
   const supabase = createServerSupabase();
   const { data } = await supabase.auth.getUser();
   const user = data?.user ?? null;
-  const avatarUrl = (user?.user_metadata as any)?.avatar_url as string | undefined;
+  const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
+  const avatarUrl = typeof meta.avatar_url === 'string' ? (meta.avatar_url as string) : undefined;
   const email = user?.email ?? null;
   return (
     <header className="sticky top-0 z-20 bg-white shadow-sm">
