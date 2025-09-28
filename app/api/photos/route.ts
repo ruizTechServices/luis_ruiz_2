@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { createClient } from '@/lib/clients/supabase/server';
 
 const PHOTOS_BUCKET = process.env.SUPABASE_PHOTOS_BUCKET || 'photos';
 
 export const dynamic = 'force-dynamic';
+
+// Supabase Storage list() item shape (subset we use)
+type StorageListedItem = {
+  name: string;
+  created_at?: string;
+  metadata?: Record<string, unknown> | null;
+};
 
 // GET /api/photos?prefix=hero
 export async function GET(request: Request) {
@@ -14,8 +20,7 @@ export async function GET(request: Request) {
     const limit = Math.min(Number(searchParams.get('limit') || '50'), 100);
     const expiresIn = Math.min(Number(process.env.SUPABASE_SIGNED_URL_EXPIRES || '3600'), 60 * 60 * 24);
 
-    const cookieStore = await cookies();
-    const supabase = createClient(cookieStore);
+    const supabase = createClient();
 
     // List objects in the bucket under the given prefix
     const { data: files, error: listError } = await supabase.storage.from(PHOTOS_BUCKET).list(prefix, {
@@ -45,16 +50,16 @@ export async function GET(request: Request) {
               name: f.name,
               path,
               url: pub.publicUrl,
-              created_at: (f as any).created_at ?? null,
-              metadata: f.metadata ?? null,
+              created_at: (f as StorageListedItem).created_at ?? null,
+              metadata: (f as StorageListedItem).metadata ?? null,
             };
           }
           return {
             name: f.name,
             path,
             url: signed.signedUrl,
-            created_at: (f as any).created_at ?? null,
-            metadata: f.metadata ?? null,
+            created_at: (f as StorageListedItem).created_at ?? null,
+            metadata: (f as StorageListedItem).metadata ?? null,
           };
         })
     );
@@ -82,8 +87,7 @@ export async function DELETE(request: Request) {
     path = String(path).replace(/^\/+|\/+$/g, '');
     if (!path) return NextResponse.json({ error: 'Missing path' }, { status: 400 });
 
-    const cookieStore = await cookies();
-    const supabase = createClient(cookieStore);
+    const supabase = createClient();
 
     const { error } = await supabase.storage.from(PHOTOS_BUCKET).remove([path]);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });

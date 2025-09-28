@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { createClient as createServerClient } from "@/lib/clients/supabase/server";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
 
@@ -72,8 +71,7 @@ export function BlogPostCard({ blogPost }: BlogCardProps) {
 
 // Slideshow component: fetches posts and renders one-at-a-time carousel
 export async function BlogCard() {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(cookieStore);
+  const supabase = createServerClient();
 
   const { data: posts, error } = await supabase
     .from("blog_posts")

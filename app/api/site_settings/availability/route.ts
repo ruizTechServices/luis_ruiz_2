@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { createClient as createServerClient } from "@/lib/clients/supabase/server";
 
 // GET: return current availability and availability_text
 export async function GET() {
   try {
-    const supabase = createServerClient(await cookies());
+    const supabase = createServerClient();
 
     const { data, error } = await supabase
       .from("site_settings")
@@ -31,7 +30,7 @@ export async function GET() {
 // POST: update availability and/or availability_text
 export async function POST(req: Request) {
   try {
-    const supabase = createServerClient(await cookies());
+    const supabase = createServerClient();
     const body = (await req.json()) as { availability?: boolean; availability_text?: string };
 
     const nextAvailability = typeof body.availability === "boolean" ? body.availability : undefined;

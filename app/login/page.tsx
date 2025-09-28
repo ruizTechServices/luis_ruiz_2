@@ -24,8 +24,8 @@ export default function LoginPage() {
       });
       if (error) setError(error.message);
       // Supabase will redirect; no further action needed
-    } catch (e: any) {
-      setError(e?.message ?? "Unexpected error");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : String(e));
       setLoading(false);
     }
   }, [supabase]);

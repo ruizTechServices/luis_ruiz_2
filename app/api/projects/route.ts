@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { z } from "zod";
 import { createClient as createServerClient } from "@/lib/clients/supabase/server";
 
@@ -18,8 +17,7 @@ export async function POST(req: Request) {
     }
     const { url, title, description } = parsed.data;
 
-    const cookieStore = await cookies();
-    const supabase = createServerClient(cookieStore);
+    const supabase = createServerClient();
 
     const { data, error } = await supabase
       .from("projects")

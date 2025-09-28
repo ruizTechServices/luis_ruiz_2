@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { createClient } from '@/lib/clients/supabase/server';
 import { promises as fs } from 'fs';
 import path from 'path';
@@ -22,8 +21,7 @@ export async function POST() {
       return NextResponse.json({ message: 'No files found in public/edited' }, { status: 200 });
     }
 
-    const cookieStore = await cookies();
-    const supabase = createClient(cookieStore);
+    const supabase = createClient();
 
     const uploaded: Array<{ name: string; path: string; url: string | null }> = [];
     const errors: Array<{ name: string; message: string }> = [];

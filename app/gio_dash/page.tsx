@@ -1,6 +1,6 @@
 import 'server-only';
-import NavBar, { items } from "@/components/app/landing_page/Navbar";
-import { cookies } from "next/headers";
+import NavBar from "@/components/app/landing_page/Navbar";
+import { items } from "@/components/app/landing_page/navbarItems";
 import { createClient as createServerClient } from "@/lib/clients/supabase/server";
 import SystemHealthCard from "@/components/app/gio_dashboard/SystemHealthCard";
 import ContentAnalyticsCard from "@/components/app/gio_dashboard/ContentAnalyticsCard";
@@ -13,8 +13,7 @@ import { getCounts } from "@/lib/functions/dashboard/getCounts";
 import { BlogCard } from "@/components/app/blog/blog_card"; // slideshow component
 
 export default async function GioDashboard() {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(cookieStore);
+  const supabase = createServerClient();
 
   const { posts: postsCount, comments: commentsCount, votes: votesCount, errors } =
     await getCounts(supabase);

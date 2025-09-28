@@ -1,6 +1,5 @@
 import "server-only";
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient as createServerClient } from "@/lib/clients/supabase/server";
@@ -12,8 +11,7 @@ import { Card } from "@/components/ui/card";
 
 async function createPost(formData: FormData) {
   "use server";
-  const cookieStore = await cookies();
-  const supabase = createServerClient(cookieStore);
+  const supabase = createServerClient();
 
   const title = (formData.get("title") || "").toString().trim();
   const summary = (formData.get("summary") || "").toString().trim();

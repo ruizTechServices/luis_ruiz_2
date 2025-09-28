@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import NavBar, { items } from "@/components/app/landing_page/Navbar";
+import NavBar from "@/components/app/landing_page/NavbarClient";
+import { items } from "@/components/app/landing_page/navbarItems";
 import { TrashIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import {
   AlertDialog,

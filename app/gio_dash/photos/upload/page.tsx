@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import NavBar, { items } from "@/components/app/landing_page/Navbar";
+import NavBar from "@/components/app/landing_page/NavbarClient";
+import { items } from "@/components/app/landing_page/navbarItems";
 
 export default function UploadPhotosPage() {
   const [prefix, setPrefix] = useState("hero");

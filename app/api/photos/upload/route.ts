@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { createClient } from '@/lib/clients/supabase/server';
 
 const PHOTOS_BUCKET = process.env.SUPABASE_PHOTOS_BUCKET || 'photos';
@@ -20,8 +19,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No files provided (field name: files)' }, { status: 400 });
     }
 
-    const cookieStore = await cookies();
-    const supabase = createClient(cookieStore);
+    const supabase = createClient();
 
     const uploaded: Array<{ name: string; path: string; url: string | null }> = [];
     const errors: Array<{ name: string; message: string }> = [];
@@ -31,7 +29,7 @@ export async function POST(request: Request) {
         const ab = await file.arrayBuffer();
         const bytes = new Uint8Array(ab);
 
-        const original = (file as any).name || 'upload';
+        const original = (file.name || 'upload');
         const ext = (original.includes('.') ? original.split('.').pop() : '') || 'bin';
         const safeExt = String(ext).slice(0, 10).replace(/[^a-zA-Z0-9]/g, '') || 'bin';
         const baseName = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
@@ -56,7 +54,7 @@ export async function POST(request: Request) {
 
         uploaded.push({ name: filename, path, url });
       } catch (e) {
-        errors.push({ name: (file as any).name || 'unknown', message: e instanceof Error ? e.message : String(e) });
+        errors.push({ name: file.name || 'unknown', message: e instanceof Error ? e.message : String(e) });
       }
     }
 

@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { createClient } from '@/lib/clients/supabase/server';
 
 const PHOTOS_BUCKET = process.env.SUPABASE_PHOTOS_BUCKET || 'photos';
@@ -24,8 +23,7 @@ export async function POST(request: Request) {
     const bytes = new Uint8Array(ab);
     const contentType = file.type || 'application/octet-stream';
 
-    const cookieStore = await cookies();
-    const supabase = createClient(cookieStore);
+    const supabase = createClient();
 
     const { error } = await supabase.storage
       .from(PHOTOS_BUCKET)

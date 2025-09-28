@@ -1,9 +1,9 @@
 import 'server-only'
 import Link from 'next/link'
-import { cookies } from 'next/headers'
-import { createClient as createServerClient } from '@/lib/clients/supabase/server'
+import { createClient as createServerSupabase } from '@/lib/clients/supabase/server'
 import { BlogPostCard } from '@/components/app/blog/blog_card'
-import NavBar, { items } from '@/components/app/landing_page/Navbar'
+import NavBar from '@/components/app/landing_page/Navbar'
+import { items } from '@/components/app/landing_page/navbarItems'
 
 export const revalidate = 0
 
@@ -13,8 +13,7 @@ export default async function BlogIndexPage({ searchParams }: { searchParams: Pr
   const pageSize = Math.max(1, Number(sp.pageSize ?? '10'))
   const tag = typeof sp.tag === 'string' ? sp.tag.trim() : undefined
 
-  const cookieStore = await cookies()
-  const supabase = createServerClient(cookieStore)
+  const supabase = createServerSupabase()
 
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1

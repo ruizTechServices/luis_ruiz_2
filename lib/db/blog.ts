@@ -1,10 +1,8 @@
-import { cookies } from "next/headers";
 import { createClient as createServerClient } from "@/lib/clients/supabase/server";
 import type { BlogPost, Comment as BlogComment } from "@/lib/types/blog";
 
 export async function supa() {
-  const cookieStore = await cookies();
-  return createServerClient(cookieStore);
+  return createServerClient();
 }
 
 export async function getPostById(id: number): Promise<BlogPost | null> {

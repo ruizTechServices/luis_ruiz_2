@@ -3,7 +3,7 @@
 // https://chatbot-with-browser-and-rag.replit.app/
 //https://agent-ai-practice-giovanniruiz5.replit.app/
 import NavBar from "@/components/app/landing_page/Navbar";
-import { items } from "@/components/app/landing_page/Navbar";
+import { items } from "@/components/app/landing_page/navbarItems";
 import Project from "@/components/app/projects/project";
 import { getProjects } from "@/lib/db/projects";
 

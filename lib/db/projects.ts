@@ -1,4 +1,3 @@
-import { cookies } from "next/headers";
 import { createClient as createServerClient } from "@/lib/clients/supabase/server";
 
 export type ProjectRow = {
@@ -11,8 +10,7 @@ export type ProjectRow = {
 };
 
 async function supa() {
-  const cookieStore = await cookies();
-  return createServerClient(cookieStore);
+  return createServerClient();
 }
 
 export async function getProjects(): Promise<ProjectRow[]> {
