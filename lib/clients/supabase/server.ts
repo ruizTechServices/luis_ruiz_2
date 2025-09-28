@@ -15,16 +15,17 @@ if (!supabaseUrl || !supabaseKey) {
   );
 }
 
-export const createClient = (cookieStore: Awaited<ReturnType<typeof cookies>>) => {
+export const createClient = () => {
+  const cookieStore: any = cookies() as any;
   return createServerClient(
     supabaseUrl!,
     supabaseKey!,
     {
       cookies: {
         getAll() {
-          return cookieStore.getAll()
+          return cookieStore.getAll();
         },
-        setAll(cookiesToSet: { name: string; value: string; options: Parameters<typeof cookieStore.set>[2] }[]) {
+        setAll(cookiesToSet: { name: string; value: string; options: any }[]) {
           try {
             cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
           } catch {

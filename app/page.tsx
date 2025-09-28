@@ -1,3 +1,4 @@
+//C:\Users\giost\CascadeProjects\websites\luis-ruiz\luis_ruiz_2\app\page.tsx
 import NavBar from "@/components/app/landing_page/Navbar";
 import { items } from "@/components/app/landing_page/Navbar";
 import Hero from "../components/app/landing_page/Hero"

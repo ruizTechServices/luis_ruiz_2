@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { HamburgerMenu } from './hamburgerMenu'
 import { Button } from '@/components/ui/button'
+import SignOut from '@/app/components/SignOut'
+import { createClient as createServerSupabase } from '@/lib/clients/supabase/server'
 
 export interface NavItem {
   label: string
@@ -20,7 +22,12 @@ export const items: NavItem[] = [
   { label: 'Chat', href: '/ollama' },
 ]
 
-export default function NavBar({ items }: NavBarProps) {
+export default async function NavBar({ items }: NavBarProps) {
+  const supabase = createServerSupabase();
+  const { data } = await supabase.auth.getUser();
+  const user = data?.user ?? null;
+  const avatarUrl = (user?.user_metadata as any)?.avatar_url as string | undefined;
+  const email = user?.email ?? null;
   return (
     <header className="sticky top-0 z-20 bg-white shadow-sm">
       <div className="container mx-auto flex items-center justify-between px-6 py-4">
@@ -43,11 +50,22 @@ export default function NavBar({ items }: NavBarProps) {
           ))}
         </nav>
 
-        {/* Call to action */}
-        <div className="hidden md:block">
-          <Button asChild>
-            <Link href="/">Login</Link>{/* TODO: change this to the actual login page. THe auth must be made with NextAuth and Supabase and Google ONLY */}
-          </Button>
+        {/* Auth actions */}
+        <div className="hidden md:flex items-center gap-3">
+          {!user ? (
+            <Button asChild>
+              <Link href="/login">Sign in</Link>
+            </Button>
+          ) : (
+            <div className="flex items-center gap-3">
+              {avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={avatarUrl} alt="avatar" className="h-8 w-8 rounded-full border" />
+              ) : null}
+              <span className="text-sm text-gray-600">{email}</span>
+              <SignOut />
+            </div>
+          )}
         </div>
 
         {/* Mobile hamburger */}
