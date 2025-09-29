@@ -14,8 +14,11 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     try {
-      const origin = window.location.origin;
-      const redirectTo = `${origin}/auth/callback`;
+      // Prefer explicitly configured site URL when available; normalize 0.0.0.0 to localhost
+      const envBase = process.env.NEXT_PUBLIC_SITE_URL;
+      const runtimeBase = typeof window !== 'undefined' ? window.location.origin : '';
+      const base = (envBase || runtimeBase || 'http://localhost:5000').replace('0.0.0.0', 'localhost');
+      const redirectTo = new URL('/auth/callback', base).toString();
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
@@ -42,7 +45,7 @@ export default function LoginPage() {
         disabled={loading}
         className="w-full border px-4 py-2 rounded hover:bg-gray-50 disabled:opacity-60"
       >
-        {loading ? "Redirecting..." : "Continue with Google"}
+        {loading ? "Redirecting…" : "Continue with Google"}
       </button>
 
       {error ? (
@@ -55,4 +58,3 @@ export default function LoginPage() {
     </div>
   );
 }
-//C:\Users\giost\CascadeProjects\websites\luis-ruiz\luis_ruiz_2\app\login\page.tsx
