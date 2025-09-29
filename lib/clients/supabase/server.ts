@@ -15,12 +15,9 @@ if (!supabaseUrl || !supabaseKey) {
   );
 }
 
-// Minimal cookie options compatible with Next.js setter
-export const createClient = () => {
-  const cookieStore = cookies() as unknown as {
-    getAll: () => Array<{ name: string; value: string }>;
-    set: (name: string, value: string, options?: Record<string, unknown>) => void;
-  };
+// Next 15 requires awaiting cookies() before use. Expose an async factory
+export const createClient = async () => {
+  const cookieStore = await cookies();
   return createServerClient(
     supabaseUrl!,
     supabaseKey!,

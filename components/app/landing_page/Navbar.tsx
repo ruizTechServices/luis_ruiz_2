@@ -14,7 +14,7 @@ interface NavBarProps {
 }
 
 export default async function NavBar({ items }: NavBarProps) {
-  const supabase = createServerSupabase();
+  const supabase = await createServerSupabase();
   const { data } = await supabase.auth.getUser();
   const user = data?.user ?? null;
   const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;

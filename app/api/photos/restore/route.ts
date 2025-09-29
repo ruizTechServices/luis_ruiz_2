@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     const bytes = new Uint8Array(ab);
     const contentType = file.type || 'application/octet-stream';
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { error } = await supabase.storage
       .from(PHOTOS_BUCKET)

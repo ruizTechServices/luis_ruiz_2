@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     }
     const { url, title, description } = parsed.data;
 
-    const supabase = createServerClient();
+    const supabase = await createServerClient();
 
     const { data, error } = await supabase
       .from("projects")

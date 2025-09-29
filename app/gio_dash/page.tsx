@@ -13,7 +13,7 @@ import { getCounts } from "@/lib/functions/dashboard/getCounts";
 import { BlogCard } from "@/components/app/blog/blog_card"; // slideshow component
 
 export default async function GioDashboard() {
-  const supabase = createServerClient();
+  const supabase = await createServerClient();
 
   const { posts: postsCount, comments: commentsCount, votes: votesCount, errors } =
     await getCounts(supabase);

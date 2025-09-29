@@ -14,7 +14,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid vote" }, { status: 400 });
     }
 
-    const supabase = createServerClient();
+    const supabase = await createServerClient();
 
     // Upsert by (post_id, user_email)
     const { error } = await supabase.from("votes").upsert(

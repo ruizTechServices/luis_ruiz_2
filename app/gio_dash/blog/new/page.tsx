@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card";
 
 async function createPost(formData: FormData) {
   "use server";
-  const supabase = createServerClient();
+  const supabase = await createServerClient();
 
   const title = (formData.get("title") || "").toString().trim();
   const summary = (formData.get("summary") || "").toString().trim();

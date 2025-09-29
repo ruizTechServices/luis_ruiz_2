@@ -71,7 +71,7 @@ export function BlogPostCard({ blogPost }: BlogCardProps) {
 
 // Slideshow component: fetches posts and renders one-at-a-time carousel
 export async function BlogCard() {
-  const supabase = createServerClient();
+  const supabase = await createServerClient();
 
   const { data: posts, error } = await supabase
     .from("blog_posts")

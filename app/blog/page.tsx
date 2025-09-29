@@ -13,7 +13,7 @@ export default async function BlogIndexPage({ searchParams }: { searchParams: Pr
   const pageSize = Math.max(1, Number(sp.pageSize ?? '10'))
   const tag = typeof sp.tag === 'string' ? sp.tag.trim() : undefined
 
-  const supabase = createServerSupabase()
+  const supabase = await createServerSupabase()
 
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1

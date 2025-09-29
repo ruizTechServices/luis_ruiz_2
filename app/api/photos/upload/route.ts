@@ -19,7 +19,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No files provided (field name: files)' }, { status: 400 });
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const uploaded: Array<{ name: string; path: string; url: string | null }> = [];
     const errors: Array<{ name: string; message: string }> = [];

@@ -20,7 +20,7 @@ export async function GET(request: Request) {
     const limit = Math.min(Number(searchParams.get('limit') || '50'), 100);
     const expiresIn = Math.min(Number(process.env.SUPABASE_SIGNED_URL_EXPIRES || '3600'), 60 * 60 * 24);
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // List objects in the bucket under the given prefix
     const { data: files, error: listError } = await supabase.storage.from(PHOTOS_BUCKET).list(prefix, {
@@ -87,7 +87,7 @@ export async function DELETE(request: Request) {
     path = String(path).replace(/^\/+|\/+$/g, '');
     if (!path) return NextResponse.json({ error: 'Missing path' }, { status: 400 });
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { error } = await supabase.storage.from(PHOTOS_BUCKET).remove([path]);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
