@@ -2,8 +2,6 @@
 // https://ragbot.replit.app/
 // https://chatbot-with-browser-and-rag.replit.app/
 //https://agent-ai-practice-giovanniruiz5.replit.app/
-import NavBar from "@/components/app/landing_page/Navbar";
-import { items } from "@/components/app/landing_page/navbarItems";
 import Project from "@/components/app/projects/project";
 import { getProjects } from "@/lib/db/projects";
 
@@ -11,7 +9,6 @@ export default async function ProjectsPage() {
   const projects = await getProjects();
   return (
     <>
-      <NavBar items={items} />
       <main className="container mx-auto px-6 py-16">
         <h1 className="text-4xl font-bold mb-2">Projects</h1>
         <p className="text-gray-600 mb-10">Interactive demos embedded below.</p>

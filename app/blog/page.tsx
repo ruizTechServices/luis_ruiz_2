@@ -2,8 +2,6 @@ import 'server-only'
 import Link from 'next/link'
 import { createClient as createServerSupabase } from '@/lib/clients/supabase/server'
 import { BlogPostCard } from '@/components/app/blog/blog_card'
-import NavBar from '@/components/app/landing_page/Navbar'
-import { items } from '@/components/app/landing_page/navbarItems'
 
 export const revalidate = 0
 
@@ -45,7 +43,6 @@ export default async function BlogIndexPage({ searchParams }: { searchParams: Pr
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
-      <NavBar items={items} />
       <main className="container mx-auto px-6 py-10">
         <h1 className="text-3xl font-bold mb-6">Blog</h1>
 

@@ -1,6 +1,4 @@
 import 'server-only';
-import NavBar from "@/components/app/landing_page/Navbar";
-import { items } from "@/components/app/landing_page/navbarItems";
 import { createClient as createServerClient } from "@/lib/clients/supabase/server";
 import SystemHealthCard from "@/components/app/gio_dashboard/SystemHealthCard";
 import ContentAnalyticsCard from "@/components/app/gio_dashboard/ContentAnalyticsCard";
@@ -21,8 +19,6 @@ export default async function GioDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-slate-800 dark:to-indigo-900">
-      <NavBar items={items} />
-
       <div className="container mx-auto px-6 py-8">
         {/* Header */}
         <div className="mb-8">

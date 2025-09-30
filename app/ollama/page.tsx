@@ -8,8 +8,6 @@ import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { Input as NumberInput } from '@/components/ui/input'
 import EmbedInput from '@/components/app/chatbot_basic/EmbedInput'
-import NavBar from '@/components/app/landing_page/NavbarClient'
-import { items } from '@/components/app/landing_page/navbarItems'
 import { Toaster, toast } from 'sonner'
 
 // Minimal chat UI for local Ollama via Next.js API routes
@@ -234,7 +232,6 @@ export default function OllamaChatPage() {
   return (
     <>
     <Toaster richColors position="top-right" />
-    <NavBar items={items} /> 
     <div className="mx-auto max-w-3xl p-4 space-y-4">
       <h1 className="text-2xl font-semibold">Local Ollama Chat</h1>
 
