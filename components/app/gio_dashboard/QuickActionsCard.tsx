@@ -34,22 +34,29 @@ export default function QuickActionsCard() {
     return () => { active = false };
   }, []);
 
-  const save = (next?: { availability?: boolean; availability_text?: string }) => {
+  const save = (
+    next?: { availability?: boolean; availability_text?: string },
+    opts?: { revertAvailabilityTo?: boolean }
+  ) => {
     setMessage(null);
     startTransition(async () => {
       try {
-        const body = JSON.stringify({
+        const payload = {
           availability: next?.availability ?? available,
-          availability_text: next?.availability_text ?? availabilityText,
-        });
+          availability_text: (next?.availability_text ?? availabilityText)?.trim().slice(0, 200),
+        };
         const res = await fetch("/api/site_settings/availability", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body,
+          body: JSON.stringify(payload),
         });
-        if (!res.ok) throw new Error(`Save failed (${res.status})`);
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(json?.error ?? `Save failed (${res.status})`);
         setMessage("Saved");
       } catch (e) {
+        if (typeof opts?.revertAvailabilityTo === "boolean") {
+          setAvailable(opts.revertAvailabilityTo);
+        }
         setMessage(e instanceof Error ? e.message : String(e));
       }
     });
@@ -108,8 +115,9 @@ export default function QuickActionsCard() {
               checked={available}
               disabled={!loaded || isPending}
               onCheckedChange={(checked) => {
+                const prev = available;
                 setAvailable(checked);
-                save({ availability: checked });
+                save({ availability: checked }, { revertAvailabilityTo: prev });
               }}
             />
           </div>
