@@ -59,7 +59,11 @@ export function VoteControls({
       } catch (err) {
         // rollback
         if (current === null) {
-          vote === "up" ? setUp((v) => Math.max(0, v - 1)) : setDown((v) => Math.max(0, v - 1));
+          if (vote === "up") {
+            setUp((v) => Math.max(0, v - 1));
+          } else {
+            setDown((v) => Math.max(0, v - 1));
+          }
           setCurrent(null);
         } else if (current !== vote) {
           // we optimistically switched; revert back
