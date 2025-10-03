@@ -20,6 +20,8 @@ export default async function NavBar({ items }: NavBarProps) {
   const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
   const avatarUrl = typeof meta.avatar_url === 'string' ? (meta.avatar_url as string) : undefined;
   const email = user?.email ?? null;
+  const isGio = email === 'giosterr44@gmail.com';
+  const itemsToRender = items.filter((item) => item.href !== '/gio_dash' || isGio);
   return (
     <header className="sticky top-0 z-20 bg-white shadow-sm">
       <div className="container mx-auto flex items-center justify-between px-6 py-4">
@@ -31,7 +33,7 @@ export default async function NavBar({ items }: NavBarProps) {
 
         {/* Desktop nav */}
         <nav className="hidden md:flex space-x-8">
-          {items.map((item) => (
+          {itemsToRender.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -61,7 +63,7 @@ export default async function NavBar({ items }: NavBarProps) {
         </div>
 
         {/* Mobile hamburger */}
-        <HamburgerMenu items={items} />
+        <HamburgerMenu items={itemsToRender} />
       </div>
     </header>
   )

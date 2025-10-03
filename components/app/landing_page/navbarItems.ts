@@ -6,9 +6,10 @@ export interface NavItem {
 
 export const items: NavItem[] = [
   { label: 'Home', href: '/' },
-  { label: 'Gio-Dash', href: '/gio_dash' },
+  { label: 'Gio-Dash', href: '/gio_dash' },//<==This is supposed to be displayed only if the user is authenticated and the email is "giosterr44@gmail.com"
   { label: 'Blog', href: '/blog' },
   { label: 'Projects', href: '/projects' },
   { label: 'Contact', href: '/contact' },
   { label: 'Chat', href: '/ollama' },
+  // { label: `${user?.name}`Dashboard', href: '/dashboard'` },//<==This is supposed to be displayed only if the user is authenticated
 ];

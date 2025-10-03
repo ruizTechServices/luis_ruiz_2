@@ -87,3 +87,15 @@
     - Page: `app/services/page.tsx` (cards with ShadCN `card`)
     - Integration: “Book now” → prefill appointment duration/price
     - Tests: rendering, sorting, empty state
+
+
+
+
+    notes:
+    -I need to implement 
+    --Nav: 
+        components/app/landing_page/Navbar.tsx
+        is an async Server Component that uses createServerSupabase() and supabase.auth.getUser() to show:
+        If anonymous: “Sign in” button linking to /login.
+        [ ]If authenticated: avatar (if present), email, show "/dashboard" and SignOut button.
+        [x]If authenticated & email === "giosterr44@gmail.com": show "/gio_dash" avatar (if present), email, and SignOut button.
