@@ -32,7 +32,7 @@ const TechSection = () => {
               
               {/* Side shine effect */}
               <div className="absolute top-0 left-0 w-px h-1/2 bg-gradient-to-blue/70 from-white/70 dark:from-white/10 to-transparent" />
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Luis's GitHub Heatmap</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Luis&apos;s GitHub Heatmap</h1>
               <GithubHeatmap />
               
               {/* Bottom subtle reflection */}
