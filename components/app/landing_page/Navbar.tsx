@@ -3,6 +3,7 @@ import { HamburgerMenu } from './hamburgerMenu'
 import { Button } from '@/components/ui/button'
 import { SignOut } from '@/components/app/landing_page'
 import { createClient as createServerSupabase } from '@/lib/clients/supabase/server'
+import { isOwner } from '@/lib/auth/ownership'
 
 export interface NavItem {
   label: string
@@ -20,8 +21,16 @@ export default async function NavBar({ items }: NavBarProps) {
   const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
   const avatarUrl = typeof meta.avatar_url === 'string' ? (meta.avatar_url as string) : undefined;
   const email = user?.email ?? null;
-  const isGio = email === 'giosterr44@gmail.com';
-  const itemsToRender = items.filter((item) => item.href !== '/gio_dash' || isGio);
+  const owner = isOwner(email);
+
+  // Start from provided items; hide Gio-Dash unless owner
+  const base = items.filter((item) => item.href !== '/gio_dash' || owner);
+
+  // Add a Dashboard link for any authenticated user if it's not already present
+  const hasDashboard = base.some((i) => i.href === '/dashboard');
+  const itemsToRender = !user || hasDashboard
+    ? base
+    : [...base, { label: 'Dashboard', href: '/dashboard' }];
   return (
     <header className="sticky top-0 z-20 bg-white shadow-sm">
       <div className="container mx-auto flex items-center justify-between px-6 py-4">
