@@ -1,6 +1,5 @@
 //C:\Users\giost\CascadeProjects\websites\luis-ruiz\luis_ruiz_2\app\page.tsx
 import Hero from "../components/app/landing_page/Hero";
-import About from "../components/app/landing_page/about";
 import TechSection from "../components/app/landing_page/techSection";
 import Quote from "../components/app/landing_page/quotes";  
 export default function Home() {
