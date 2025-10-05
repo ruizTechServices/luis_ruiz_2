@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { HamburgerMenu } from './hamburgerMenu'
 import { Button } from '@/components/ui/button'
-import SignOut from '@/app/components/SignOut'
+import { SignOut } from '@/components/app/landing_page'
 import { createClient as createServerSupabase } from '@/lib/clients/supabase/server'
 
 export interface NavItem {

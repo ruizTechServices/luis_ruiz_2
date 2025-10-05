@@ -26,6 +26,7 @@ const nextConfig: NextConfig = {
         pathname: '/storage/v1/object/**',
       },
     ],
+    domains: ['ghchart.rshah.org', 'nextjs.org', 'react.dev', 'www.typescriptlang.org', 'tailwindcss.com', 'ui.shadcn.com', 'supabase.com'],
   },
 };
 

@@ -12,9 +12,10 @@ export default function ContactFormClient() {
     </div>
           <form
             className="space-y-6"
-            onSubmit={(e) => {
+            onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
               e.preventDefault();
-              const formData = new FormData(e.currentTarget);
+              const form = e.currentTarget;
+              const formData = new FormData(form);
               const data = {
                 firstName: formData.get("firstName"),
                 lastName: formData.get("lastName"),
@@ -30,7 +31,7 @@ export default function ContactFormClient() {
               };
               console.log("Contact Form Submission:", data);
 
-              const submitBtn = e.currentTarget.querySelector(
+              const submitBtn = form.querySelector(
                 'button[type="submit"]'
               ) as HTMLButtonElement | null;
               if (submitBtn) {
@@ -46,7 +47,7 @@ export default function ContactFormClient() {
                     "bg-green-600",
                     "bg-indigo-600 hover:bg-indigo-700"
                   );
-                  e.currentTarget.reset();
+                  form.reset();
                 }, 2000);
               }
             }}
@@ -105,7 +106,7 @@ export default function ContactFormClient() {
                   id="phone"
                   name="phone"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
-                  placeholder="+1 (347) 901-3772"
+                  placeholder="+1 (243) 234-3445"
                 />
               </div>
             </div>
@@ -278,7 +279,7 @@ export default function ContactFormClient() {
                   <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
                   </svg>
-                  +1 (555) 123-4567
+                  +1 (347) 901-3772
                 </a>
               </div>
             </div>
