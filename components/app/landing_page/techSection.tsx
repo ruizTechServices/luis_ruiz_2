@@ -26,13 +26,13 @@ const TechSection = () => {
             {/* Subtle glow on hover */}
             <div className="absolute -inset-1 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 rounded-2xl blur opacity-0 group-hover:opacity-40 transition duration-500" />
             
-            <div className="relative flex items-center justify-center bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] p-4 sm:p-6 md:p-8 border border-white/50 dark:border-gray-700/50">
+            <div className="hidden md:flex flex-col relative items-center justify-center bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] p-4 sm:p-6 md:p-8 border border-white/50 dark:border-gray-700/50">
               {/* Top glossy highlight */}
               <div className="absolute top-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-white/80 dark:via-white/20 to-transparent" />
               
               {/* Side shine effect */}
-              <div className="absolute top-0 left-0 w-px h-1/2 bg-gradient-to-b from-white/70 dark:from-white/10 to-transparent" />
-              
+              <div className="absolute top-0 left-0 w-px h-1/2 bg-gradient-to-blue/70 from-white/70 dark:from-white/10 to-transparent" />
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Luis's GitHub Heatmap</h1>
               <GithubHeatmap />
               
               {/* Bottom subtle reflection */}
