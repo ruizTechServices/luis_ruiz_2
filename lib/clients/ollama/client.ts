@@ -8,7 +8,7 @@ import type { OllamaChatRequest, OllamaStreamEvent } from "../ollama/types";
  * Defaults to `http://localhost:11434` if `OLLAMA_BASE_URL` environment variable is not set.
  */
 export function getBaseUrl() {
-  return process.env.OLLAMA_BASE_URL?.replace(/\/+$/, "") || "http://localhost:11434";
+  return process.env.OLLAMA_BASE_URL?.replace(/\/+$/, "") || "http://localhost:11434" || "http://127.0.0.1:11434";
 }
 
 export type ChatStreamParams = {
