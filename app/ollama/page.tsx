@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch'
 import { Input as NumberInput } from '@/components/ui/input'
 import EmbedInput from '@/components/app/chatbot_basic/EmbedInput'
 import { Toaster, toast } from 'sonner'
+import { checkOllamaOnline } from '@/lib/functions/isOllama'
 
 // Minimal chat UI for local Ollama via Next.js API routes
 export default function OllamaChatPage() {
@@ -26,6 +27,8 @@ export default function OllamaChatPage() {
   const [topK, setTopK] = useState<number>(5)
   const [minSim, setMinSim] = useState<number>(0.75)
   const [dbPersist, setDbPersist] = useState<string | null>(null)
+  const [isOnline, setIsOnline] = useState<boolean>(true)
+  const [checkingOnline, setCheckingOnline] = useState<boolean>(false)
 
   useEffect(() => {
     let active = true
@@ -52,6 +55,21 @@ export default function OllamaChatPage() {
         setModels([])
         setModel('')
       }
+    })()
+    return () => {
+      active = false
+    }
+  }, [])
+
+  useEffect(() => {
+    let active = true
+    ;(async () => {
+      try {
+        const h = await checkOllamaOnline(1500)
+        if (!active) return
+        setIsOnline(Boolean(h.online))
+        if (!h.online) setError('Ollama server is not running.')
+      } catch {}
     })()
     return () => {
       active = false
@@ -120,6 +138,10 @@ export default function OllamaChatPage() {
 
   async function sendPrompt(prompt: string) {
     setError(null)
+    if (!isOnline) {
+      setError('Ollama server is not running.')
+      return
+    }
     const p = prompt.trim()
     if (!p) return
     if (!model) {
@@ -229,11 +251,55 @@ export default function OllamaChatPage() {
     setChatId(null)
   }
 
+  async function handleRetry() {
+    setCheckingOnline(true)
+    try {
+      const h = await checkOllamaOnline(1500)
+      setIsOnline(Boolean(h.online))
+      if (h.online) {
+        try {
+          const res = await fetch('/api/ollama/models', { cache: 'no-store' })
+          const json = (await res.json()) as { models?: string[] }
+          const list = Array.isArray(json.models) ? json.models : []
+          setModels(list)
+          let preferred = list.find(m => /llama3\.2:1b|phi3:mini|gemma3:1b/i.test(m)) || list[0] || ''
+          try {
+            const raw = localStorage.getItem('ollama_settings')
+            if (raw) {
+              const s = JSON.parse(raw)
+              if (s && typeof s.model === 'string' && list.includes(s.model)) preferred = s.model
+              if (typeof s.temperature === 'number') setTemperature(s.temperature)
+              if (typeof s.topP === 'number') setTopP(s.topP)
+            }
+          } catch {}
+          setModel(preferred)
+          setError(null)
+        } catch {}
+      } else {
+        setError('Ollama server is not running.')
+      }
+    } finally {
+      setCheckingOnline(false)
+    }
+  }
+
   return (
     <>
     <Toaster richColors position="top-right" />
     <div className="mx-auto max-w-3xl p-4 space-y-4">
       <h1 className="text-2xl font-semibold">Local Ollama Chat</h1>
+
+      {!isOnline && (
+        <div className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700 flex items-center justify-between gap-2">
+          <div>
+            Ollama is not running. Please install and start Ollama to use this chatbot.{' '}
+            <a href="https://ollama.com/download" className="underline" target="_blank" rel="noreferrer">Download Ollama</a>
+          </div>
+          <Button size="sm" variant="secondary" onClick={handleRetry} disabled={checkingOnline}>
+            {checkingOnline ? 'Checking…' : 'Retry'}
+          </Button>
+        </div>
+      )}
 
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
@@ -336,7 +402,7 @@ export default function OllamaChatPage() {
 
       {/* Primary input: triggers server-side save + embeddings + stream */}
       <div className="flex gap-2">
-        <EmbedInput onSubmitText={(text) => { sendPrompt(text) }} disabled={streaming} loading={streaming} />
+        <EmbedInput onSubmitText={(text) => { sendPrompt(text) }} disabled={streaming || !isOnline} loading={streaming} />
       </div>
 
     </div>
