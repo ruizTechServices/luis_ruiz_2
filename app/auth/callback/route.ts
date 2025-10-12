@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Prepare a mutable response so Supabase can attach Set-Cookie headers to it
-  let response = NextResponse.redirect(new URL(`/`, request.url));
+  const response = NextResponse.redirect(new URL(`/`, request.url));
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_API_KEY;
