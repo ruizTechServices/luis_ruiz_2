@@ -29,14 +29,24 @@ export default function OllamaChatPage() {
   const [dbPersist, setDbPersist] = useState<string | null>(null)
   const [isOnline, setIsOnline] = useState<boolean>(true)
   const [checkingOnline, setCheckingOnline] = useState<boolean>(false)
+  const [baseUrl, setBaseUrl] = useState<string | null>(null)
 
   useEffect(() => {
     let active = true
     ;(async () => {
       try {
-        const res = await fetch('/api/ollama/models', { cache: 'no-store' })
-        const json = (await res.json()) as { models?: string[] }
-        const list = Array.isArray(json.models) ? json.models : []
+        let list: string[] = []
+        if (baseUrl) {
+          const res = await fetch(`${baseUrl}/api/tags`, { cache: 'no-store' })
+          if (res.ok) {
+            const json = (await res.json()) as { models?: Array<{ name?: string }> }
+            list = (json.models ?? []).map(m => m?.name).filter((n): n is string => Boolean(n))
+          }
+        } else {
+          const res = await fetch('/api/ollama/models', { cache: 'no-store' })
+          const json = (await res.json()) as { models?: string[] }
+          list = Array.isArray(json.models) ? json.models : []
+        }
         if (!active) return
         setModels(list)
         let preferred = list.find(m => /llama3\.2:1b|phi3:mini|gemma3:1b/i.test(m)) || list[0] || ''
@@ -59,7 +69,7 @@ export default function OllamaChatPage() {
     return () => {
       active = false
     }
-  }, [])
+  }, [baseUrl])
 
   useEffect(() => {
     let active = true
@@ -68,6 +78,7 @@ export default function OllamaChatPage() {
         const h = await checkOllamaOnline(1500)
         if (!active) return
         setIsOnline(Boolean(h.online))
+        setBaseUrl(h.baseUrl ?? null)
         if (!h.online) setError('Ollama server is not running.')
       } catch {}
     })()
@@ -159,67 +170,120 @@ export default function OllamaChatPage() {
     controllerRef.current = new AbortController()
 
     try {
-      const res = await fetch('/api/ollama', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model,
-          temperature,
-          top_p: topP,
-          chat_id: chatId,
-          with_context: useContext,
-          top_k: topK,
-          min_similarity: minSim,
-          messages: nextMessages.map(m => ({ role: m.role, content: m.content })),
-        }),
-        signal: controllerRef.current.signal,
-      })
+      if (baseUrl) {
+        setDbPersist('off')
+        const res = await fetch(`${baseUrl}/api/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model,
+            messages: nextMessages.map(m => ({ role: m.role, content: m.content })),
+            stream: true,
+            options: { temperature, top_p: topP },
+          }),
+          signal: controllerRef.current.signal,
+        })
 
-      if (!res.ok || !res.body) {
-        throw new Error(`Request failed (${res.status})`)
-      }
-
-      // Capture/remember chat session id from server
-      const hdr = res.headers.get('x-chat-id')
-      if (hdr) {
-        const id = Number(hdr)
-        if (!Number.isNaN(id)) {
-          setChatId(id)
-          try { localStorage.setItem(`ollama_chatId_${model}`, String(id)) } catch {}
+        if (!res.ok || !res.body) {
+          throw new Error(`Request failed (${res.status})`)
         }
-      }
 
-      // Read debug headers and toast when DB persistence is on
-      const persistHdr = res.headers.get('x-db-persist')
-      if (persistHdr) setDbPersist(persistHdr)
-      if (persistHdr === 'on') {
-        if (hdr) {
-          toast.success(`Saved to Supabase • Session ${hdr}`)
-        } else {
-          toast.success('Saved to Supabase')
-        }
-      }
+        const reader = res.body.getReader()
+        const decoder = new TextDecoder()
+        let done = false
+        let buffer = ''
 
-      const reader = res.body.getReader()
-      const decoder = new TextDecoder()
-      let done = false
-
-      while (!done) {
-        const { value, done: d } = await reader.read()
-        done = d
-        if (value) {
-          const chunk = decoder.decode(value)
-          assistantBufferRef.current += chunk
-          setMessages(curr => {
-            const last = curr[curr.length - 1]
-            if (last && last.role === 'assistant') {
-              // Update in place
-              return [...curr.slice(0, -1), { ...last, content: assistantBufferRef.current }]
-            } else {
-              // Start new assistant message
-              return [...curr, { role: 'assistant' as const, content: assistantBufferRef.current }]
+        while (!done) {
+          const { value, done: d } = await reader.read()
+          done = d
+          if (value) {
+            buffer += decoder.decode(value, { stream: true })
+            const lines = buffer.split('\n')
+            buffer = lines.pop() ?? ''
+            for (const line of lines) {
+              const t = line.trim()
+              if (!t) continue
+              try {
+                const evt = JSON.parse(t) as { message?: { content?: string }; done?: boolean }
+                const piece = evt?.message?.content ?? ''
+                if (piece) {
+                  assistantBufferRef.current += piece
+                  setMessages(curr => {
+                    const last = curr[curr.length - 1]
+                    if (last && last.role === 'assistant') {
+                      return [...curr.slice(0, -1), { ...last, content: assistantBufferRef.current }]
+                    } else {
+                      return [...curr, { role: 'assistant' as const, content: assistantBufferRef.current }]
+                    }
+                  })
+                }
+                if (evt?.done) {
+                  done = true
+                  break
+                }
+              } catch {}
             }
-          })
+          }
+        }
+      } else {
+        const res = await fetch('/api/ollama', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model,
+            temperature,
+            top_p: topP,
+            chat_id: chatId,
+            with_context: useContext,
+            top_k: topK,
+            min_similarity: minSim,
+            messages: nextMessages.map(m => ({ role: m.role, content: m.content })),
+          }),
+          signal: controllerRef.current.signal,
+        })
+
+        if (!res.ok || !res.body) {
+          throw new Error(`Request failed (${res.status})`)
+        }
+
+        const hdr = res.headers.get('x-chat-id')
+        if (hdr) {
+          const id = Number(hdr)
+          if (!Number.isNaN(id)) {
+            setChatId(id)
+            try { localStorage.setItem(`ollama_chatId_${model}`, String(id)) } catch {}
+          }
+        }
+
+        const persistHdr = res.headers.get('x-db-persist')
+        if (persistHdr) setDbPersist(persistHdr)
+        if (persistHdr === 'on') {
+          if (hdr) {
+            toast.success(`Saved to Supabase • Session ${hdr}`)
+          } else {
+            toast.success('Saved to Supabase')
+          }
+        }
+
+        const reader = res.body.getReader()
+        const decoder = new TextDecoder()
+        let done = false
+
+        while (!done) {
+          const { value, done: d } = await reader.read()
+          done = d
+          if (value) {
+            const chunk = decoder.decode(value)
+            assistantBufferRef.current += chunk
+            setMessages(curr => {
+              const last = curr[curr.length - 1]
+              if (last && last.role === 'assistant') {
+                return [...curr.slice(0, -1), { ...last, content: assistantBufferRef.current }]
+              } else {
+                return [...curr, { role: 'assistant' as const, content: assistantBufferRef.current }]
+              }
+            })
+          }
         }
       }
     } catch (e: unknown) {
@@ -256,11 +320,21 @@ export default function OllamaChatPage() {
     try {
       const h = await checkOllamaOnline(1500)
       setIsOnline(Boolean(h.online))
+      setBaseUrl(h.baseUrl ?? null)
       if (h.online) {
         try {
-          const res = await fetch('/api/ollama/models', { cache: 'no-store' })
-          const json = (await res.json()) as { models?: string[] }
-          const list = Array.isArray(json.models) ? json.models : []
+          let list: string[] = []
+          if (h.baseUrl) {
+            const res = await fetch(`${h.baseUrl}/api/tags`, { cache: 'no-store' })
+            if (res.ok) {
+              const json = (await res.json()) as { models?: Array<{ name?: string }> }
+              list = (json.models ?? []).map(m => m?.name).filter((n): n is string => Boolean(n))
+            }
+          } else {
+            const res = await fetch('/api/ollama/models', { cache: 'no-store' })
+            const json = (await res.json()) as { models?: string[] }
+            list = Array.isArray(json.models) ? json.models : []
+          }
           setModels(list)
           let preferred = list.find(m => /llama3\.2:1b|phi3:mini|gemma3:1b/i.test(m)) || list[0] || ''
           try {
