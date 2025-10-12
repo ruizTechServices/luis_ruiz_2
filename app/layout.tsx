@@ -10,6 +10,10 @@ export const metadata: Metadata = {
   description: "A portfolio website for Luis Ruiz",
 };
 
+// Ensure auth-aware UI (Navbar) is rendered per-request in production
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default function RootLayout({
   children,
 }: Readonly<{
