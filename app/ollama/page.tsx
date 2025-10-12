@@ -30,6 +30,7 @@ export default function OllamaChatPage() {
   const [isOnline, setIsOnline] = useState<boolean>(true)
   const [checkingOnline, setCheckingOnline] = useState<boolean>(false)
   const [baseUrl, setBaseUrl] = useState<string | null>(null)
+  const [siteOrigin, setSiteOrigin] = useState<string>('')
 
   useEffect(() => {
     let active = true
@@ -85,6 +86,12 @@ export default function OllamaChatPage() {
     return () => {
       active = false
     }
+  }, [])
+
+  useEffect(() => {
+    try {
+      setSiteOrigin(window.location.origin)
+    } catch {}
   }, [])
 
   // Persist settings (model, temperature, topP)
@@ -315,6 +322,15 @@ export default function OllamaChatPage() {
     setChatId(null)
   }
 
+  function handleCopy(text: string) {
+    try {
+      void navigator.clipboard.writeText(text)
+      toast.success('Copied to clipboard')
+    } catch {
+      toast.error('Copy failed')
+    }
+  }
+
   async function handleRetry() {
     setCheckingOnline(true)
     try {
@@ -364,10 +380,32 @@ export default function OllamaChatPage() {
       <h1 className="text-2xl font-semibold">Local Ollama Chat</h1>
 
       {!isOnline && (
-        <div className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700 flex items-center justify-between gap-2">
-          <div>
-            Ollama is not running. Please install and start Ollama to use this chatbot.{' '}
-            <a href="https://ollama.com/download" className="underline" target="_blank" rel="noreferrer">Download Ollama</a>
+        <div className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700 flex items-start justify-between gap-3">
+          <div className="space-y-2">
+            <div>
+              Ollama is not running. Please install and start Ollama to use this chatbot.{' '}
+              <a href="https://ollama.com/download" className="underline" target="_blank" rel="noreferrer">Download Ollama</a>
+            </div>
+            <div className="text-xs text-red-800">
+              Allow this site in your local Ollama by setting OLLAMA_ORIGINS to:
+              <div className="mt-1 font-mono text-[11px] bg-white/70 text-red-900 rounded px-1 py-0.5 inline-block">
+                {siteOrigin || 'https://your-domain.com'}
+              </div>
+            </div>
+            <div className="grid gap-2 text-xs">
+              <div className="flex items-start gap-2">
+                <div className="flex-1 rounded bg-white/70 p-2 font-mono whitespace-pre-wrap text-red-900">
+{`export OLLAMA_ORIGINS="${siteOrigin || 'https://your-domain.com'}"\nollama serve`}
+                </div>
+                <Button size="sm" variant="secondary" onClick={() => handleCopy(`export OLLAMA_ORIGINS=\"${siteOrigin || 'https://your-domain.com'}\"\nollama serve`)}>Copy macOS/Linux</Button>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="flex-1 rounded bg-white/70 p-2 font-mono whitespace-pre-wrap text-red-900">
+{`$env:OLLAMA_ORIGINS="${siteOrigin || 'https://your-domain.com'}"\nollama serve`}
+                </div>
+                <Button size="sm" variant="secondary" onClick={() => handleCopy(`$env:OLLAMA_ORIGINS=\"${siteOrigin || 'https://your-domain.com'}\"\nollama serve`)}>Copy Windows</Button>
+              </div>
+            </div>
           </div>
           <Button size="sm" variant="secondary" onClick={handleRetry} disabled={checkingOnline}>
             {checkingOnline ? 'Checking…' : 'Retry'}
