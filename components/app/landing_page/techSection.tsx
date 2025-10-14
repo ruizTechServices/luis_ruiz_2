@@ -5,11 +5,11 @@ import GithubHeatmap from './githubHeatmap';
 
 const TechSection = () => {
   return (
-    <section className=" relative py-16 md:py-24 lg:py-32">
+    <section className="">
       {/* Clean neutral background */}
-      <div className="h-[700vh] bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900" />
+      <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900 " />
       
-      <div className="container relative mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+      <div className="container relative z-10 mx-auto md:mb-10 mb-20">
         {/* Header Section with plastic card effect */}
         <div className="text-center mb-12 md:mb-16 space-y-6">
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-gray-100 drop-shadow-lg">
