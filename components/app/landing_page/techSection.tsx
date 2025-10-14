@@ -9,7 +9,7 @@ const TechSection = () => {
       {/* Clean neutral background */}
       <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900 " />
       
-      <div className="container relative z-10 mx-auto md:mb-10 mb-20">
+      <div className="container relative z-10 mx-auto md:mb-10 mb-20 py-10 sm:py-12 md:py-16">
         {/* Header Section with plastic card effect */}
         <div className="text-center mb-12 md:mb-16 space-y-6">
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-gray-100 drop-shadow-lg">
