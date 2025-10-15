@@ -21,7 +21,7 @@ const TechSection = () => {
         </div>
 
         {/* GitHub Heatmap Section - Plastic card */}
-        <div className="mb-12 md:mb-16 lg:mb-20 p-4 ">
+        <div className="mb-12 md:mb-16 lg:mb-20 p-4 d">
           <div className="relative group">
             {/* Subtle glow on hover */}
             <div className="absolute -inset-1 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 rounded-2xl blur opacity-0 group-hover:opacity-40 transition duration-500" />
@@ -42,7 +42,7 @@ const TechSection = () => {
         </div>
 
         {/* Skills Grid */}
-        <div className="relative p-4 ">
+        <div className="relative p-4 d">
           {/* Section subtitle in plastic badge */}
           <div className="text-center mb-8 md:mb-10">
             <div className="inline-block px-6 py-2 bg-white/70 dark:bg-gray-800/70 backdrop-blur-md rounded-full border border-white/50 dark:border-gray-700/50 shadow-[0_4px_16px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]">
@@ -142,7 +142,7 @@ const TechSection = () => {
         </div>
 
         {/* Stats Section - Plastic cards */}
-        <div className=" p-4 mt-12 md:mt-16 lg:mt-20 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+        <div className=" p-4 dmt-12 md:mt-16 lg:mt-20 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
           {[
             { value: `${skills.length}+`, label: 'Technologies' },
             { value: '100%', label: 'Production Ready' },
