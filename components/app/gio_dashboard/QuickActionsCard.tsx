@@ -52,6 +52,12 @@ export default function QuickActionsCard() {
         });
         const json = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(json?.error ?? `Save failed (${res.status})`);
+        if (typeof json?.availability === "boolean") {
+          setAvailable(json.availability);
+        }
+        if (typeof json?.availability_text === "string") {
+          setAvailabilityText(json.availability_text);
+        }
         setMessage("Saved");
       } catch (e) {
         if (typeof opts?.revertAvailabilityTo === "boolean") {
