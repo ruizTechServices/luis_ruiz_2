@@ -1,3 +1,4 @@
+//C:\Users\giost\CascadeProjects\websites\luis-ruiz\luis_ruiz_2\components\app\landing_page\Navbar.tsx
 import Link from 'next/link'
 import { HamburgerMenu } from './hamburgerMenu'
 import { Button } from '@/components/ui/button'
@@ -72,7 +73,12 @@ export default async function NavBar({ items }: NavBarProps) {
         </div>
 
         {/* Mobile hamburger */}
-        <HamburgerMenu items={itemsToRender} />
+        <HamburgerMenu
+          items={itemsToRender}
+          isAuthenticated={!!user}
+          avatarUrl={avatarUrl}
+          email={email ?? undefined}
+        />
       </div>
     </header>
   )

@@ -3,7 +3,6 @@
 
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
-// Use your browser Supabase client factory. Adjust the import if your path differs.
 import { createClient as createBrowserClient } from '@/lib/clients/supabase/client';
 
 type BlogPost = {
