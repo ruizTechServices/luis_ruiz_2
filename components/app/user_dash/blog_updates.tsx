@@ -60,10 +60,6 @@ function timeAgo(createdISO: string): string {
   return `${value}${unit} ago`;
 }
 
-function clamp(n: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, n));
-}
-
 function postUrl(p: Partial<BlogPost> & { slug?: string | null }): string {
   // Prefer slug if you add it later; else fallback to id
   return p.slug ? `/blog/${p.slug}` : `/blog/${p.id}`;
@@ -97,8 +93,11 @@ function useBlogPosts(limit = 10) {
           setPosts(data);
           setError(null);
         }
-      } catch (e: any) {
-        if (mounted) setError(e?.message ?? 'Failed to load posts');
+      } catch (error) {
+        if (mounted) {
+          const message = error instanceof Error ? error.message : 'Failed to load posts';
+          setError(message);
+        }
       } finally {
         if (mounted) setLoading(false);
       }
