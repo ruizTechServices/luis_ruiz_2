@@ -2,9 +2,6 @@
   import 'server-only';
   import { createClient as createServerClient } from "@/lib/clients/supabase/server";
   import { redirect } from "next/navigation";
-  import StatCard from "@/components/app/gio_dashboard/StatCard";
-  import ContentAnalyticsCard from "@/components/app/gio_dashboard/ContentAnalyticsCard";
-  import RecentActivityCard from "@/components/app/gio_dashboard/RecentActivityCard";
   import { getCounts } from "@/lib/functions/dashboard/getCounts";
   import { isOwner } from "@/lib/auth/ownership";
   import BlogUpdates from "@/components/app/user_dash/blog_updates";
