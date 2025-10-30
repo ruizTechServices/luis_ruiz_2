@@ -78,25 +78,20 @@ export async function POST(req: Request) {
         : existing?.availability_text ?? "Available for hire";
 
     if (existing) {
-      const { data: updatedRow, error: updateError } = await supabase
+      const { error: updateError } = await supabase
         .from("site_settings")
         .update({
           availability,
           availability_text: availabilityText,
           updated_at: new Date().toISOString(),
         })
-        .eq("id", existing.id)
-        .select("id")
-        .maybeSingle();
+        .eq("id", existing.id);
 
       if (updateError) {
         return NextResponse.json({ error: updateError.message }, { status: 500 });
       }
-      if (!updatedRow) {
-        return NextResponse.json({ error: "Update failed" }, { status: 500 });
-      }
     } else {
-      const { data: insertedRow, error: insertError } = await supabase
+      const { error: insertError } = await supabase
         .from("site_settings")
         .insert([
           {
@@ -104,15 +99,10 @@ export async function POST(req: Request) {
             availability_text: availabilityText,
             updated_at: new Date().toISOString(),
           },
-        ])
-        .select("id")
-        .maybeSingle();
+        ]);
 
       if (insertError) {
         return NextResponse.json({ error: insertError.message }, { status: 500 });
-      }
-      if (!insertedRow) {
-        return NextResponse.json({ error: "Insert failed" }, { status: 500 });
       }
     }
 
