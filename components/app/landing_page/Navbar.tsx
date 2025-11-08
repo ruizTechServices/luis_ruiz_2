@@ -39,8 +39,6 @@ export default async function NavBar({ items }: NavBarProps) {
         <Link href="/" className="flex items-center space-x-2 text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-purple-700 transition-all duration-300">
           Luis-Ruiz
         </Link>
-        {/* I think I want to change this logo brand with the actual logo of 24hourgpt */}
-
         {/* Desktop nav */}
         <nav className="hidden md:flex space-x-8">
           {itemsToRender.map((item) => (
