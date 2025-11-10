@@ -1,3 +1,4 @@
+// C:\Users\giost\CascadeProjects\websites\luis-ruiz\luis_ruiz_2\lib\functions\dashboard\getCounts.ts
 import type { SupabaseClient, PostgrestError } from "@supabase/supabase-js";
 
 export type DashboardCounts = {
@@ -17,6 +18,11 @@ export async function getCounts(
 
     // Fallback: GET with limit(0) still returns count header
     const get = await supabase.from(table).select("id", { count: "exact" }).limit(0);
+
+    if (!get.error) {
+      return { count: get.count ?? 0, error: null };
+    }
+
     return { count: get.count ?? 0, error: get.error ?? head.error };
   }
 

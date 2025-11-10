@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import type { OllamaMessage } from "@/lib/clients/ollama/types";
 import { ollamaStream } from "@/lib/models/providers/ollama";
-import { createClient } from "@supabase/supabase-js";
+import { createServiceRoleClient } from "@/lib/utils/supabaseServiceRole";
 import { getTextEmbedding } from "@/lib/functions/openai/embeddings";
 
 export const runtime = "nodejs";
@@ -18,14 +18,9 @@ export async function POST(req: NextRequest) {
     min_similarity?: number; // optional: filter by similarity threshold
   };
 
-  const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const supabase = SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
-    ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-    : null;
-
+  const supabase = createServiceRoleClient();
   if (!supabase) {
-    console.warn("[api/ollama] Supabase not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local and restart the dev server. Persistence will be skipped.");
+    console.warn("[api/ollama] Supabase service-role client unavailable. Persistence will be skipped.");
   }
 
   const encoder = new TextEncoder();

@@ -1,5 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
 import { getTextEmbedding } from "@/lib/functions/openai/embeddings";
+import { createServiceRoleClient } from "@/lib/utils/supabaseServiceRole";
 
 export type RetrievedContext = {
   id: number;
@@ -15,14 +15,11 @@ export async function getRelevantContext(
   topK: number = 5,
   minSimilarity?: number,
 ): Promise<RetrievedContext[]> {
-  const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-    console.warn("Supabase env vars missing for getRelevantContext");
+  const supabase = createServiceRoleClient();
+  if (!supabase) {
+    console.warn("Supabase service-role client unavailable for getRelevantContext");
     return [];
   }
-
-  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
   const embedding = await getTextEmbedding(queryText);
 
   const { data, error } = await supabase.rpc("match_gios_context", {

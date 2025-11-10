@@ -1,3 +1,4 @@
+// C:\Users\giost\CascadeProjects\websites\luis-ruiz\luis_ruiz_2\lib\auth\ownership.ts
 // Centralized owner check. Keep owner identities in env var OWNER_EMAILS (comma-separated)
 // Example: OWNER_EMAILS="giosterr44@gmail.com,owner2@example.com"
 import dotenv from "dotenv";
