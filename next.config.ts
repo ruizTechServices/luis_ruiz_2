@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Configure for Replit environment
   async headers() {
     return [
       {
@@ -15,9 +14,7 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  // Enable external packages configuration for better Replit compatibility
   serverExternalPackages: [],
-  // Allow images from Supabase Storage (project: huyhgdsjpdjzokjwaspb)
   images: {
     remotePatterns: [
       {

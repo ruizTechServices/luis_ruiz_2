@@ -1,3 +1,4 @@
+//C:\Users\giost\CascadeProjects\websites\luis-ruiz\luis_ruiz_2\tests\testAssistantForGio.ts
 import 'dotenv/config'
 import { createMessage, tools as gioTools } from '../lib/functions/anthropic/assistant_for_gio'
 import { getCurrentTimestamp } from '../lib/functions/getCurrentTimestamp'
@@ -21,7 +22,7 @@ if (!process.env.ANTHROPIC_API_KEY) {
 }
 
 async function run() {
-  const model = 'claude-3-5-sonnet-20240620'
+  const model = 'claude-sonnet-4-5'
 
   const first = await createMessage({
     model,

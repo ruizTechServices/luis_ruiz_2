@@ -1,9 +1,12 @@
+//C:\Users\giost\CascadeProjects\websites\luis-ruiz\luis_ruiz_2\scripts\run-tests.js
 /* Cross-platform test runner for all TS files in ./tests
  * Runs each test sequentially using tsx (local if available, else via npx).
  */
 const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const dotenv = require('dotenv');
+dotenv.config({ path: ['.env.local', '.env'] })
 
 const root = process.cwd();
 const testsDir = path.join(root, 'tests');
