@@ -4,6 +4,7 @@ import "./globals.css";
 import NavBar from "@/components/app/landing_page/Navbar";
 import { items } from "@/components/app/landing_page/navbarItems";
 import Footer from "@/components/app/landing_page/footer";
+import { Analytics } from "@vercel/analytics/next"
 
 export const metadata: Metadata = {
   title: "Luis Ruiz: your Tech Partner!",
@@ -24,6 +25,7 @@ export default function RootLayout({
       <body>
         <NavBar items={items} />
         {children}
+        <Analytics />
         <Footer />
       </body>
     </html>
