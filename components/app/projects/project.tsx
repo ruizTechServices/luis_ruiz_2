@@ -29,7 +29,16 @@ export default function Project({ url, title, description, reverse = false }: Pr
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
         {/* Description */}
         <div className={`order-2 ${descOrder} lg:col-span-5 ${descAlign} ${descPadding}`}>
-          <h3 className="text-xl font-semibold mb-2">{derivedTitle}</h3>
+          <h3 className="text-xl font-semibold mb-2">
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-current hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary"
+            >
+              {derivedTitle}
+            </a>
+          </h3>
           {description ? (
             <p className="text-muted-foreground leading-relaxed">{description}</p>
           ) : null}
