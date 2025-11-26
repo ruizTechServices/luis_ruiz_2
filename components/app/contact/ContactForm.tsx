@@ -8,7 +8,6 @@ import {
   CONTACT_FORM_CONSTANTS,
   type ContactFormInput,
   type ContactFormValues,
-  buildContactInsertPayload,
   contactFormSchema,
 } from "@/lib/validation/contact";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -55,12 +54,11 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
       try {
         setIsSubmitting(true);
         const parsedValues: ContactFormValues = contactFormSchema.parse(values);
-        const payload = buildContactInsertPayload(parsedValues);
 
         const response = await fetch("/api/contact", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+          body: JSON.stringify(parsedValues),
         });
 
         if (!response.ok) {
