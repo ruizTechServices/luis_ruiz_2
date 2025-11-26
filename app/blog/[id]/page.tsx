@@ -2,8 +2,6 @@ import 'server-only'
 import { notFound } from 'next/navigation'
 import { getPostById, getComments, getVoteCounts } from '@/lib/db/blog'
 import type { BlogPost } from '@/lib/types/blog'
-import NavBar from '@/components/app/landing_page/Navbar'
-import { items } from '@/components/app/landing_page/navbarItems'
 import { renderMarkdownToHtml } from '@/lib/utils/markdown'
 import { VoteControls, CommentsClient } from '@/components/app/blog/BlogInteractions'
 
@@ -26,7 +24,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ id: s
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
-      <NavBar items={items} />
       <article className="container mx-auto px-6 py-10 prose dark:prose-invert">
         <h1 className="mb-2">{post.title}</h1>
         <p className="text-sm text-gray-500">

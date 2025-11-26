@@ -68,7 +68,6 @@ export default function LoginPage() {
         // IMPORTANT: force a full navigation so server components (Navbar)
         // see the updated Supabase auth cookies.
         window.location.href = "/dashboard";
-        // alternative: window.location.assign("/dashboard");
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : String(e));
         setPasswordLoading(false);
