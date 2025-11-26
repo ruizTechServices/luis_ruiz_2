@@ -12,35 +12,18 @@ const budgetOptions = [
 const timelineOptions = ["asap", "1-month", "3-months", "6-months", "flexible"] as const;
 const preferredContactOptions = ["email", "phone", "either"] as const;
 
-const preprocessToTrimmed = (input: unknown) => (typeof input === "string" ? input.trim() : "");
-
 const requiredTextField = (maxLength: number, missingMessage: string) =>
-  z.preprocess(
-    preprocessToTrimmed,
-    z.string().min(1, missingMessage).max(maxLength, `Keep it under ${maxLength} characters`)
-  );
+  z.string().trim().min(1, missingMessage).max(maxLength, `Keep it under ${maxLength} characters`);
 
-const optionalTextField = (maxLength: number) =>
-  z.preprocess(
-    preprocessToTrimmed,
-    z.string().max(maxLength, `Keep it under ${maxLength} characters`)
-  );
-
-const createRequiredSelect = <const T extends readonly [string, ...string[]]>(options: T, message: string) =>
-  z.preprocess(
-    preprocessToTrimmed,
-    z.enum(options, {
-      errorMap: () => ({ message }),
-      required_error: message,
-      invalid_type_error: message,
-    })
-  );
+const optionalTextField = (maxLength: number) => z.string().trim().max(maxLength, `Keep it under ${maxLength} characters`);
 
 const createOptionalSelect = <const T extends readonly [string, ...string[]]>(options: T) =>
-  z.preprocess(
-    preprocessToTrimmed,
-    z.union([z.enum(options), z.literal("")])
-  );
+  z.union([z.enum(options), z.literal("")]);
+
+const createRequiredSelect = <const T extends readonly [string, ...string[]]>(options: T, message: string) =>
+  z
+    .union([z.enum(options), z.literal("")])
+    .refine((value): value is T[number] => value !== "", { message });
 
 export const contactFormSchema = z.object({
   firstName: requiredTextField(100, "First name is required"),
@@ -60,8 +43,10 @@ export const contactFormSchema = z.object({
     .max(2000, "Keep the message under 2000 characters"),
   budget: createOptionalSelect(budgetOptions),
   timeline: createOptionalSelect(timelineOptions),
-  preferredContact: createRequiredSelect(preferredContactOptions, "Choose a contact preference"),
-  newsletter: z.boolean().optional().transform((value) => value ?? false),
+  preferredContact: z.enum(preferredContactOptions, {
+    required_error: "Choose a contact preference",
+  }),
+  newsletter: z.boolean().default(false),
 });
 
 export const CONTACT_FORM_CONSTANTS = {

@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
   CONTACT_FORM_CONSTANTS,
+  type ContactFormInput,
   type ContactFormValues,
   buildContactInsertPayload,
   contactFormSchema,
@@ -27,7 +28,7 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitLabel, setSubmitLabel] = useState("Send Message");
 
-  const form = useForm<ContactFormValues>({
+  const form = useForm<ContactFormInput>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
       firstName: "",
@@ -41,7 +42,7 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
       timeline: "",
       preferredContact: "email",
       newsletter: false,
-    },
+    } satisfies ContactFormInput,
   });
 
   const subjectOptions = useMemo(() => CONTACT_FORM_CONSTANTS.subjectOptions, []);
@@ -50,10 +51,11 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
   const preferredContactOptions = useMemo(() => CONTACT_FORM_CONSTANTS.preferredContactOptions, []);
 
   const handleSubmit = useCallback(
-    async (values: ContactFormValues) => {
+    async (values: ContactFormInput) => {
       try {
         setIsSubmitting(true);
-        const payload = buildContactInsertPayload(values);
+        const parsedValues: ContactFormValues = contactFormSchema.parse(values);
+        const payload = buildContactInsertPayload(parsedValues);
 
         const response = await fetch("/api/contact", {
           method: "POST",
