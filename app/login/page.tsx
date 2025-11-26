@@ -15,35 +15,37 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const signInWithGoogle = useCallback(async () => {
+ const signInWithGoogle = useCallback(async () => {
   setGoogleLoading(true);
   setError(null);
   try {
-    // Prefer the current browser origin; fall back to configured site URL.
+    const envBase = process.env.NEXT_PUBLIC_SITE_URL;
     const runtimeBase =
       typeof window !== "undefined" ? window.location.origin : "";
-    const envBase = process.env.NEXT_PUBLIC_SITE_URL;
-    const base = (runtimeBase || envBase || "http://localhost:3000").replace(
+
+    const fallback = (runtimeBase || "http://localhost:3000").replace(
       "0.0.0.0",
       "localhost",
     );
 
+    // Prefer canonical env domain if provided; keeps prod on https://luis-ruiz.com
+    const base = (envBase || fallback).replace("0.0.0.0", "localhost");
+
     const redirectTo = new URL("/auth/callback", base).toString();
+
+    console.log("GOOGLE LOGIN DEBUG", { runtimeBase, envBase, base, redirectTo });
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo },
     });
-
-    console.log("GOOGLE LOGIN DEBUG", { runtimeBase, envBase, base, redirectTo });
-
     if (error) setError(error.message);
-    // Supabase will redirect; no further action needed
   } catch (e: unknown) {
     setError(e instanceof Error ? e.message : String(e));
     setGoogleLoading(false);
   }
 }, [supabase]);
+
 
 
   const signInWithPassword = useCallback(
