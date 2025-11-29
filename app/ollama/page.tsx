@@ -11,6 +11,27 @@ import EmbedInput from '@/components/app/chatbot_basic/EmbedInput'
 import { Toaster, toast } from 'sonner'
 import { checkOllamaOnline } from '@/lib/functions/isOllama'
 
+async function formatFetchError(res: Response, origin: string) {
+  try {
+    const contentType = res.headers.get('content-type')?.toLowerCase() ?? ''
+    if (contentType.includes('application/json')) {
+      const data = await res.json().catch(() => null)
+      if (data && typeof data === 'object') {
+        const message = typeof (data as { error?: unknown }).error === 'string'
+          ? (data as { error?: string }).error
+          : JSON.stringify(data)
+        return `${origin} responded ${res.status}${message ? ` – ${message}` : ''}`
+      }
+    } else {
+      const text = (await res.text().catch(() => '')).trim()
+      if (text) {
+        return `${origin} responded ${res.status} – ${text.slice(0, 400)}`
+      }
+    }
+  } catch {}
+  return `${origin} responded ${res.status}`
+}
+
 // Minimal chat UI for local Ollama via Next.js API routes
 export default function OllamaChatPage() {
   const [models, setModels] = useState<string[]>([])
@@ -37,20 +58,25 @@ export default function OllamaChatPage() {
     ;(async () => {
       try {
         let list: string[] = []
+        let latestError: string | null = null
         if (baseUrl) {
           const res = await fetch(`${baseUrl}/api/tags`, { cache: 'no-store' })
           if (res.ok) {
             const json = (await res.json()) as { models?: Array<{ name?: string }> }
             list = (json.models ?? []).map(m => m?.name).filter((n): n is string => Boolean(n))
+            latestError = null
           }
         } else {
           const res = await fetch('/api/ollama/models', { cache: 'no-store' })
-          const json = (await res.json()) as { models?: string[] }
+          const json = (await res.json()) as { models?: string[]; error?: string }
           list = Array.isArray(json.models) ? json.models : []
+          latestError = typeof json.error === 'string' ? json.error : null
         }
         if (!active) return
         setModels(list)
+        setError(latestError)
         let preferred = list.find(m => /llama3\.2:1b|phi3:mini|gemma3:1b/i.test(m)) || list[0] || ''
+
         try {
           const raw = localStorage.getItem('ollama_settings')
           if (raw) {
@@ -61,12 +87,15 @@ export default function OllamaChatPage() {
           }
         } catch {}
         setModel(preferred)
-      } catch {
+      } catch (e: unknown) {
         if (!active) return
         setModels([])
         setModel('')
+        const message = e instanceof Error ? e.message : 'Failed to load local models'
+        setError(message)
       }
     })()
+
     return () => {
       active = false
     }
@@ -191,8 +220,11 @@ export default function OllamaChatPage() {
           signal: controllerRef.current.signal,
         })
 
-        if (!res.ok || !res.body) {
-          throw new Error(`Request failed (${res.status})`)
+        if (!res.ok) {
+          throw new Error(await formatFetchError(res, `Ollama at ${baseUrl}`))
+        }
+        if (!res.body) {
+          throw new Error(`Ollama at ${baseUrl} returned an empty response body`)
         }
 
         const reader = res.body.getReader()
@@ -249,8 +281,11 @@ export default function OllamaChatPage() {
           signal: controllerRef.current.signal,
         })
 
-        if (!res.ok || !res.body) {
-          throw new Error(`Request failed (${res.status})`)
+        if (!res.ok) {
+          throw new Error(await formatFetchError(res, '/api/ollama'))
+        }
+        if (!res.body) {
+          throw new Error('Server response did not include a readable body')
         }
 
         const hdr = res.headers.get('x-chat-id')
@@ -340,16 +375,19 @@ export default function OllamaChatPage() {
       if (h.online) {
         try {
           let list: string[] = []
+          let latestError: string | null = null
           if (h.baseUrl) {
             const res = await fetch(`${h.baseUrl}/api/tags`, { cache: 'no-store' })
             if (res.ok) {
               const json = (await res.json()) as { models?: Array<{ name?: string }> }
               list = (json.models ?? []).map(m => m?.name).filter((n): n is string => Boolean(n))
+              latestError = null
             }
           } else {
             const res = await fetch('/api/ollama/models', { cache: 'no-store' })
-            const json = (await res.json()) as { models?: string[] }
+            const json = (await res.json()) as { models?: string[]; error?: string }
             list = Array.isArray(json.models) ? json.models : []
+            latestError = typeof json.error === 'string' ? json.error : null
           }
           setModels(list)
           let preferred = list.find(m => /llama3\.2:1b|phi3:mini|gemma3:1b/i.test(m)) || list[0] || ''
@@ -363,7 +401,7 @@ export default function OllamaChatPage() {
             }
           } catch {}
           setModel(preferred)
-          setError(null)
+          setError(latestError)
         } catch {}
       } else {
         setError('Ollama server is not running.')
