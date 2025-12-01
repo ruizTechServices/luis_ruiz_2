@@ -10,4 +10,5 @@ export const items: NavItem[] = [
   { label: 'Projects', href: '/projects' },
   { label: 'Contact', href: '/contact' },
   { label: 'Chat', href: '/ollama' },
+  { label: 'Round-Robin', href: '/round-robin' }
 ];
