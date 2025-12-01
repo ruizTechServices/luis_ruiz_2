@@ -11,6 +11,7 @@ export type RoundRobinEventType =
   | "session_resumed"
   | "session_completed"
   | "model_status"
+  | "round_complete"
   | "long_wait";
 
 export interface BaseEvent<T extends RoundRobinEventType, D> {
@@ -60,6 +61,11 @@ export type SessionCompletedEvent = BaseEvent<"session_completed", {
   summary: string;
 }>;
 
+export type RoundCompleteEvent = BaseEvent<"round_complete", {
+  round: number;
+  nextAction: "awaiting_user_input";
+}>;
+
 export type ModelStatusEvent = BaseEvent<"model_status", {
   model: string;
   status: "active" | "inactive" | "error";
@@ -81,8 +87,19 @@ export type RoundRobinEvent =
   | SessionResumedEvent
   | SessionCompletedEvent
   | ModelStatusEvent
+  | RoundCompleteEvent
   | LongWaitEvent;
 
 export function serializeEvent(event: RoundRobinEvent): string {
   return `event: ${event.type}\ndata: ${JSON.stringify(event.data)}\n\n`;
+}
+
+export function createRoundCompleteEvent(round: number): RoundRobinEvent {
+  return {
+    type: "round_complete",
+    data: {
+      round,
+      nextAction: "awaiting_user_input",
+    },
+  };
 }

@@ -9,7 +9,8 @@ export interface RoundRobinSession {
   turnOrder: string[];
   activeModels: string[];
   currentTurnIndex: number;
-  status: 'active' | 'paused' | 'completed' | 'error';
+  currentRound: number;
+  status: 'active' | 'paused' | 'completed' | 'error' | 'awaiting_user';
   userId?: string;
   errorContext?: {
     model: string;
