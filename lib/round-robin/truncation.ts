@@ -59,7 +59,7 @@ export async function truncateHistory(
     removedMessages.push(entry.message);
   }
 
-  let truncated = annotated.filter((entry) => !entry.removed).map((entry) => entry.message);
+  const truncated = annotated.filter((entry) => !entry.removed).map((entry) => entry.message);
 
   if (totalTokens > budget) {
     // Nothing more can be removed without touching anchors, so return the best effort.

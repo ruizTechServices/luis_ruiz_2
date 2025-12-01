@@ -2,13 +2,11 @@
 "use client";
 
 import { useCallback, useMemo, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import { createClient as createBrowserSupabase } from "@/lib/clients/supabase/client";
 import Link from "next/link";
 
 export default function LoginPage() {
   const supabase = useMemo(() => createBrowserSupabase(), []);
-  const router = useRouter();
   const [googleLoading, setGoogleLoading] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

@@ -196,7 +196,13 @@ export default function RoundRobinPage() {
         setCurrentRound(dbSession.current_round ?? 1);
 
         const mappedMessages: ThreadMessage[] = (data.messages ?? []).map(
-          (m: any) => ({
+          (m: {
+            id: number;
+            model: string;
+            role: "user" | "assistant";
+            content?: string | null;
+            turn_index?: number | null;
+          }) => ({
             id: m.id,
             model: m.model,
             role: m.role,

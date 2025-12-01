@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
       });
 
       let currentTurnIndex: number = session.current_turn_index ?? 0;
-      let currentRound: number = session.current_round ?? 1;
+      const currentRound: number = session.current_round ?? 1;
 
       if (modelsInRound === 0) {
         enqueueEvent({
