@@ -33,14 +33,6 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
     // Check if admin
     const isAdmin = isOwner(user.email);
 
-    // Parse body for userId (for user-scoped deletion)
-    let body: { userId?: string } = {};
-    try {
-      body = await req.json();
-    } catch {
-      // No body is fine for admin
-    }
-
     if (isAdmin) {
       // Admin can delete any session
       await deleteChatSession(chatIdNum);
