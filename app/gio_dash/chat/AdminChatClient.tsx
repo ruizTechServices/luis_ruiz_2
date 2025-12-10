@@ -13,7 +13,6 @@ export default function AdminChatClient({ sessions }: AdminChatClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [expandedId, setExpandedId] = useState<number | null>(null);
 
   const handleDelete = async (chatId: number) => {
     if (!confirm("Delete this chat session? This cannot be undone.")) return;

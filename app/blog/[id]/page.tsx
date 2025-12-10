@@ -1,6 +1,6 @@
 import 'server-only'
 import { notFound } from 'next/navigation'
-import { getPostById, getComments, getVoteCounts } from '@/lib/db/blog'
+import { getPostById, getCommentsForPost, getVoteCounts } from '@/lib/db/blog'
 import type { BlogPost } from '@/lib/types/blog'
 import { renderMarkdownToHtml } from '@/lib/utils/markdown'
 import { VoteControls, CommentsClient } from '@/components/app/blog/BlogInteractions'
@@ -16,7 +16,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ id: s
   if (!post) return notFound()
 
   const [comments, votes] = await Promise.all([
-    getComments(idNum),
+    getCommentsForPost(idNum),
     getVoteCounts(idNum),
   ])
 
