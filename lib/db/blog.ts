@@ -146,17 +146,6 @@ export async function getPostById(id: number): Promise<BlogPost | null> {
   return data as BlogPost | null;
 }
 
-export async function getComments(postId: number): Promise<BlogComment[]> {
-  const supabase = await supa();
-  const { data, error } = await supabase
-    .from("comments")
-    .select("id, post_id, user_email, content, created_at")
-    .eq("post_id", postId)
-    .order("created_at", { ascending: false });
-  if (error) throw error;
-  return (data ?? []) as BlogComment[];
-}
-
 export async function getVoteCounts(postId: number): Promise<{ up: number; down: number }> {
   const supabase = await supa();
   const { data, error } = await supabase
