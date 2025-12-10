@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import type { OllamaMessage } from "@/lib/clients/ollama/types";
 import { ollamaStream } from "@/lib/models/providers/ollama";
 import { createServiceRoleClient } from "@/lib/utils/supabaseServiceRole";
+import { createClient as createServerSupabase } from "@/lib/clients/supabase/server";
 import { getTextEmbedding } from "@/lib/functions/openai/embeddings";
 
 export const runtime = "nodejs";
@@ -21,6 +22,16 @@ export async function POST(req: NextRequest) {
   const supabase = createServiceRoleClient();
   if (!supabase) {
     console.warn("[api/ollama] Supabase service-role client unavailable. Persistence will be skipped.");
+  }
+
+  // Resolve current user from session (for user_id on chat rows)
+  let userId: string | null = null;
+  try {
+    const authClient = await createServerSupabase();
+    const { data: { user } } = await authClient.auth.getUser();
+    userId = user?.id ?? null;
+  } catch {
+    // No session or auth error; userId stays null (anonymous usage)
   }
 
   const encoder = new TextEncoder();
@@ -53,7 +64,7 @@ export async function POST(req: NextRequest) {
     try {
       const { data: msgRow, error: insErr } = await supabase
         .from("chat_messages")
-        .insert({ chat_id: sessionId, message: userContent })
+        .insert({ chat_id: sessionId, message: userContent, user_id: userId })
         .select("id")
         .single();
       if (insErr) throw insErr;
@@ -68,6 +79,7 @@ export async function POST(req: NextRequest) {
           embedding: userEmbedding,
           message: userContent,
           chat_id: userMessageId,
+          user_id: userId,
         });
       }
 
@@ -80,6 +92,7 @@ export async function POST(req: NextRequest) {
         source: "conversation",
         content: userContent,
         embedding: userEmbedding,
+        user_id: userId,
       });
     } catch (e) {
       console.error("Failed to persist user message/embedding:", e);
@@ -130,7 +143,7 @@ export async function POST(req: NextRequest) {
           try {
             const { data: msgRow, error: insErr } = await supabase
               .from("chat_messages")
-              .insert({ chat_id: sessionId, message: assistantText })
+              .insert({ chat_id: sessionId, message: assistantText, user_id: userId })
               .select("id")
               .single();
             if (insErr) throw insErr;
@@ -144,6 +157,7 @@ export async function POST(req: NextRequest) {
                 embedding: assistantEmbedding,
                 message: assistantText,
                 chat_id: assistantMessageId,
+                user_id: userId,
               });
             }
 
@@ -155,6 +169,7 @@ export async function POST(req: NextRequest) {
               source: "conversation",
               content: assistantText,
               embedding: assistantEmbedding,
+              user_id: userId,
             });
           } catch (e) {
             console.error("Failed to persist assistant message/embedding:", e);
