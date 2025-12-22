@@ -118,6 +118,13 @@ export async function GET(request: NextRequest) {
         // Check provider availability; emit error if unavailable
         const isAvailable = await provider.isAvailable();
         if (!isAvailable) {
+          console.error('[round-robin] provider unavailable', {
+            sessionId,
+            modelId,
+            turnIndex: currentTurnIndex,
+            round: currentRound,
+            error: 'Missing API key or provider offline',
+          });
           enqueueEvent({
             type: 'turn_error',
             data: {
@@ -155,6 +162,14 @@ export async function GET(request: NextRequest) {
         try {
           const result = await provider.generateResponse(trimmedHistory, systemPrompt);
           clearTimeout(longWaitTimer);
+          console.info('[round-robin] provider success', {
+            sessionId,
+            modelId,
+            turnIndex: currentTurnIndex,
+            round: currentRound,
+            tokenCount: result.tokenCount,
+            contentLength: result.content.length,
+          });
 
           emitContentChunks(result.content, modelId, enqueueEvent);
           enqueueEvent({
@@ -238,6 +253,15 @@ export async function GET(request: NextRequest) {
               updated_at: new Date().toISOString(),
             })
             .eq('id', sessionId);
+
+          console.error('[round-robin] provider call failed', {
+            sessionId,
+            modelId,
+            turnIndex: currentTurnIndex,
+            round: currentRound,
+            error: message,
+            stack: providerError instanceof Error ? providerError.stack : undefined,
+          });
 
           controller.close();
           return;

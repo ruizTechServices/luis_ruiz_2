@@ -63,6 +63,12 @@ export const openAIAdapter: ProviderAdapter = {
         tokenCount,
       };
     } catch (error) {
+      console.error('[round-robin] openai error', {
+        model: DEFAULT_OPENAI_MODEL,
+        messageCount: messages.length,
+        lastRole: messages.at(-1)?.role,
+        error: error instanceof Error ? error.message : error,
+      });
       const message =
         error instanceof OpenAI.APIError
           ? `${error.status ?? ''} ${error.error?.message ?? error.message}`.trim()

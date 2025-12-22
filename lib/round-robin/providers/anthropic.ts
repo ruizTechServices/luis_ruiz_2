@@ -41,13 +41,22 @@ export const anthropicAdapter: ProviderAdapter = {
   // NOTE: truncation is handled by the stream route before calling this adapter
   async generateResponse(messages: RoundRobinMessage[], systemPrompt: string) {
     const client = getClient();
+    const conversation = messages.map(toAnthropicMessage);
+
+    // Anthropic expects the last turn to be user/input; ensure we end on a user role.
+    if (conversation.length === 0 || conversation[conversation.length - 1].role !== 'user') {
+      conversation.push({
+        role: 'user',
+        content: 'Continue the discussion based on the conversation above. Provide your next contribution.',
+      });
+    }
 
     try {
       const response = await client.messages.create({
         model: DEFAULT_ANTHROPIC_MODEL,
         max_tokens: 2048,
         system: systemPrompt,
-        messages: messages.map(toAnthropicMessage),
+        messages: conversation,
       });
 
       const textBlock = response.content.find((block) => block.type === 'text');
@@ -62,6 +71,12 @@ export const anthropicAdapter: ProviderAdapter = {
 
       return { content, tokenCount };
     } catch (error) {
+      console.error('[round-robin] anthropic error', {
+        model: DEFAULT_ANTHROPIC_MODEL,
+        messageCount: messages.length,
+        lastRole: messages.at(-1)?.role,
+        error: error instanceof Error ? error.message : error,
+      });
       if (error instanceof AnthropicProviderError) throw error;
       const message = error instanceof Error ? error.message : 'Unknown Anthropic error';
       throw new AnthropicProviderError(message);

@@ -60,6 +60,12 @@ export const huggingfaceAdapter: ProviderAdapter = {
       const tokenCount = response.usage?.total_tokens ?? countTokens(content);
       return { content, tokenCount };
     } catch (error) {
+      console.error('[round-robin] huggingface error', {
+        model: DEFAULT_HF_MODEL,
+        messageCount: messages.length,
+        lastRole: messages.at(-1)?.role,
+        error: error instanceof Error ? error.message : error,
+      });
       if (error instanceof HuggingFaceProviderError) throw error;
       const message = error instanceof Error ? error.message : 'Unknown HuggingFace error';
       throw new HuggingFaceProviderError(message);

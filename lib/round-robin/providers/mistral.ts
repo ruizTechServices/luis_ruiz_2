@@ -41,13 +41,22 @@ export const mistralAdapter: ProviderAdapter = {
   // NOTE: truncation is handled by the stream route before calling this adapter
   async generateResponse(messages: RoundRobinMessage[], systemPrompt: string) {
     const client = getClient();
+    const conversation = messages.map(toMistralMessage);
+
+    // Mistral requires the last message to be 'user' or 'tool'; enforce a user turn to avoid 400 errors.
+    if (conversation.length === 0 || conversation[conversation.length - 1].role !== 'user') {
+      conversation.push({
+        role: 'user',
+        content: 'Continue the discussion based on the conversation above. Provide your next contribution.',
+      });
+    }
 
     try {
       const response = await client.chat.complete({
         model: DEFAULT_MISTRAL_MODEL,
         messages: [
           { role: 'system', content: systemPrompt },
-          ...messages.map(toMistralMessage),
+          ...conversation,
         ],
       });
 
@@ -63,6 +72,12 @@ export const mistralAdapter: ProviderAdapter = {
       const tokenCount = response.usage?.totalTokens ?? countTokens(content);
       return { content, tokenCount };
     } catch (error) {
+      console.error('[round-robin] mistral error', {
+        model: DEFAULT_MISTRAL_MODEL,
+        messageCount: messages.length,
+        lastRole: messages.at(-1)?.role,
+        error: error instanceof Error ? error.message : error,
+      });
       if (error instanceof MistralProviderError) throw error;
       const message = error instanceof Error ? error.message : 'Unknown Mistral error';
       throw new MistralProviderError(message);

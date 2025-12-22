@@ -6,7 +6,7 @@ import OpenAI from 'openai';
 import type { ProviderAdapter, RoundRobinMessage } from '../types';
 import { countTokens, MODEL_CONTEXT_LIMITS } from '../truncation';
 
-const DEFAULT_XAI_MODEL = process.env.XAI_MODEL ?? 'grok-2-latest';
+const DEFAULT_XAI_MODEL = 'grok-4-1-fast';
 
 class XAIProviderError extends Error {
   constructor(message: string) {
@@ -66,6 +66,12 @@ export const xaiAdapter: ProviderAdapter = {
       const tokenCount = completion.usage?.total_tokens ?? countTokens(content);
       return { content, tokenCount };
     } catch (error) {
+      console.error('[round-robin] xai error', {
+        model: DEFAULT_XAI_MODEL,
+        messageCount: messages.length,
+        lastRole: messages.at(-1)?.role,
+        error: error instanceof Error ? error.message : error,
+      });
       if (error instanceof XAIProviderError) throw error;
       const message =
         error instanceof OpenAI.APIError
