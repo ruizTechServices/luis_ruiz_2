@@ -7,14 +7,10 @@ import {
   SUPPORTED_MODELS,
 } from '@/lib/round-robin/constants';
 import { createRoundCompleteEvent, serializeEvent } from '@/lib/round-robin/events';
-import openAIAdapter from '@/lib/round-robin/providers/openai';
+import { adapterRegistry, fallbackAdapter } from '@/lib/round-robin/providers';
 import { truncateHistory } from '@/lib/round-robin/truncation';
-import type { ProviderAdapter, RoundRobinMessage } from '@/lib/round-robin/types';
+import type { RoundRobinMessage } from '@/lib/round-robin/types';
 import { createServiceRoleClient } from '@/lib/utils/supabaseServiceRole';
-
-const adapterRegistry: Record<string, ProviderAdapter> = {
-  openai: openAIAdapter,
-};
 
 export const runtime = 'nodejs';
 
@@ -44,10 +40,7 @@ export async function GET(request: NextRequest) {
     return new Response('Session not found', { status: 404 });
   }
 
-  const adapter = adapterRegistry.openai;
-  if (!(await adapter.isAvailable())) {
-    return new Response('OpenAI adapter unavailable', { status: 503 });
-  }
+  // Provider availability is checked per-turn to allow mixed availability
 
   const { data: historyRows, error: historyError } = await supabase
     .from('round_robin_messages')
@@ -120,7 +113,32 @@ export async function GET(request: NextRequest) {
       while (true) {
         const turnsCompletedThisRound = currentTurnIndex % modelsInRound;
         const modelId = activeTurnOrder[turnsCompletedThisRound];
-        const provider = adapterRegistry[modelId] ?? adapterRegistry.openai;
+        const provider = adapterRegistry[modelId] ?? fallbackAdapter;
+
+        // Check provider availability; emit error if unavailable
+        const isAvailable = await provider.isAvailable();
+        if (!isAvailable) {
+          enqueueEvent({
+            type: 'turn_error',
+            data: {
+              model: modelId,
+              error: `${modelId} provider is not configured (missing API key)`,
+              options: ['skip', 'remove'],
+            },
+          });
+
+          await supabase
+            .from('round_robin_sessions')
+            .update({
+              status: 'error',
+              error_context: { model: modelId, error: 'Provider unavailable', retryCount: 0 },
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', sessionId);
+
+          controller.close();
+          return;
+        }
 
         enqueueEvent({ type: 'turn_start', data: { model: modelId, turnIndex: currentTurnIndex } });
 

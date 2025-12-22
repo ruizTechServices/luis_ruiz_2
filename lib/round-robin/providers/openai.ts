@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 
 import type { ProviderAdapter, RoundRobinMessage } from '../types';
-import { countTokens, MODEL_CONTEXT_LIMITS, truncateHistory } from '../truncation';
+import { countTokens, MODEL_CONTEXT_LIMITS } from '../truncation';
 
 const DEFAULT_OPENAI_MODEL = process.env.OPENAI_MODEL ?? 'gpt-4o-mini';
 
@@ -35,13 +35,13 @@ export const openAIAdapter: ProviderAdapter = {
     return Boolean(process.env.OPENAI_API_KEY);
   },
 
+  // NOTE: truncation is handled by the stream route before calling this adapter
   async generateResponse(messages: RoundRobinMessage[], systemPrompt: string) {
     const client = getClient();
 
-    const history = await truncateHistory(messages, 'openai');
     const payloadMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
       { role: 'system', content: systemPrompt },
-      ...history.map(toChatMessage),
+      ...messages.map(toChatMessage),
     ];
 
     try {
