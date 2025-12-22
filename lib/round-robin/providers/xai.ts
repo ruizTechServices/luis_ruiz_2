@@ -6,7 +6,7 @@ import OpenAI from 'openai';
 import type { ProviderAdapter, RoundRobinMessage } from '../types';
 import { countTokens, MODEL_CONTEXT_LIMITS } from '../truncation';
 
-const DEFAULT_XAI_MODEL = 'grok-4-1-fast';
+const DEFAULT_XAI_MODEL = 'grok-4-fast-non-reasoning';
 
 class XAIProviderError extends Error {
   constructor(message: string) {
