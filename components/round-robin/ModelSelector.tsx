@@ -51,18 +51,23 @@ export function ModelSelector({
           const isSelected = selectedModels.includes(model.id);
           const selectable = !disabled && model.available;
           return (
-            <button
+            <div
               key={model.id}
-              type="button"
+              role="button"
+              tabIndex={selectable ? 0 : -1}
               onClick={() => handleToggle(model.id, selectable)}
-              disabled={!selectable}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  handleToggle(model.id, selectable);
+                }
+              }}
               className={cn(
                 "flex items-center justify-between rounded-md border px-3 py-2 text-left transition-colors",
                 isSelected
                   ? "border-primary bg-primary/5"
                   : "border-border bg-background",
-                !model.available && "opacity-60 cursor-not-allowed",
-                disabled && "opacity-60 cursor-not-allowed"
+                selectable ? "cursor-pointer" : "opacity-60 cursor-not-allowed"
               )}
               title={
                 model.available
@@ -79,7 +84,7 @@ export function ModelSelector({
                 onCheckedChange={() => handleToggle(model.id, selectable)}
                 disabled={!selectable}
               />
-            </button>
+            </div>
           );
         })}
       </CardContent>
