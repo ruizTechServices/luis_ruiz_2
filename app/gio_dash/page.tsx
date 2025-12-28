@@ -26,49 +26,58 @@ export default async function GioDashboard() {
             Gio Dashboard
           </h1>
           <p className="text-gray-600 dark:text-gray-300">
-            Your command center for content management and analytics
+            Your command center for ruizTechServices and luis-ruiz.com
           </p>
         </div>
 
         {/* Blog posts */}
         <div className="mt-6 w-1/2">
+          <h2 className="text-2xl font-bold mb-4">Blog Posts</h2>
           <BlogCard />
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-8">
-          <StatCard
-            title="Total Posts"
-            value={postsCount}
-            icon={
-              <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            }
-            iconBgClassName="bg-blue-100 dark:bg-blue-900"
-          />
-          <StatCard
-            title="Comments"
-            value={commentsCount}
-            icon={
-              <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-            }
-            iconBgClassName="bg-green-100 dark:bg-green-900"
-          />
-          <StatCard
-            title="Total Votes"
-            value={votesCount}
-            icon={
-              <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-              </svg>
-            }
-            iconBgClassName="bg-purple-100 dark:bg-purple-900"
-          />
+        <div className="my-10">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+            <h2 className="text-2xl font-bold">Stats</h2>
+            <span className="text-sm text-gray-600 dark:text-gray-400">Live snapshot of site activity</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <StatCard
+              title="Total Posts"
+              value={postsCount}
+              icon={
+                <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              }
+              iconBgClassName="bg-blue-100 dark:bg-blue-900"
+            />
+            <StatCard
+              title="Comments"
+              value={commentsCount}
+              icon={
+                <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              }
+              iconBgClassName="bg-green-100 dark:bg-green-900"
+            />
+            <StatCard
+              title="Total Votes"
+              value={votesCount}
+              icon={
+                <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                </svg>
+              }
+              iconBgClassName="bg-purple-100 dark:bg-purple-900"
+            />
+          </div>
         </div>
-
+        
+        <div className="my-10"><hr /></div>
+        
         {/* Feature Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <ContentAnalyticsCard />
