@@ -3,6 +3,7 @@ import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient as createServerClient } from "@/lib/clients/supabase/server";
+import { isOwner } from "@/lib/auth/ownership";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -12,6 +13,14 @@ import { Card } from "@/components/ui/card";
 async function createPost(formData: FormData) {
   "use server";
   const supabase = await createServerClient();
+  const { data: userRes } = await supabase.auth.getUser();
+  const email = userRes?.user?.email;
+  if (!email) {
+    throw new Error("Not authenticated");
+  }
+  if (!isOwner(email)) {
+    throw new Error("Not authorized");
+  }
 
   const title = (formData.get("title") || "").toString().trim();
   const summary = (formData.get("summary") || "").toString().trim();
@@ -39,7 +48,13 @@ async function createPost(formData: FormData) {
   redirect("/gio_dash");
 }
 
-export default function NewPostPage() {
+export default async function NewPostPage() {
+  const supabase = await createServerClient();
+  const { data: userRes } = await supabase.auth.getUser();
+  const email = userRes?.user?.email;
+  if (!email) redirect("/login");
+  if (!isOwner(email)) redirect("/dashboard");
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-slate-800 dark:to-indigo-900">
       <div className="container mx-auto px-6 py-8">

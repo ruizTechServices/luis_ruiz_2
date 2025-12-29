@@ -1,9 +1,42 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/clients/supabase/server';
+import { isOwner } from '@/lib/auth/ownership';
 
 const PHOTOS_BUCKET = process.env.SUPABASE_PHOTOS_BUCKET || 'photos';
 
 export const dynamic = 'force-dynamic';
+
+async function getSupabaseOrJsonError() {
+  try {
+    return { supabase: await createClient() };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    return {
+      errorResponse: NextResponse.json(
+        { error: `Supabase client not configured: ${message}` },
+        { status: 500 },
+      ),
+    };
+  }
+}
+
+async function requireOwnerClient() {
+  const { supabase, errorResponse } = await getSupabaseOrJsonError();
+  if (!supabase) return { errorResponse };
+
+  const { data: userRes, error: userErr } = await supabase.auth.getUser();
+  if (userErr) {
+    return { errorResponse: NextResponse.json({ error: userErr.message }, { status: 401 }) };
+  }
+  const email = userRes?.user?.email;
+  if (!email) {
+    return { errorResponse: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
+  }
+  if (!isOwner(email)) {
+    return { errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) };
+  }
+  return { supabase };
+}
 
 // POST /api/photos/upload
 // Form fields:
@@ -11,6 +44,9 @@ export const dynamic = 'force-dynamic';
 // - files (one or more File inputs)
 export async function POST(request: Request) {
   try {
+    const { supabase, errorResponse } = await requireOwnerClient();
+    if (!supabase) return errorResponse!;
+
     const form = await request.formData();
     const prefix = String(form.get('prefix') || 'hero').replace(/^\/+|\/+$/g, '');
     const files = form.getAll('files') as File[];
@@ -18,8 +54,6 @@ export async function POST(request: Request) {
     if (!files || files.length === 0) {
       return NextResponse.json({ error: 'No files provided (field name: files)' }, { status: 400 });
     }
-
-    const supabase = await createClient();
 
     const uploaded: Array<{ name: string; path: string; url: string | null }> = [];
     const errors: Array<{ name: string; message: string }> = [];

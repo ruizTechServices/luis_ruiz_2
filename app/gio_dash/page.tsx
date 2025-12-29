@@ -1,5 +1,7 @@
 import 'server-only';
 import { createClient as createServerClient } from "@/lib/clients/supabase/server";
+import { redirect } from "next/navigation";
+import { isOwner } from "@/lib/auth/ownership";
 import SystemHealthCard from "@/components/app/gio_dashboard/SystemHealthCard";
 import ContentAnalyticsCard from "@/components/app/gio_dashboard/ContentAnalyticsCard";
 import UserManagementCard from "@/components/app/gio_dashboard/UserManagementCard";
@@ -12,6 +14,15 @@ import { BlogCard } from "@/components/app/blog/blog_card"; // slideshow compone
 
 export default async function GioDashboard() {
   const supabase = await createServerClient();
+  const { data: userRes } = await supabase.auth.getUser();
+  const email = userRes?.user?.email;
+
+  if (!email) {
+    redirect("/login");
+  }
+  if (!isOwner(email)) {
+    redirect("/dashboard");
+  }
 
   const { posts: postsCount, comments: commentsCount, votes: votesCount, errors } =
     await getCounts(supabase);

@@ -46,8 +46,13 @@ const TechSection = () => {
           {/* Section subtitle in plastic badge */}
           <div className="text-center mb-8 md:mb-10">
             <div className="inline-block px-6 py-2 bg-white/70 dark:bg-gray-800/70 backdrop-blur-md rounded-full border border-white/50 dark:border-gray-700/50 shadow-[0_4px_16px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]">
-              <p className="text-sm sm:text-base uppercase tracking-wider text-gray-800 dark:text-gray-200 font-bold">
-                Technologies & Tools
+              <p className="text-sm sm:text-base font-bold text-gray-900 dark:text-gray-100 drop-shadow-lg">
+                <span className="block text-base text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                  Technologies & Tools
+                </span>
+                <span className="block text-2xl font-semibold">
+                  That I utilize
+                </span>
               </p>
             </div>
           </div>
