@@ -3,6 +3,12 @@
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { Switch } from "@/components/ui/switch";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 
 const AVAILABILITY_ENDPOINT = "/api/site_settings/availability";
 const DEFAULT_AVAILABILITY_TEXT = "Available for hire";
@@ -44,6 +50,8 @@ export default function QuickActionsCard() {
   const [projectTitle, setProjectTitle] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
   const [projectMsg, setProjectMsg] = useState<string | null>(null);
+  const [availabilityOpen, setAvailabilityOpen] = useState(true);
+  const [projectOpen, setProjectOpen] = useState(true);
 
   const quickLinks = useMemo(
     () => [
@@ -121,7 +129,8 @@ export default function QuickActionsCard() {
         setProjectTitle("");
         setProjectDescription("");
       } catch (error) {
-        setProjectMsg(error instanceof Error ? error.message : String(error));
+        const msg = error instanceof Error ? error.message : JSON.stringify(error);
+        setProjectMsg(msg);
       }
     });
   }, [projectDescription, projectTitle, projectUrl]);
@@ -143,13 +152,19 @@ export default function QuickActionsCard() {
         ))}
       </div>
 
-      <div className="mt-2 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
-        <div className="flex items-center justify-between mb-2">
-          <div className="text-sm font-medium text-gray-800 dark:text-gray-200">Availability</div>
-          <div className="flex items-center gap-2">
+      <Collapsible
+        open={availabilityOpen}
+        onOpenChange={setAvailabilityOpen}
+        className="mt-2 p-3 rounded-lg border border-gray-200 dark:border-gray-700"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="text-sm font-medium text-gray-800 dark:text-gray-200">Availability</div>
             <span className={`text-xs ${available ? "text-green-600" : "text-red-500"}`}>
               {available ? "Available" : "Booked"}
             </span>
+          </div>
+          <div className="flex items-center gap-2">
             <Switch
               checked={available}
               disabled={!loaded || isPending}
@@ -159,66 +174,92 @@ export default function QuickActionsCard() {
                 save({ availability: checked }, { revertAvailabilityTo: prev });
               }}
             />
+            <CollapsibleTrigger
+              className="text-xs text-gray-600 dark:text-gray-300 inline-flex items-center gap-1 rounded-md border border-gray-200 dark:border-gray-700 px-2 py-1 transition hover:bg-gray-50 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+              aria-label={`${availabilityOpen ? "Hide" : "Show"} availability`}
+            >
+              <span>{availabilityOpen ? "Hide" : "Show"}</span>
+              <ChevronDown
+                className={`size-4 transition-transform ${availabilityOpen ? "rotate-180" : ""}`}
+              />
+            </CollapsibleTrigger>
           </div>
         </div>
-        <div className="flex items-center gap-2 mt-2">
-          <input
-            type="text"
-            className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-transparent text-sm"
-            value={availabilityText}
-            onChange={(e) => setAvailabilityText(e.target.value)}
-            placeholder="Availability text"
-            disabled={!loaded || isPending}
-          />
-          <button
-            onClick={() => save()}
-            disabled={!loaded || isPending}
-            className="px-3 py-2 rounded-md border text-xs hover:bg-gray-50 disabled:opacity-50"
-          >
-            {isPending ? "Saving..." : "Save"}
-          </button>
-          {message && <div className="mt-2 text-xs text-gray-500">{message}</div>}
-        </div>
-      </div>
-
-      <div className="mt-4 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
-        <div className="text-sm font-medium text-gray-800 dark:text-gray-200 mb-2">Add Project</div>
-        <div className="flex flex-col gap-2">
-          <input
-            type="url"
-            placeholder="https://example.com"
-            className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-transparent text-sm"
-            value={projectUrl}
-            onChange={(e) => setProjectUrl(e.target.value)}
-            disabled={isPending}
-          />
-          <input
-            type="text"
-            placeholder="Title (optional)"
-            className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-transparent text-sm"
-            value={projectTitle}
-            onChange={(e) => setProjectTitle(e.target.value)}
-            disabled={isPending}
-          />
-          <textarea
-            placeholder="Description (optional)"
-            className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-transparent text-sm min-h-20"
-            value={projectDescription}
-            onChange={(e) => setProjectDescription(e.target.value)}
-            disabled={isPending}
-          />
-          <div className="flex items-center gap-2">
+        <CollapsibleContent className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden">
+          <div className="flex items-center gap-2 mt-3">
+            <input
+              type="text"
+              className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-transparent text-sm"
+              value={availabilityText}
+              onChange={(e) => setAvailabilityText(e.target.value)}
+              placeholder="Availability text"
+              disabled={!loaded || isPending}
+            />
             <button
-              onClick={submitProject}
-              disabled={isPending || !projectUrl}
+              onClick={() => save()}
+              disabled={!loaded || isPending}
               className="px-3 py-2 rounded-md border text-xs hover:bg-gray-50 disabled:opacity-50"
             >
-              {isPending ? "Saving..." : "Upload Project"}
+              {isPending ? "Saving..." : "Save"}
             </button>
-            {projectMsg && <span className="text-xs text-gray-500">{projectMsg}</span>}
+            {message && <div className="text-xs text-gray-500">{message}</div>}
           </div>
+        </CollapsibleContent>
+      </Collapsible>
+
+      <Collapsible
+        open={projectOpen}
+        onOpenChange={setProjectOpen}
+        className="mt-4 p-3 rounded-lg border border-gray-200 dark:border-gray-700"
+      >
+        <div className="flex items-center justify-between">
+          <div className="text-sm font-medium text-gray-800 dark:text-gray-200">Add Project</div>
+          <CollapsibleTrigger
+            className="text-xs text-gray-600 dark:text-gray-300 inline-flex items-center gap-1 rounded-md border border-gray-200 dark:border-gray-700 px-2 py-1 transition hover:bg-gray-50 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+            aria-label={`${projectOpen ? "Hide" : "Show"} add project`}
+          >
+            <span>{projectOpen ? "Hide" : "Show"}</span>
+            <ChevronDown className={`size-4 transition-transform ${projectOpen ? "rotate-180" : ""}`} />
+          </CollapsibleTrigger>
         </div>
-      </div>
+        <CollapsibleContent className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden">
+          <div className="flex flex-col gap-2 mt-2">
+            <input
+              type="url"
+              placeholder="https://example.com"
+              className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-transparent text-sm"
+              value={projectUrl}
+              onChange={(e) => setProjectUrl(e.target.value)}
+              disabled={isPending}
+            />
+            <input
+              type="text"
+              placeholder="Title (optional)"
+              className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-transparent text-sm"
+              value={projectTitle}
+              onChange={(e) => setProjectTitle(e.target.value)}
+              disabled={isPending}
+            />
+            <textarea
+              placeholder="Description (optional)"
+              className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-transparent text-sm min-h-20"
+              value={projectDescription}
+              onChange={(e) => setProjectDescription(e.target.value)}
+              disabled={isPending}
+            />
+            <div className="flex items-center gap-2">
+              <button
+                onClick={submitProject}
+                disabled={isPending || !projectUrl}
+                className="px-3 py-2 rounded-md border text-xs hover:bg-gray-50 disabled:opacity-50"
+              >
+                {isPending ? "Saving..." : "Upload Project"}
+              </button>
+              {projectMsg && <span className="text-xs text-gray-500">{projectMsg}</span>}
+            </div>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
     </div>
   );
 }
