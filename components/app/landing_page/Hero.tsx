@@ -228,21 +228,22 @@ export default function Hero() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-6 mt-16">
+            <div className="grid grid-cols-4 gap-6 mt-16">
               {[
                 { label: 'Projects', value: '5+' },
+                { value: '100%', label: 'Resilient' },
                 { label: 'Clients', value: '10+' },
-                { label: 'Experience', value: '4+ yrs' },
+                { label: 'Experience', value: '5+ yrs' }
               ].map((stat, index) => (
                 <div 
                   key={stat.label}
                   className="text-center opacity-0 animate-fadeInUp"
                   style={{ animationDelay: `${0.5 + index * 0.1}s`, animationFillMode: 'forwards' }}
                 >
-                  <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+                  <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
                     {stat.value}
                   </div>
-                  <div className="text-sm text-gray-400 mt-1">{stat.label}</div>
+                  <div className="text-sm text-gray-400 mt-3">{stat.label}</div>
                 </div>
               ))}
             </div>

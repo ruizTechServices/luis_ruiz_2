@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useState } from "react";
 import { TrashIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import {
   AlertDialog,
@@ -15,17 +15,19 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
+import { removePhoto, restorePhoto } from "./api";
+import { usePhotos } from "./usePhotos";
+import { Img } from "./types";
 
-export type Img = { name: string; path: string; url: string };
+type PendingDeleteState = {
+  img: Img;
+  blob: Blob | null;
+};
 
 export default function PhotosClient() {
-  const [prefix, setPrefix] = useState("hero");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [images, setImages] = useState<Img[]>([]);
-  const [seeding, setSeeding] = useState(false);
+  const { prefix, setPrefix, images, setImages, loading, seeding, error, setError, load, seedHeroImages } = usePhotos();
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [pendingDelete, setPendingDelete] = useState<Img | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<PendingDeleteState | null>(null);
   const [deleting, setDeleting] = useState(false);
 
   const downloadImage = async (img: { name: string; url: string }) => {
@@ -45,41 +47,35 @@ export default function PhotosClient() {
     }
   };
 
-  const requestDelete = (img: Img) => {
-    setPendingDelete(img);
-    setConfirmOpen(true);
+  const requestDelete = async (img: Img) => {
+    try {
+      const res = await fetch(img.url);
+      const blob = res.ok ? await res.blob() : null;
+      setPendingDelete({ img, blob });
+    } catch {
+      setPendingDelete({ img, blob: null });
+    } finally {
+      setConfirmOpen(true);
+    }
   };
 
   const confirmDelete = async () => {
     if (!pendingDelete) return;
     setDeleting(true);
-    const img = pendingDelete;
-    let blob: Blob | null = null;
-    try {
-      const res = await fetch(img.url);
-      if (res.ok) blob = await res.blob();
-    } catch {}
-
-    const prev = images;
+    const { img, blob } = pendingDelete;
+    const previousImages = [...images];
     setImages((curr) => curr.filter((i) => i.path !== img.path));
-    try {
-      const res = await fetch(`/api/photos?path=${encodeURIComponent(img.path)}`, { method: "DELETE" });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || `Delete failed (${res.status})`);
 
+    try {
+      await removePhoto(img.path);
       toast.success(`${img.name} deleted`, {
         action: blob
           ? {
               label: "Undo",
               onClick: async () => {
                 try {
-                  const file = new File([blob!], img.name, { type: blob!.type || "application/octet-stream" });
-                  const form = new FormData();
-                  form.set("path", img.path);
-                  form.set("file", file);
-                  const r = await fetch("/api/photos/restore", { method: "POST", body: form });
-                  const rd = await r.json();
-                  if (!r.ok) throw new Error(rd?.error || `Restore failed (${r.status})`);
+                  const file = new File([blob], img.name, { type: blob.type || "application/octet-stream" });
+                  await restorePhoto(img.path, file);
                   await load(prefix);
                 } catch (e) {
                   setError(e instanceof Error ? e.message : String(e));
@@ -91,7 +87,7 @@ export default function PhotosClient() {
         duration: 6000,
       });
     } catch (e) {
-      setImages(prev);
+      setImages(previousImages);
       setError(e instanceof Error ? e.message : String(e));
       toast.error("Delete failed");
     } finally {
@@ -101,26 +97,6 @@ export default function PhotosClient() {
     }
   };
 
-  const load = async (p = prefix) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`/api/photos?prefix=${encodeURIComponent(p)}&limit=100`, { cache: "no-store" });
-      if (!res.ok) throw new Error(`Failed to load (${res.status})`);
-      const data = await res.json();
-      setImages(Array.isArray(data?.images) ? data.images : []);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    load("hero");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Photos</h1>
@@ -129,7 +105,7 @@ export default function PhotosClient() {
           type="text"
           value={prefix}
           onChange={(e) => setPrefix(e.target.value)}
-          placeholder="Prefix (e.g., hero)"
+          placeholder="Prefix (optional, e.g., hero; blank = all)"
           className="px-3 py-2 border rounded-md bg-transparent"
         />
         <button
@@ -137,27 +113,14 @@ export default function PhotosClient() {
           disabled={loading}
           className="px-3 py-2 rounded-md border text-sm hover:bg-gray-50 disabled:opacity-50"
         >
-          {loading ? "Loading…" : "Refresh"}
+          {loading ? "Loading..." : "Refresh"}
         </button>
         <button
-          onClick={async () => {
-            setSeeding(true);
-            setError(null);
-            try {
-              const res = await fetch("/api/photos/seed-hero", { method: "POST" });
-              const data = await res.json();
-              if (!res.ok) throw new Error(data?.error || `Seed failed (${res.status})`);
-              await load("hero");
-            } catch (e) {
-              setError(e instanceof Error ? e.message : String(e));
-            } finally {
-              setSeeding(false);
-            }
-          }}
+          onClick={() => seedHeroImages()}
           disabled={seeding}
           className="px-3 py-2 rounded-md border text-sm hover:bg-gray-50 disabled:opacity-50"
         >
-          {seeding ? "Importing…" : "Import current Hero images"}
+          {seeding ? "Importing..." : "Import hero images from public/edited"}
         </button>
       </div>
       {error && <div className="mb-3 text-sm text-red-500">{error}</div>}
@@ -196,7 +159,7 @@ export default function PhotosClient() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete photo?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently remove {pendingDelete?.name ?? "this photo"} from storage. You can Undo right after deletion.
+              This will permanently remove {pendingDelete?.img.name ?? "this photo"} from storage. You can Undo right after deletion.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

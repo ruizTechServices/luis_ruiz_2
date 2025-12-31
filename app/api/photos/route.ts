@@ -45,57 +45,77 @@ async function requireOwnerClient() {
   return { supabase };
 }
 
-// GET /api/photos?prefix=hero
+// GET /api/photos?prefix=hero&recursive=true
 export async function GET(request: Request) {
   try {
     const { supabase, errorResponse } = await getSupabaseOrJsonError();
     if (!supabase) return errorResponse!;
 
     const { searchParams } = new URL(request.url);
-    const prefix = (searchParams.get('prefix') || 'hero').replace(/^\/+|\/+$/g, '');
-    const limit = Math.min(Number(searchParams.get('limit') || '50'), 100);
+    const prefix = (searchParams.get('prefix') || '').replace(/^\/+|\/+$/g, '');
+    const limit = Math.min(Number(searchParams.get('limit') || '500'), 1000);
+    const recursive = searchParams.get('recursive') !== 'false'; // default true
     const expiresIn = Math.min(Number(process.env.SUPABASE_SIGNED_URL_EXPIRES || '3600'), 60 * 60 * 24);
 
-    // List objects in the bucket under the given prefix
-    const { data: files, error: listError } = await supabase.storage.from(PHOTOS_BUCKET).list(prefix, {
-      limit,
-      sortBy: { column: 'created_at', order: 'desc' },
-    });
+    type ListedItemWithPath = StorageListedItem & { path: string };
+    const files: ListedItemWithPath[] = [];
+    const queue: string[] = [prefix];
 
-    if (listError) {
-      return NextResponse.json({ error: listError.message }, { status: 500 });
+    while (queue.length > 0 && files.length < limit) {
+      const currentPrefix = queue.shift()!;
+      const { data: entries, error: listError } = await supabase.storage.from(PHOTOS_BUCKET).list(currentPrefix, {
+        limit: Math.min(1000, limit), // per-folder cap
+        sortBy: { column: 'created_at', order: 'desc' },
+      });
+
+      if (listError) {
+        return NextResponse.json({ error: listError.message }, { status: 500 });
+      }
+
+      for (const entry of entries || []) {
+        const path = currentPrefix ? `${currentPrefix}/${entry.name}` : entry.name;
+        const isFolder = !entry.metadata || typeof entry.metadata.size !== 'number';
+
+        if (isFolder) {
+          if (recursive) queue.push(path);
+          continue;
+        }
+
+        files.push({
+          name: entry.name,
+          created_at: (entry as StorageListedItem).created_at ?? null,
+          metadata: (entry as StorageListedItem).metadata ?? null,
+          path,
+        });
+
+        if (files.length >= limit) break;
+      }
     }
 
-    const items = files || [];
-
-    // Generate signed URLs for each file path
     const urls = await Promise.all(
-      items
-        .filter((f) => f.name && !f.name.endsWith('/'))
-        .map(async (f) => {
-          const path = prefix ? `${prefix}/${f.name}` : f.name;
-          const { data: signed, error: signedErr } = await supabase.storage
-            .from(PHOTOS_BUCKET)
-            .createSignedUrl(path, expiresIn);
-          if (signedErr || !signed?.signedUrl) {
-            // Fallback to public URL (works if bucket is public)
-            const { data: pub } = supabase.storage.from(PHOTOS_BUCKET).getPublicUrl(path);
-            return {
-              name: f.name,
-              path,
-              url: pub.publicUrl,
-              created_at: (f as StorageListedItem).created_at ?? null,
-              metadata: (f as StorageListedItem).metadata ?? null,
-            };
-          }
+      files.map(async (f) => {
+        const path = f.path;
+        const { data: signed, error: signedErr } = await supabase.storage
+          .from(PHOTOS_BUCKET)
+          .createSignedUrl(path, expiresIn);
+        if (signedErr || !signed?.signedUrl) {
+          const { data: pub } = supabase.storage.from(PHOTOS_BUCKET).getPublicUrl(path);
           return {
             name: f.name,
             path,
-            url: signed.signedUrl,
-            created_at: (f as StorageListedItem).created_at ?? null,
-            metadata: (f as StorageListedItem).metadata ?? null,
+            url: pub.publicUrl,
+            created_at: f.created_at ?? null,
+            metadata: f.metadata ?? null,
           };
-        })
+        }
+        return {
+          name: f.name,
+          path,
+          url: signed.signedUrl,
+          created_at: f.created_at ?? null,
+          metadata: f.metadata ?? null,
+        };
+      })
     );
 
     return NextResponse.json({ images: urls }, { status: 200 });

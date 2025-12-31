@@ -151,7 +151,7 @@ const TechSection = () => {
           {[
             { value: `${skills.length}+`, label: 'Technologies' },
             { value: '100%', label: 'Production Ready' },
-            { value: '24/7', label: 'Scalable Systems' }
+            { value: '24/7', label: 'Scalable Systems' },
           ].map((stat, idx) => (
             <div key={idx} className="relative group">
               {/* Subtle outer glow */}
