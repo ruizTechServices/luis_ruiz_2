@@ -1,20 +1,32 @@
 import { Img } from "./types";
 
-type ApiResult<T> = T | never;
+type JsonRecord = Record<string, unknown>;
 
-async function parseJsonOrThrow(res: Response): Promise<ApiResult<any>> {
-  const data = await res.json().catch(() => ({}));
+function isJsonRecord(value: unknown): value is JsonRecord {
+  return typeof value === "object" && value !== null;
+}
+
+async function parseJsonOrThrow<T>(res: Response): Promise<T> {
+  const data: unknown = await res.json().catch(() => ({}));
   if (!res.ok) {
-    const message = (data && (data.error as string)) || `Request failed (${res.status})`;
+    const message =
+      isJsonRecord(data) && typeof data.error === "string"
+        ? data.error
+        : `Request failed (${res.status})`;
     throw new Error(message);
   }
-  return data;
+  return data as T;
 }
+
+type ListPhotosResponse = {
+  images?: Img[];
+  error?: string;
+};
 
 export async function listPhotos(prefix: string, limit = 500): Promise<Img[]> {
   const res = await fetch(`/api/photos?prefix=${encodeURIComponent(prefix)}&limit=${limit}`, { cache: "no-store" });
-  const data = await parseJsonOrThrow(res);
-  return Array.isArray(data?.images) ? (data.images as Img[]) : [];
+  const data = await parseJsonOrThrow<ListPhotosResponse>(res);
+  return Array.isArray(data.images) ? data.images : [];
 }
 
 export async function seedHero(): Promise<void> {

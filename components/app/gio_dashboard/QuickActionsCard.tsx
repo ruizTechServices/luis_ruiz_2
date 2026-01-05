@@ -73,7 +73,6 @@ export default function QuickActionsCard() {
         }
       } catch (error) {
         if (process.env.NODE_ENV === "development") {
-          // eslint-disable-next-line no-console
           console.warn("Failed to load availability", error);
         }
       } finally {

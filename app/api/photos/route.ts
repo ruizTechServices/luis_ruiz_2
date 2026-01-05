@@ -83,8 +83,8 @@ export async function GET(request: Request) {
 
         files.push({
           name: entry.name,
-          created_at: (entry as StorageListedItem).created_at ?? null,
-          metadata: (entry as StorageListedItem).metadata ?? null,
+          created_at: (entry as StorageListedItem).created_at ?? undefined,
+          metadata: (entry as StorageListedItem).metadata ?? undefined,
           path,
         });
 
