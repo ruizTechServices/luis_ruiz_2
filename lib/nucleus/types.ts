@@ -1,3 +1,4 @@
+//C:\Users\giost\CascadeProjects\websites\luis-ruiz\luis_ruiz_2\lib\nucleus\types.ts
 // =============================================================================
 // NUCLEUS BOT TYPES - luis-ruiz.com
 // TypeScript interfaces for Nucleus Bot API

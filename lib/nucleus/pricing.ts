@@ -1,3 +1,4 @@
+//C:\Users\giost\CascadeProjects\websites\luis-ruiz\luis_ruiz_2\lib\nucleus\pricing.ts
 // =============================================================================
 // NUCLEUS BOT PRICING - luis-ruiz.com
 // Model pricing tiers and credit costs (fallback if DB unavailable)

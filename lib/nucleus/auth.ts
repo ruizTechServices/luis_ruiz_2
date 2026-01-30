@@ -1,3 +1,4 @@
+//C:\Users\giost\CascadeProjects\websites\luis-ruiz\luis_ruiz_2\lib\nucleus\auth.ts
 // =============================================================================
 // NUCLEUS BOT AUTH HELPERS - luis-ruiz.com
 // Authentication utilities for API routes
@@ -5,6 +6,7 @@
 
 import { createClient } from '@/lib/clients/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { createRemoteJWKSet, jwtVerify, type JWTPayload } from 'jose';
 import type { NucleusProfile } from './types';
 import { getOrCreateProfile, getProfile } from './credits';
 
@@ -21,6 +23,50 @@ export interface AuthenticatedUser {
 export interface AuthResult {
   user: AuthenticatedUser | null;
   error: NextResponse | null;
+}
+
+// -----------------------------------------------------------------------------
+// JWT Verification
+// -----------------------------------------------------------------------------
+
+const SUPABASE_URL =
+  process.env.SUPABASE_URL ||
+  process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  '';
+
+const SUPABASE_JWT_ISSUER =
+  process.env.SUPABASE_JWT_ISSUER ||
+  (SUPABASE_URL ? `${SUPABASE_URL}/auth/v1` : '');
+
+const SUPABASE_JWT_AUDIENCE =
+  process.env.SUPABASE_JWT_AUDIENCE || 'authenticated';
+
+const SUPABASE_JWKS_URL =
+  process.env.SUPABASE_JWKS_URL ||
+  (SUPABASE_URL ? `${SUPABASE_URL}/auth/v1/keys` : '');
+
+let jwks: ReturnType<typeof createRemoteJWKSet> | null = null;
+
+function getSupabaseJwks() {
+  if (!SUPABASE_JWKS_URL) return null;
+  if (!jwks) {
+    jwks = createRemoteJWKSet(new URL(SUPABASE_JWKS_URL));
+  }
+  return jwks;
+}
+
+async function verifySupabaseJwt(token: string): Promise<JWTPayload> {
+  const jwksClient = getSupabaseJwks();
+  if (!jwksClient || !SUPABASE_JWT_ISSUER) {
+    throw new Error('Supabase JWT verification is not configured');
+  }
+
+  const { payload } = await jwtVerify(token, jwksClient, {
+    issuer: SUPABASE_JWT_ISSUER,
+    audience: SUPABASE_JWT_AUDIENCE,
+  });
+
+  return payload;
 }
 
 // -----------------------------------------------------------------------------
@@ -94,6 +140,7 @@ export async function authenticateBearer(
   const token = authHeader.substring(7); // Remove 'Bearer '
 
   try {
+    const payload = await verifySupabaseJwt(token);
     const supabase = await createClient();
 
     // Verify the token by getting user
@@ -110,7 +157,12 @@ export async function authenticateBearer(
     }
 
     // Get profile
-    const profile = await getOrCreateProfile(supabase, user.id, user.email || '');
+    const emailFromToken = typeof payload.email === 'string' ? payload.email : '';
+    const profile = await getOrCreateProfile(
+      supabase,
+      user.id,
+      user.email || emailFromToken
+    );
 
     return {
       user: {
@@ -177,7 +229,8 @@ export function errorResponse(
   message: string,
   code: string,
   status: number,
-  details?: Record<string, unknown>
+  details?: Record<string, unknown>,
+  headers?: HeadersInit
 ): NextResponse {
   return NextResponse.json(
     {
@@ -185,7 +238,7 @@ export function errorResponse(
       code,
       ...(details && { details }),
     },
-    { status }
+    { status, headers }
   );
 }
 

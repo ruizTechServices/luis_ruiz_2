@@ -7,6 +7,7 @@
 import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/clients/supabase/server';
 import { authenticateBearer, errorResponse, successResponse } from '@/lib/nucleus/auth';
+import { rateLimit, rateLimitHeaders } from '@/lib/nucleus/rate-limit';
 import { 
   getCreditBalance, 
   hasActiveSubscription, 
@@ -40,6 +41,17 @@ export async function POST(request: NextRequest) {
   const { user, error } = await authenticateBearer(request);
   if (error) return error;
   if (!user) return errorResponse('Unauthorized', 'UNAUTHORIZED', 401);
+
+  const rate = rateLimit(`llm:${user.id}`);
+  if (!rate.allowed) {
+    return errorResponse(
+      'Rate limit exceeded',
+      'RATE_LIMITED',
+      429,
+      { limit: rate.limit, reset_ms: rate.resetMs },
+      rateLimitHeaders(rate, true)
+    );
+  }
 
   try {
     const body: ChatRequest = await request.json();
@@ -165,7 +177,10 @@ export async function POST(request: NextRequest) {
       finish_reason: response.finish_reason,
     };
 
-    return successResponse(chatResponse);
+    const httpResponse = successResponse(chatResponse);
+    const headers = rateLimitHeaders(rate);
+    Object.entries(headers).forEach(([key, value]) => httpResponse.headers.set(key, value));
+    return httpResponse;
 
   } catch (err: unknown) {
     console.error('LLM Chat error:', err);
