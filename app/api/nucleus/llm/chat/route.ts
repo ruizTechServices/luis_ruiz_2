@@ -14,7 +14,7 @@ import {
   deductCredits, 
   logUsage 
 } from '@/lib/nucleus/credits';
-import { getModelInfo, DEFAULT_MODEL_PRICING } from '@/lib/nucleus/pricing';
+import { DEFAULT_MODEL_PRICING } from '@/lib/nucleus/pricing';
 import type { ChatRequest, ChatResponse, ModelPricing } from '@/lib/nucleus/types';
 
 // Import LLM clients

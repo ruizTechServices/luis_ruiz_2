@@ -3,7 +3,7 @@
 // Get user's usage history and statistics
 // =============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/clients/supabase/server';
 import { authenticateBearer, errorResponse, successResponse } from '@/lib/nucleus/auth';
 import { getUsageHistory, getTransactionHistory } from '@/lib/nucleus/credits';

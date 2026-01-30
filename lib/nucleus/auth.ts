@@ -8,7 +8,7 @@ import { createClient } from '@/lib/clients/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { createRemoteJWKSet, jwtVerify, type JWTPayload } from 'jose';
 import type { NucleusProfile } from './types';
-import { getOrCreateProfile, getProfile } from './credits';
+import { getOrCreateProfile } from './credits';
 
 // -----------------------------------------------------------------------------
 // Types
@@ -77,9 +77,7 @@ async function verifySupabaseJwt(token: string): Promise<JWTPayload> {
  * Authenticate request and get user info
  * Returns user data or error response
  */
-export async function authenticateRequest(
-  request: NextRequest
-): Promise<AuthResult> {
+export async function authenticateRequest(): Promise<AuthResult> {
   try {
     const supabase = await createClient();
 
@@ -211,16 +209,6 @@ export function withAuth(
   };
 }
 
-/**
- * Extract user ID from request (doesn't validate)
- */
-export function getUserIdFromRequest(request: NextRequest): string | null {
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader) return null;
-
-  // For now, just return null - actual extraction happens in authenticateBearer
-  return null;
-}
 
 /**
  * Create error response helper

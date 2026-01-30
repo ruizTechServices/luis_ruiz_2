@@ -18,45 +18,36 @@ import type {
 
 /**
  * Get or create a nucleus profile for a user
+ * Uses upsert to avoid race conditions between check and insert
  */
 export async function getOrCreateProfile(
   supabase: SupabaseClient,
   userId: string,
   email: string
 ): Promise<NucleusProfile> {
-  // Try to get existing profile
-  const { data: existing, error: fetchError } = await supabase
+  const { data, error } = await supabase
     .from('nucleus_profiles')
-    .select('*')
-    .eq('id', userId)
-    .single();
-
-  if (existing) {
-    return existing as NucleusProfile;
-  }
-
-  // Create new profile if doesn't exist
-  if (fetchError?.code === 'PGRST116') { // Row not found
-    const { data: created, error: createError } = await supabase
-      .from('nucleus_profiles')
-      .insert({
+    .upsert(
+      {
         id: userId,
         email: email,
         display_name: email.split('@')[0],
         credit_balance: 0,
         subscription_tier: 'free',
-      })
-      .select()
-      .single();
+      },
+      {
+        onConflict: 'id',
+        ignoreDuplicates: true,
+      }
+    )
+    .select()
+    .single();
 
-    if (createError) {
-      throw new Error(`Failed to create profile: ${createError.message}`);
-    }
-
-    return created as NucleusProfile;
+  if (error) {
+    throw new Error(`Failed to get or create profile: ${error.message}`);
   }
 
-  throw new Error(`Failed to fetch profile: ${fetchError?.message}`);
+  return data as NucleusProfile;
 }
 
 /**

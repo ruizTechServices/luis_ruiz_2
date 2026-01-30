@@ -7,7 +7,7 @@ import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/clients/supabase/server';
 import { stripe } from '@/lib/clients/stripe/client';
 import { authenticateBearer, errorResponse, successResponse } from '@/lib/nucleus/auth';
-import { getProfile, updateProfile } from '@/lib/nucleus/credits';
+import { updateProfile } from '@/lib/nucleus/credits';
 import type { CreditPackage, PurchaseRequest } from '@/lib/nucleus/types';
 
 /**
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Default URLs
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://luis-ruiz.com';
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:5000';
     const defaultSuccessUrl = `${baseUrl}/nucleus/purchase/success?session_id={CHECKOUT_SESSION_ID}`;
     const defaultCancelUrl = `${baseUrl}/nucleus/purchase/cancel`;
 

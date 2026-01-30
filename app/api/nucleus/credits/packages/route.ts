@@ -3,7 +3,6 @@
 // Get available credit packages for purchase
 // =============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/clients/supabase/server';
 import { successResponse, errorResponse } from '@/lib/nucleus/auth';
 import type { CreditPackage } from '@/lib/nucleus/types';
@@ -13,7 +12,7 @@ import type { CreditPackage } from '@/lib/nucleus/types';
  * Get all active credit packages
  * No authentication required - public endpoint
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const supabase = await createClient();
 

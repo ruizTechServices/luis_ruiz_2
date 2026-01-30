@@ -3,10 +3,10 @@
 // Get available credit packages for purchase
 // =============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getCreditPackages, getSubscriptionPlans } from '@/lib/nucleus/pricing';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const [packages, subscriptions] = await Promise.all([
       getCreditPackages(),

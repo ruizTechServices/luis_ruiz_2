@@ -79,7 +79,6 @@ export async function POST(request: NextRequest) {
         if (type === 'credit_purchase') {
           // Credit package purchase
           const credits = parseInt(session.metadata?.credits || '0', 10);
-          const packageId = session.metadata?.package_id;
 
           if (credits > 0) {
             await addCredits(supabase, userId, credits, {

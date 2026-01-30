@@ -3,10 +3,10 @@
 // Get available models and their pricing
 // =============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getAllModelPricing } from '@/lib/nucleus/pricing';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const models = await getAllModelPricing();
     
