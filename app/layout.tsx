@@ -4,7 +4,8 @@ import "./globals.css";
 import NavBar from "@/components/app/landing_page/Navbar";
 import { items } from "@/components/app/landing_page/navbarItems";
 import Footer from "@/components/app/landing_page/footer";
-import { Analytics } from "@vercel/analytics/next"
+import { Analytics } from "@vercel/analytics/next";
+import { BackToTop } from "@/components/ui/back-to-top";
 
 export const metadata: Metadata = {
   title: "Luis Ruiz: your Tech Partner!",
@@ -27,6 +28,7 @@ export default function RootLayout({
         {children}
         <Analytics />
         <Footer />
+        <BackToTop />
       </body>
     </html>
   );

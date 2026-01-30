@@ -17,6 +17,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 export type ContactFormProps = {
   onSuccess?: () => void;
@@ -26,6 +28,7 @@ export type ContactFormProps = {
 export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitLabel, setSubmitLabel] = useState("Send Message");
+  const [showMoreDetails, setShowMoreDetails] = useState(false);
 
   const form = useForm<ContactFormInput>({
     resolver: zodResolver(contactFormSchema),
@@ -186,57 +189,6 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
           )}
         />
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="budget"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Project Budget</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select budget range" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {budgetOptions.map((option) => (
-                      <SelectItem key={option} value={option}>
-                        {option.replace("-", " ")}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="timeline"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Project Timeline</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select timeline" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {timelineOptions.map((option) => (
-                      <SelectItem key={option} value={option}>
-                        {option.replace("-", " ")}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
         <FormField
           control={form.control}
           name="message"
@@ -255,42 +207,106 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
           )}
         />
 
-        <div className="space-y-4">
-          <FormField
-            control={form.control}
-            name="preferredContact"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Preferred Contact Method</FormLabel>
-                <FormControl>
-                  <RadioGroup className="flex flex-wrap gap-4" onValueChange={field.onChange} value={field.value}>
-                    {preferredContactOptions.map((option) => (
-                      <RadioGroupItem key={option} value={option} id={`contact-${option}`}>
-                        <span className="capitalize">{option}</span>
-                      </RadioGroupItem>
-                    ))}
-                  </RadioGroup>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        {/* Progressive disclosure for optional fields */}
+        <Collapsible open={showMoreDetails} onOpenChange={setShowMoreDetails}>
+          <CollapsibleTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground"
+            >
+              <span>{showMoreDetails ? "Hide" : "Add more"} project details</span>
+              <ChevronDownIcon className={`h-4 w-4 transition-transform ${showMoreDetails ? "rotate-180" : ""}`} />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-6 pt-4">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="budget"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Project Budget</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select budget range" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {budgetOptions.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {option.replace("-", " ")}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="timeline"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Project Timeline</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select timeline" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {timelineOptions.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {option.replace("-", " ")}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-          <FormField
-            control={form.control}
-            name="newsletter"
-            render={({ field }) => (
-              <FormItem className="flex items-center space-x-2">
-                <FormControl>
-                  <Checkbox checked={field.value} onCheckedChange={field.onChange} id="newsletter" />
-                </FormControl>
-                <FormLabel htmlFor="newsletter" className="leading-none">
-                  Subscribe to our newsletter for updates and special offers
-                </FormLabel>
-              </FormItem>
-            )}
-          />
-        </div>
+            <FormField
+              control={form.control}
+              name="preferredContact"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Preferred Contact Method</FormLabel>
+                  <FormControl>
+                    <RadioGroup className="flex flex-wrap gap-4" onValueChange={field.onChange} value={field.value}>
+                      {preferredContactOptions.map((option) => (
+                        <RadioGroupItem key={option} value={option} id={`contact-${option}`}>
+                          <span className="capitalize">{option}</span>
+                        </RadioGroupItem>
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CollapsibleContent>
+        </Collapsible>
+
+        <FormField
+          control={form.control}
+          name="newsletter"
+          render={({ field }) => (
+            <FormItem className="flex items-center space-x-2">
+              <FormControl>
+                <Checkbox checked={field.value} onCheckedChange={field.onChange} id="newsletter" />
+              </FormControl>
+              <FormLabel htmlFor="newsletter" className="leading-none">
+                Subscribe to our newsletter for updates and special offers
+              </FormLabel>
+            </FormItem>
+          )}
+        />
 
         <div className="pt-6">
           <Button className="w-full" disabled={isSubmitting} type="submit">

@@ -13,14 +13,13 @@ export default async function ProjectsPage() {
         <h1 className="text-4xl font-bold mb-2">Projects</h1>
         <p className="text-gray-600 mb-10">Interactive demos embedded below.</p>
         <hr className="mb-10 h-px border border-gray-200"/>
-        <div className="space-y-14">
-          {projects.map((p, idx) => (
+        <div className="space-y-6">
+          {projects.map((p) => (
             <Project
               key={p.url}
               url={p.url}
               title={p.title ?? undefined}
               description={p.description ?? undefined}
-              reverse={idx % 2 === 1}
             />
           ))}
         </div>

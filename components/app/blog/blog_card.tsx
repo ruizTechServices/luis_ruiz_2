@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import { createClient as createServerClient } from "@/lib/clients/supabase/server";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
 
@@ -46,17 +47,26 @@ export function BlogPostCard({ blogPost }: BlogCardProps) {
       </Link>
       <p className="text-gray-600 mb-3">{blogPost.summary}</p>
 
-      {/* Tags */}
+      {/* Tags - clickable filter links */}
       <div className="flex flex-wrap gap-2 mb-3">
         {blogPost.tags &&
-          blogPost.tags.split(",").map((tag, index) => (
-            <span
-              key={index}
-              className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm"
-            >
-              {tag.trim()}
-            </span>
-          ))}
+          blogPost.tags.split(",").map((tag, index) => {
+            const trimmedTag = tag.trim();
+            return (
+              <Link
+                key={index}
+                href={`/blog?tag=${encodeURIComponent(trimmedTag)}`}
+                className={cn(
+                  "px-3 py-1 rounded-full text-sm font-medium transition-all",
+                  "bg-blue-100 text-blue-800 hover:bg-blue-200",
+                  "dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50",
+                  "hover:scale-105 active:scale-95 cursor-pointer"
+                )}
+              >
+                {trimmedTag}
+              </Link>
+            );
+          })}
       </div>
 
       {/* Date */}

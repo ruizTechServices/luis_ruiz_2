@@ -1,4 +1,8 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { ArrowTopRightOnSquareIcon, PlayIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 type ProjectProps = {
   url: string;
@@ -11,11 +15,9 @@ type ProjectProps = {
   reverse?: boolean;
 };
 
-export default function Project({ url, title, description, reverse = false }: ProjectProps) {
-  const descOrder = reverse ? "lg:order-2" : "lg:order-1";
-  const frameOrder = reverse ? "lg:order-1" : "lg:order-2";
-  const descAlign = reverse ? "lg:text-right" : "lg:text-left";
-  const descPadding = reverse ? "lg:pl-8" : "lg:pr-8";
+export default function Project({ url, title, description }: ProjectProps) {
+  const [showPreview, setShowPreview] = useState(false);
+  
   const derivedTitle = title || (() => {
     try {
       return new URL(url).hostname.replace(/^www\./, "");
@@ -26,29 +28,61 @@ export default function Project({ url, title, description, reverse = false }: Pr
 
   return (
     <section className="w-full">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-        {/* Description */}
-        <div className={`order-2 ${descOrder} lg:col-span-5 ${descAlign} ${descPadding}`}>
-          <h3 className="text-xl font-semibold mb-2">
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-current hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary"
+      <div className="rounded-xl border bg-card shadow-sm overflow-hidden transition-all hover:shadow-md">
+        {/* Card Header */}
+        <div className="p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <h3 className="text-xl font-semibold mb-2">
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-current hover:text-primary transition-colors inline-flex items-center gap-2"
+                >
+                  {derivedTitle}
+                  <ArrowTopRightOnSquareIcon className="h-4 w-4 opacity-50" />
+                </a>
+              </h3>
+              {description && (
+                <p className="text-muted-foreground leading-relaxed">{description}</p>
+              )}
+            </div>
+          </div>
+          
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-3 mt-4">
+            <Button
+              variant={showPreview ? "secondary" : "default"}
+              size="sm"
+              onClick={() => setShowPreview(!showPreview)}
+              className="gap-2"
             >
-              {derivedTitle}
-            </a>
-          </h3>
-          {description ? (
-            <p className="text-muted-foreground leading-relaxed">{description}</p>
-          ) : null}
+              {showPreview ? (
+                <>
+                  <XMarkIcon className="h-4 w-4" />
+                  Hide Preview
+                </>
+              ) : (
+                <>
+                  <PlayIcon className="h-4 w-4" />
+                  Show Preview
+                </>
+              )}
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <a href={url} target="_blank" rel="noopener noreferrer" className="gap-2">
+                <ArrowTopRightOnSquareIcon className="h-4 w-4" />
+                Open in New Tab
+              </a>
+            </Button>
+          </div>
         </div>
 
-        {/* Iframe */}
-        <div className={`order-1 ${frameOrder} lg:col-span-7`}>
-          <div className="relative w-full rounded-xl border bg-card shadow-sm overflow-hidden">
-            {/* Maintain aspect ratio without relying on plugins */}
-            <div className="w-full" style={{ aspectRatio: "16 / 9" }}>
+        {/* Collapsible Iframe Preview */}
+        {showPreview && (
+          <div className="border-t bg-muted/30">
+            <div className="relative w-full" style={{ aspectRatio: "16 / 9" }}>
               <iframe
                 src={url}
                 title={derivedTitle}
@@ -60,7 +94,7 @@ export default function Project({ url, title, description, reverse = false }: Pr
               />
             </div>
           </div>
-        </div>
+        )}
       </div>
     </section>
   );

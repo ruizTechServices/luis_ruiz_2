@@ -1,9 +1,10 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { ChevronRightIcon, SparklesIcon, CodeBracketIcon, ServerIcon, DevicePhoneMobileIcon, CloudIcon } from '@heroicons/react/20/solid';
+import { ChevronRightIcon, SparklesIcon } from '@heroicons/react/20/solid';
 import { ArrowDownIcon } from '@heroicons/react/24/outline';
 import NextImage from 'next/image';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
  
 
 // Slideshow images from public/edited
@@ -103,13 +104,7 @@ export default function Hero() {
 
   const isAvailable = availability ?? true;
 
-  const techStack = [
-    { icon: CodeBracketIcon, name: 'Frontend' },
-    { icon: ServerIcon, name: 'Backend' },
-    { icon: CloudIcon, name: 'Cloud' },
-    { icon: DevicePhoneMobileIcon, name: 'Mobile' },
-  ];
-
+  
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
       {/* Animated gradient background */}
@@ -164,7 +159,7 @@ export default function Hero() {
             ) : null}
 
             {/* Main Heading */}
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-4">
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 animate-gradient">
                 Luis Giovanni Ruiz
               </span>
@@ -179,73 +174,33 @@ export default function Hero() {
               </span>
             </h1>
 
+            {/* Tagline */}
+            <p className="text-xl sm:text-2xl text-violet-300 font-medium mb-6">
+              Building fast, scalable web experiences
+            </p>
+
             {/* Description */}
-            <p className="text-lg text-gray-300 mb-8 leading-relaxed">
+            <p className="text-lg text-gray-300 mb-10 leading-relaxed max-w-xl">
               Crafting next-generation digital experiences with cutting-edge technologies. 
               Specialized in building scalable, performant applications that push the boundaries 
               of what&#39;s possible on the web.
             </p>
 
-            {/* Tech Stack Icons */}
-            <div className="flex gap-4 mb-10">
-              {techStack.map((tech, index) => (
-                <div
-                  key={tech.name}
-                  className="group relative"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg blur opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                  <div className="relative bg-white/10 backdrop-blur-md rounded-lg p-3 border border-white/20 hover:border-white/40 transition-all hover:scale-110 cursor-pointer">
-                    <tech.icon className="h-6 w-6 text-white" />
-                  </div>
-                  <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                    {tech.name}
-                  </span>
-                </div>
-              ))}
-            </div>
-
             {/* CTA Buttons */}
-            <div className="flex flex-wrap gap-4 mt-12">
-              <Link href="/contact">
-                <button className="group relative px-8 py-4 overflow-hidden rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold shadow-2xl transition-all hover:scale-105 hover:shadow-violet-500/25">
-                  <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
-                  <span className="relative flex items-center gap-2">
-                    <SparklesIcon className="h-5 w-5" />
-                    Let&#39;s Connect
-                  </span>
-                </button>
-              </Link> 
+            <div className="flex flex-wrap gap-4">
+              <Button variant="cta" size="lg" className="px-8 py-6 text-base" asChild>
+                <Link href="/contact">
+                  <SparklesIcon className="h-5 w-5" />
+                  Let&#39;s Connect
+                </Link>
+              </Button>
               
-              <Link href="/projects">
-                <button className="group px-8 py-4 rounded-lg bg-white/5 backdrop-blur-md border border-white/20 text-white font-semibold transition-all hover:bg-white/10 hover:scale-105 hover:border-white/40">
-                  <span className="flex items-center gap-2">
-                    View Projects
-                    <ChevronRightIcon className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                </button>
-              </Link>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-4 gap-6 mt-16">
-              {[
-                { label: 'Projects', value: '5+' },
-                { value: '100%', label: 'Resilient' },
-                { label: 'Clients', value: '10+' },
-                { label: 'Experience', value: '5+ yrs' }
-              ].map((stat, index) => (
-                <div 
-                  key={stat.label}
-                  className="text-center opacity-0 animate-fadeInUp"
-                  style={{ animationDelay: `${0.5 + index * 0.1}s`, animationFillMode: 'forwards' }}
-                >
-                  <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-                    {stat.value}
-                  </div>
-                  <div className="text-sm text-gray-400 mt-3">{stat.label}</div>
-                </div>
-              ))}
+              <Button variant="cta-outline" size="lg" className="px-8 py-6 text-base group" asChild>
+                <Link href="/projects">
+                  View Projects
+                  <ChevronRightIcon className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </Button>
             </div>
           </div>
 
@@ -283,12 +238,6 @@ export default function Hero() {
                   <div className="absolute inset-0 bg-gradient-to-r from-violet-600/0 to-indigo-600/0 group-hover:from-violet-600/20 group-hover:to-indigo-600/20 transition-all duration-300"></div>
                 </div>
 
-                {/* Floating badges */}
-                <div className={`absolute -top-3 -right-3 text-black text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-bounce 
-                  ${isAvailable ? 'bg-gradient-to-r from-green-400 to-emerald-400' : 'bg-gradient-to-r from-rose-400 to-red-400'}`}>
-                  {/* dynamic via Supabase site_settings */}
-                  {isAvailable ? 'AVAILABLE' : 'BOOKED'}
-                </div>
               </div>
             </div>
           </div>

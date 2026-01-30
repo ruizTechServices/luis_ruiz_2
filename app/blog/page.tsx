@@ -44,23 +44,59 @@ export default async function BlogIndexPage({ searchParams }: { searchParams: Pr
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
       <main className="container mx-auto px-6 py-10">
-        <h1 className="text-3xl font-bold mb-6">Blog</h1>
+        <h1 className="text-3xl font-bold mb-6 dark:text-white">Blog</h1>
+
+        {/* Active Filter Indicator */}
+        {tag && (
+          <div className="mb-4 flex items-center gap-2 flex-wrap">
+            <span className="text-sm text-gray-600 dark:text-gray-400">Filtering by:</span>
+            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300">
+              {tag}
+              <Link 
+                href={`/blog?pageSize=${pageSize}`}
+                className="ml-1 hover:text-violet-600 dark:hover:text-violet-200"
+                aria-label="Clear filter"
+              >
+                ×
+              </Link>
+            </span>
+            <Link 
+              href="/blog"
+              className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 underline"
+            >
+              Clear all filters
+            </Link>
+          </div>
+        )}
 
         {/* Filters */}
         <form method="get" className="mb-6 flex flex-wrap items-end gap-3">
           <div className="flex flex-col">
-            <label htmlFor="tag" className="text-sm text-gray-600">Filter by tag</label>
-            <input id="tag" name="tag" defaultValue={tag ?? ''} placeholder="e.g. ai" className="border rounded px-3 py-2" />
+            <label htmlFor="tag" className="text-sm text-gray-600 dark:text-gray-400">Filter by tag</label>
+            <input 
+              id="tag" 
+              name="tag" 
+              defaultValue={tag ?? ''} 
+              placeholder="e.g. ai" 
+              className="border rounded px-3 py-2 dark:bg-gray-800 dark:border-gray-700 dark:text-white" 
+            />
           </div>
           <div className="flex flex-col">
-            <label htmlFor="pageSize" className="text-sm text-gray-600">Per page</label>
-            <select id="pageSize" name="pageSize" defaultValue={String(pageSize)} className="border rounded px-3 py-2">
+            <label htmlFor="pageSize" className="text-sm text-gray-600 dark:text-gray-400">Per page</label>
+            <select 
+              id="pageSize" 
+              name="pageSize" 
+              defaultValue={String(pageSize)} 
+              className="border rounded px-3 py-2 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+            >
               <option value="5">5</option>
               <option value="10">10</option>
               <option value="20">20</option>
             </select>
           </div>
-          <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white">Apply</button>
+          <button type="submit" className="px-4 py-2 rounded bg-violet-600 hover:bg-violet-700 text-white transition-colors">
+            Apply
+          </button>
         </form>
 
         <section className="space-y-4">
