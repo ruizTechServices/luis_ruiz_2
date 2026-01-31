@@ -1,8 +1,21 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/clients/supabase/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { isOwner } from '@/lib/auth/ownership';
 
 const PHOTOS_BUCKET = process.env.SUPABASE_PHOTOS_BUCKET || 'photos';
+
+// Logging helper
+function log(level: 'info' | 'warn' | 'error', message: string, data?: Record<string, unknown>) {
+  const timestamp = new Date().toISOString();
+  const prefix = `[${timestamp}] [photos-api] [${level.toUpperCase()}]`;
+  if (data) {
+    console[level](`${prefix} ${message}`, JSON.stringify(data, null, 2));
+  } else {
+    console[level](`${prefix} ${message}`);
+  }
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -13,11 +26,35 @@ type StorageListedItem = {
   metadata?: Record<string, unknown> | null;
 };
 
+// Create auth client (uses anon key to read session from cookies)
+async function createAuthClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  
+  if (!supabaseUrl || !anonKey) {
+    throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY');
+  }
+  
+  const cookieStore = await cookies();
+  return createServerClient(supabaseUrl, anonKey, {
+    cookies: {
+      getAll() { return cookieStore.getAll(); },
+      setAll(cookiesToSet) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+        } catch { /* ignore in RSC */ }
+      },
+    },
+  });
+}
+
 async function getSupabaseOrJsonError() {
   try {
+    log('info', 'Creating Supabase client...');
     return { supabase: await createClient() };
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
+    log('error', 'Failed to create Supabase client', { error: message });
     return {
       errorResponse: NextResponse.json(
         { error: `Supabase client not configured: ${message}` },
@@ -28,25 +65,50 @@ async function getSupabaseOrJsonError() {
 }
 
 async function requireOwnerClient() {
-  const { supabase, errorResponse } = await getSupabaseOrJsonError();
-  if (!supabase) return { errorResponse };
+  log('info', 'Checking owner authorization...');
+  
+  // Use anon key client to read user session from cookies
+  let authClient;
+  try {
+    authClient = await createAuthClient();
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    log('error', 'Failed to create auth client', { error: message });
+    return { errorResponse: NextResponse.json({ error: message }, { status: 500 }) };
+  }
 
-  const { data: userRes, error: userErr } = await supabase.auth.getUser();
+  const { data: userRes, error: userErr } = await authClient.auth.getUser();
+  log('info', 'Auth getUser result', { 
+    hasUser: !!userRes?.user, 
+    email: userRes?.user?.email ?? null,
+    error: userErr?.message ?? null 
+  });
+  
   if (userErr) {
+    log('warn', 'Auth error', { error: userErr.message });
     return { errorResponse: NextResponse.json({ error: userErr.message }, { status: 401 }) };
   }
   const email = userRes?.user?.email;
   if (!email) {
+    log('warn', 'No email found in user session');
     return { errorResponse: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
   }
   if (!isOwner(email)) {
+    log('warn', 'User is not an owner', { email });
     return { errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) };
   }
+  
+  log('info', 'Owner verified, creating service client');
+  const { supabase, errorResponse } = await getSupabaseOrJsonError();
+  if (!supabase) return { errorResponse };
+  
   return { supabase };
 }
 
 // GET /api/photos?prefix=hero&recursive=true
 export async function GET(request: Request) {
+  log('info', '=== GET /api/photos called ===');
+  
   try {
     const { supabase, errorResponse } = await getSupabaseOrJsonError();
     if (!supabase) return errorResponse!;
@@ -56,6 +118,8 @@ export async function GET(request: Request) {
     const limit = Math.min(Number(searchParams.get('limit') || '500'), 1000);
     const recursive = searchParams.get('recursive') !== 'false'; // default true
     const expiresIn = Math.min(Number(process.env.SUPABASE_SIGNED_URL_EXPIRES || '3600'), 60 * 60 * 24);
+    
+    log('info', 'GET params', { prefix, limit, recursive, bucket: PHOTOS_BUCKET });
 
     type ListedItemWithPath = StorageListedItem & { path: string };
     const files: ListedItemWithPath[] = [];
@@ -69,6 +133,7 @@ export async function GET(request: Request) {
       });
 
       if (listError) {
+        log('error', 'Storage list error', { error: listError.message, prefix: currentPrefix });
         return NextResponse.json({ error: listError.message }, { status: 500 });
       }
 
@@ -118,15 +183,19 @@ export async function GET(request: Request) {
       })
     );
 
+    log('info', 'GET complete', { imageCount: urls.length });
     return NextResponse.json({ images: urls }, { status: 200 });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
+    log('error', 'GET unhandled error', { error: msg });
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
 
 // DELETE /api/photos?path=hero/filename.png
 export async function DELETE(request: Request) {
+  log('info', '=== DELETE /api/photos called ===');
+  
   try {
     const url = new URL(request.url);
     let path = url.searchParams.get('path') || '';
@@ -144,12 +213,18 @@ export async function DELETE(request: Request) {
     const { supabase, errorResponse } = await requireOwnerClient();
     if (!supabase) return errorResponse!;
 
+    log('info', 'Deleting from storage', { path, bucket: PHOTOS_BUCKET });
     const { error } = await supabase.storage.from(PHOTOS_BUCKET).remove([path]);
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) {
+      log('error', 'Delete failed', { error: error.message, path });
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
 
+    log('info', 'Delete successful', { path });
     return NextResponse.json({ ok: true, path }, { status: 200 });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
+    log('error', 'DELETE unhandled error', { error: msg });
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
