@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { DEFAULT_TURN_ORDER } from '@/lib/round-robin/constants';
-import { createServiceRoleClient } from '@/lib/utils/supabaseServiceRole';
+import { createServiceRoleClient } from '@/lib/clients/supabase/service-role';
 
 type StartSessionPayload = {
   topic: string;

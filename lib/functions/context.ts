@@ -1,5 +1,5 @@
 import { getTextEmbedding } from "@/lib/functions/openai/embeddings";
-import { createServiceRoleClient } from "@/lib/utils/supabaseServiceRole";
+import { createServiceRoleClient } from "@/lib/clients/supabase/service-role";
 
 export type RetrievedContext = {
   id: number;

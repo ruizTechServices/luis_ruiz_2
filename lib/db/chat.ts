@@ -30,6 +30,36 @@ async function supa() {
   return createServerClient();
 }
 
+/**
+ * Groups a flat list of chat messages into sessions keyed by chat_id.
+ */
+function groupMessagesIntoSessions(messages: ChatMessage[]): ChatSession[] {
+  const sessionsMap = new Map<number, ChatMessage[]>();
+  messages.forEach((msg) => {
+    const msgs = sessionsMap.get(msg.chat_id) ?? [];
+    msgs.push(msg);
+    sessionsMap.set(msg.chat_id, msgs);
+  });
+
+  const sessions: ChatSession[] = [];
+  sessionsMap.forEach((msgs, chatId) => {
+    const sorted = msgs.sort(
+      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    );
+    sessions.push({
+      chat_id: chatId,
+      message_count: msgs.length,
+      first_message: sorted[0]?.message?.substring(0, 100) ?? "",
+      last_message_at: sorted[sorted.length - 1]?.created_at ?? "",
+      user_id: msgs[0]?.user_id ?? null,
+    });
+  });
+
+  return sessions.sort(
+    (a, b) => new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime()
+  );
+}
+
 // ─────────────────────────────────────────────────────────────
 // Per-user chat functions
 // ─────────────────────────────────────────────────────────────
@@ -50,33 +80,7 @@ export async function getChatSessionsForUser(userId: string): Promise<ChatSessio
   if (error) throw error;
   if (!data || data.length === 0) return [];
 
-  // Group by chat_id
-  const sessionsMap = new Map<number, ChatMessage[]>();
-  data.forEach((msg) => {
-    const msgs = sessionsMap.get(msg.chat_id) ?? [];
-    msgs.push(msg as ChatMessage);
-    sessionsMap.set(msg.chat_id, msgs);
-  });
-
-  // Convert to sessions
-  const sessions: ChatSession[] = [];
-  sessionsMap.forEach((msgs, chatId) => {
-    const sorted = msgs.sort((a, b) => 
-      new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-    );
-    sessions.push({
-      chat_id: chatId,
-      message_count: msgs.length,
-      first_message: sorted[0]?.message?.substring(0, 100) ?? "",
-      last_message_at: sorted[sorted.length - 1]?.created_at ?? "",
-      user_id: msgs[0]?.user_id ?? null,
-    });
-  });
-
-  // Sort by last message
-  return sessions.sort((a, b) => 
-    new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime()
-  );
+  return groupMessagesIntoSessions(data as ChatMessage[]);
 }
 
 /**
@@ -136,32 +140,7 @@ export async function getAllChatSessions(): Promise<ChatSession[]> {
   if (error) throw error;
   if (!data || data.length === 0) return [];
 
-  // Group by chat_id
-  const sessionsMap = new Map<number, ChatMessage[]>();
-  data.forEach((msg) => {
-    const msgs = sessionsMap.get(msg.chat_id) ?? [];
-    msgs.push(msg as ChatMessage);
-    sessionsMap.set(msg.chat_id, msgs);
-  });
-
-  // Convert to sessions
-  const sessions: ChatSession[] = [];
-  sessionsMap.forEach((msgs, chatId) => {
-    const sorted = msgs.sort((a, b) => 
-      new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-    );
-    sessions.push({
-      chat_id: chatId,
-      message_count: msgs.length,
-      first_message: sorted[0]?.message?.substring(0, 100) ?? "",
-      last_message_at: sorted[sorted.length - 1]?.created_at ?? "",
-      user_id: msgs[0]?.user_id ?? null,
-    });
-  });
-
-  return sessions.sort((a, b) => 
-    new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime()
-  );
+  return groupMessagesIntoSessions(data as ChatMessage[]);
 }
 
 /**

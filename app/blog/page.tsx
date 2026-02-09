@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { createClient as createServerSupabase } from '@/lib/clients/supabase/server'
 import { BlogPostCard } from '@/components/app/blog/blog_card'
 
-export const revalidate = 0
+export const revalidate = 60
 
 export default async function BlogIndexPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const sp = await searchParams

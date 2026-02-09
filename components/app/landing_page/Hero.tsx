@@ -5,35 +5,20 @@ import { ArrowDownIcon } from '@heroicons/react/24/outline';
 import NextImage from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
- 
-
-// Slideshow images from public/edited
-const SLIDESHOW_IMAGES = [
-  '/edited/luis-4.png',
-  '/edited/luis-2.png',
-  '/edited/luis-3-removebg-preview.png',
-  '/edited/luis_businessman-2.png',
-];
-// TODO: change this to be images retrieved from Supabase and modified by the user admin dashboard
+import { useMousePosition } from './hooks/useMousePosition';
+import { useAvailability } from './hooks/useAvailability';
+import { useHeroSlides } from './hooks/useHeroSlides';
 
 export default function Hero() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const mousePosition = useMousePosition();
+  const { isAvailable, availabilityText } = useAvailability();
+  const { slides, currentSlide } = useHeroSlides();
+
   const [isVisible, setIsVisible] = useState(false);
   const [particles, setParticles] = useState<{ left: number; top: number; delay: number; duration: number }[]>([]);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [availability, setAvailability] = useState<boolean | null>(null);
-  const [availabilityText, setAvailabilityText] = useState<string>('Available for hire');
-  // Dynamically loaded slideshow images from Supabase (fallback to static defaults)
-  const [slides, setSlides] = useState<string[]>(SLIDESHOW_IMAGES);
 
   useEffect(() => {
     setIsVisible(true);
-    
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
 
     // Generate floating particles client-side after mount to avoid SSR/client mismatch
     const count = 30;
@@ -44,74 +29,15 @@ export default function Hero() {
       duration: 10 + Math.random() * 20,
     }));
     setParticles(generated);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-    };
   }, []);
 
-  // Fetch availability settings from API (server-proxied Supabase)
-  useEffect(() => {
-    let active = true;
-    const fetchSettings = async () => {
-      try {
-        const res = await fetch('/api/site_settings/availability', { cache: 'no-store' });
-        if (!res.ok) throw new Error(`Failed to fetch settings (${res.status})`);
-        const data = await res.json();
-        if (!active) return;
-        setAvailability(!!data.availability);
-        setAvailabilityText(data.availability_text ?? 'Available for hire');
-      } catch {
-        // No-op: fall back to defaults
-      }
-    };
-    fetchSettings();
-    return () => { active = false };
-  }, []);
-
-  // Fetch hero slideshow images from server API (Supabase-backed)
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const res = await fetch('/api/photos?prefix=hero&limit=10', { cache: 'no-store' });
-        if (!res.ok) return;
-        const data = await res.json();
-        const urls: string[] = Array.isArray(data?.images)
-          ? (data.images as Array<{ url?: string }>)
-              .map((img) => img?.url ?? '')
-              .filter((u): u is string => !!u)
-          : [];
-        if (active && urls.length > 0) {
-          setSlides(urls);
-          setCurrentSlide(0);
-        }
-      } catch {
-        // ignore, fallback to static
-      }
-    })();
-    return () => { active = false };
-  }, []);
-
-  // Rotate slideshow every 5s based on current slides length
-  useEffect(() => {
-    if (!slides.length) return;
-    const intervalId = window.setInterval(() => {
-      setCurrentSlide((idx) => (idx + 1) % slides.length);
-    }, 5000);
-    return () => window.clearInterval(intervalId);
-  }, [slides]);
-
-  const isAvailable = availability ?? true;
-
-  
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
       {/* Animated gradient background */}
       <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20 animate-pulse" />
-      
+
       {/* Dynamic mesh gradient */}
-      <div 
+      <div
         className="absolute inset-0 opacity-30"
         style={{
           background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(139, 92, 246, 0.15), transparent 40%)`,
@@ -146,13 +72,13 @@ export default function Hero() {
             {/* Status Badge (links to Contact when available; hidden when text says "not available") */}
             {isAvailable && !availabilityText.toLowerCase().includes('not available') ? (
               <Link href="/contact" className="inline-block">
-                <div className={`inline-flex items-center gap-x-2 rounded-full px-4 py-2 backdrop-blur-md mb-8 group hover:scale-105 transition-transform cursor-pointer border 
+                <div className={`inline-flex items-center gap-x-2 rounded-full px-4 py-2 backdrop-blur-md mb-8 group hover:scale-105 transition-transform cursor-pointer border
                   ${isAvailable ? 'bg-gradient-to-r from-green-400/10 to-emerald-400/10 border-green-400/20' : 'bg-gradient-to-r from-rose-400/10 to-red-400/10 border-red-400/20'}`}>
                   <span className="relative flex h-2 w-2">
                     <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isAvailable ? 'bg-green-400' : 'bg-red-400'}`}></span>
                     <span className={`relative inline-flex rounded-full h-2 w-2 ${isAvailable ? 'bg-green-500' : 'bg-red-500'}`}></span>
                   </span>
-                  <span className={`text-sm font-medium ${isAvailable ? 'text-green-400' : 'text-red-400'}`}>{availabilityText}</span>{/* dynamic via Supabase site_settings */}
+                  <span className={`text-sm font-medium ${isAvailable ? 'text-green-400' : 'text-red-400'}`}>{availabilityText}</span>
                   <ChevronRightIcon className={`h-4 w-4 group-hover:translate-x-1 transition-transform ${isAvailable ? 'text-green-400' : 'text-red-400'}`} />
                 </div>
               </Link>
@@ -181,8 +107,8 @@ export default function Hero() {
 
             {/* Description */}
             <p className="text-lg text-gray-300 mb-10 leading-relaxed max-w-xl">
-              Crafting next-generation digital experiences with cutting-edge technologies. 
-              Specialized in building scalable, performant applications that push the boundaries 
+              Crafting next-generation digital experiences with cutting-edge technologies.
+              Specialized in building scalable, performant applications that push the boundaries
               of what&#39;s possible on the web.
             </p>
 
@@ -194,7 +120,7 @@ export default function Hero() {
                   Let&#39;s Connect
                 </Link>
               </Button>
-              
+
               <Button variant="cta-outline" size="lg" className="px-8 py-6 text-base group" asChild>
                 <Link href="/projects">
                   View Projects
@@ -209,13 +135,13 @@ export default function Hero() {
             <div className="relative mx-auto w-full max-w-lg">
               {/* Glow effect behind image */}
               <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-3xl blur-3xl opacity-50 animate-pulse"></div>
-              
+
               {/* Glass morphism card */}
               <div className="hidden md:block relative bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl">
                 {/* Decorative elements */}
                 <div className="absolute -top-4 -right-4 h-20 w-20 bg-gradient-to-br from-pink-500 to-violet-500 rounded-full blur-2xl opacity-60"></div>
                 <div className="absolute -bottom-4 -left-4 h-24 w-24 bg-gradient-to-tr from-blue-500 to-cyan-500 rounded-full blur-2xl opacity-60"></div>
-                
+
                 {/* Profile image placeholder (slideshow) */}
                 <div className="relative aspect-square rounded-2xl bg-transparent overflow-hidden group">
                   <div className="absolute inset-0">

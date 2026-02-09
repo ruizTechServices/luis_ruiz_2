@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { cookies } from "next/headers";
+import { createAnonServerClient } from "@/lib/clients/supabase/anon-server";
 import { createClient as createServiceClient } from "@/lib/clients/supabase/server";
-import { createServerClient as createSsrClient } from "@supabase/ssr";
+import { isOwner } from "@/lib/auth/ownership";
 
 const bodySchema = z.object({
   url: z.string().url(),
   title: z.string().trim().min(1).max(200).optional(),
   description: z.string().trim().min(1).max(2000).optional(),
 });
-
-const ALLOWED_EMAIL = "giosterr44@gmail.com";
 
 export async function POST(req: Request) {
   try {
@@ -22,33 +20,13 @@ export async function POST(req: Request) {
     }
     const { url, title, description } = parsed.data;
 
-    // Gate by signed-in user email
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!supabaseUrl || !supabaseAnonKey) {
-      return NextResponse.json({ error: "Server misconfigured: missing Supabase env vars." }, { status: 500 });
-    }
-
-    const cookieStore = await cookies();
-    const supabaseAuth = createSsrClient(
-      supabaseUrl,
-      supabaseAnonKey,
-      {
-        cookies: {
-          getAll: () => cookieStore.getAll(),
-          setAll: () => {
-            /* no-op for API route auth check */
-          },
-        },
-      },
-    );
-
+    const supabaseAuth = await createAnonServerClient();
     const { data: userData, error: userError } = await supabaseAuth.auth.getUser();
     if (userError || !userData?.user) {
       return NextResponse.json({ error: "Sign in required to add a project." }, { status: 401 });
     }
 
-    if ((userData.user.email ?? "").toLowerCase() !== ALLOWED_EMAIL) {
+    if (!isOwner(userData.user.email)) {
       return NextResponse.json({ error: "You are not allowed to add projects." }, { status: 403 });
     }
 

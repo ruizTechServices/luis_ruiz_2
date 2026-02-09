@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/clients/supabase/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
-import { isOwner } from '@/lib/auth/ownership';
+import { requireOwnerClient } from '@/lib/auth/require-owner';
 
 const PHOTOS_BUCKET = process.env.SUPABASE_PHOTOS_BUCKET || 'photos';
 
@@ -26,28 +24,6 @@ type StorageListedItem = {
   metadata?: Record<string, unknown> | null;
 };
 
-// Create auth client (uses anon key to read session from cookies)
-async function createAuthClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  
-  if (!supabaseUrl || !anonKey) {
-    throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY');
-  }
-  
-  const cookieStore = await cookies();
-  return createServerClient(supabaseUrl, anonKey, {
-    cookies: {
-      getAll() { return cookieStore.getAll(); },
-      setAll(cookiesToSet) {
-        try {
-          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
-        } catch { /* ignore in RSC */ }
-      },
-    },
-  });
-}
-
 async function getSupabaseOrJsonError() {
   try {
     log('info', 'Creating Supabase client...');
@@ -62,47 +38,6 @@ async function getSupabaseOrJsonError() {
       ),
     };
   }
-}
-
-async function requireOwnerClient() {
-  log('info', 'Checking owner authorization...');
-  
-  // Use anon key client to read user session from cookies
-  let authClient;
-  try {
-    authClient = await createAuthClient();
-  } catch (e) {
-    const message = e instanceof Error ? e.message : String(e);
-    log('error', 'Failed to create auth client', { error: message });
-    return { errorResponse: NextResponse.json({ error: message }, { status: 500 }) };
-  }
-
-  const { data: userRes, error: userErr } = await authClient.auth.getUser();
-  log('info', 'Auth getUser result', { 
-    hasUser: !!userRes?.user, 
-    email: userRes?.user?.email ?? null,
-    error: userErr?.message ?? null 
-  });
-  
-  if (userErr) {
-    log('warn', 'Auth error', { error: userErr.message });
-    return { errorResponse: NextResponse.json({ error: userErr.message }, { status: 401 }) };
-  }
-  const email = userRes?.user?.email;
-  if (!email) {
-    log('warn', 'No email found in user session');
-    return { errorResponse: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
-  }
-  if (!isOwner(email)) {
-    log('warn', 'User is not an owner', { email });
-    return { errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) };
-  }
-  
-  log('info', 'Owner verified, creating service client');
-  const { supabase, errorResponse } = await getSupabaseOrJsonError();
-  if (!supabase) return { errorResponse };
-  
-  return { supabase };
 }
 
 // GET /api/photos?prefix=hero&recursive=true

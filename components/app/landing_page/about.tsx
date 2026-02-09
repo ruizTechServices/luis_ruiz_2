@@ -2,7 +2,16 @@
 'use client';
 import Image from "next/image";
 import { useEffect, useRef, useMemo } from "react";
-import Globe3D from "./Globe3D";
+import dynamic from "next/dynamic";
+
+const Globe3D = dynamic(() => import("./Globe3D"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center w-full h-full">
+      <div className="w-48 h-48 rounded-full bg-gray-200/20 animate-pulse" />
+    </div>
+  ),
+});
 
 
 export default function About() {

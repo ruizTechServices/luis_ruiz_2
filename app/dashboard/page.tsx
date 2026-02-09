@@ -6,6 +6,8 @@
   import { isOwner } from "@/lib/auth/ownership";
   import BlogUpdates from "@/components/app/user_dash/blog_updates";
 
+  export const dynamic = "force-dynamic";
+
   export default async function Dashboard() {
     const supabase = await createServerClient();
     const { data: userRes } = await supabase.auth.getUser();

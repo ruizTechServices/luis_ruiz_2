@@ -1,42 +1,11 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/clients/supabase/server';
-import { isOwner } from '@/lib/auth/ownership';
+import { requireOwnerClient } from '@/lib/auth/require-owner';
 
 const PHOTOS_BUCKET = process.env.SUPABASE_PHOTOS_BUCKET || 'photos';
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
 export const dynamic = 'force-dynamic';
-
-async function getSupabaseOrJsonError() {
-  try {
-    return { supabase: await createClient() };
-  } catch (e) {
-    const message = e instanceof Error ? e.message : String(e);
-    return {
-      errorResponse: NextResponse.json(
-        { error: `Supabase client not configured: ${message}` },
-        { status: 500 },
-      ),
-    };
-  }
-}
-
-async function requireOwnerClient() {
-  const { supabase, errorResponse } = await getSupabaseOrJsonError();
-  if (!supabase) return { errorResponse };
-
-  const { data: userRes, error: userErr } = await supabase.auth.getUser();
-  if (userErr) {
-    return { errorResponse: NextResponse.json({ error: userErr.message }, { status: 401 }) };
-  }
-  const email = userRes?.user?.email;
-  if (!email) {
-    return { errorResponse: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
-  }
-  if (!isOwner(email)) {
-    return { errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) };
-  }
-  return { supabase };
-}
 
 // POST /api/photos/upload
 // Form fields:
@@ -53,6 +22,22 @@ export async function POST(request: Request) {
 
     if (!files || files.length === 0) {
       return NextResponse.json({ error: 'No files provided (field name: files)' }, { status: 400 });
+    }
+
+    // Validate file sizes and MIME types
+    for (const file of files) {
+      if (file.size > MAX_FILE_SIZE) {
+        return NextResponse.json(
+          { error: `File "${file.name}" exceeds maximum size of 10MB` },
+          { status: 413 }
+        );
+      }
+      if (file.type && !ALLOWED_MIME_TYPES.includes(file.type)) {
+        return NextResponse.json(
+          { error: `File "${file.name}" has unsupported type "${file.type}". Allowed: ${ALLOWED_MIME_TYPES.join(', ')}` },
+          { status: 400 }
+        );
+      }
     }
 
     const uploaded: Array<{ name: string; path: string; url: string | null }> = [];

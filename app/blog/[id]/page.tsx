@@ -5,7 +5,7 @@ import type { BlogPost } from '@/lib/types/blog'
 import { renderMarkdownToHtml } from '@/lib/utils/markdown'
 import { VoteControls, CommentsClient } from '@/components/app/blog/BlogInteractions'
 
-export const revalidate = 0
+export const revalidate = 60
 
 export default async function BlogPostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
