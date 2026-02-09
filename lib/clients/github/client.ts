@@ -25,10 +25,10 @@ export async function githubFetch<T>(
   options: GithubRequestOptions = {},
 ): Promise<T> {
   const url = buildGithubUrl(path);
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     Accept: 'application/vnd.github+json',
     'X-GitHub-Api-Version': githubConfig.apiVersion,
-    ...options.headers,
+    ...(options.headers as Record<string, string>),
   };
 
   if (githubConfig.token) {
