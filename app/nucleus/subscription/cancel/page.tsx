@@ -1,3 +1,4 @@
+"use client";
 // =============================================================================
 // NUCLEUS BOT SUBSCRIPTION CANCEL PAGE - luis-ruiz.com
 // Displayed when user cancels Stripe subscription checkout
