@@ -1,3 +1,4 @@
+"use client";
 // =============================================================================
 // NUCLEUS BOT PURCHASE SUCCESS PAGE
 // Shows after successful credit purchase via Stripe

@@ -1,3 +1,4 @@
+"use client";
 // =============================================================================
 // NUCLEUS BOT PURCHASE CANCEL PAGE - luis-ruiz.com
 // Displayed when user cancels Stripe checkout

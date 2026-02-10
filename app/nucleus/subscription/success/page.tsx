@@ -1,3 +1,4 @@
+"use client";
 // =============================================================================
 // NUCLEUS BOT SUBSCRIPTION SUCCESS PAGE - luis-ruiz.com
 // Displayed after successful Pro subscription via Stripe
