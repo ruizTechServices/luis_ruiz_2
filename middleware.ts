@@ -4,7 +4,8 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-const NUCLEUS_CORS_ORIGINS = process.env.NUCLEUS_CORS_ORIGINS || "*";
+const NUCLEUS_CORS_ORIGINS =
+  process.env.NUCLEUS_CORS_ORIGINS || "https://luis-ruiz.com,https://www.luis-ruiz.com";
 
 function corsHeaders(origin: string | null) {
   const allowedOrigin =
