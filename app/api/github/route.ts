@@ -194,7 +194,11 @@ function shouldIncludeBody(method: string, payload: unknown): boolean {
 }
 
 function serializeBody(payload: unknown): BodyInit {
-  if (payload instanceof Uint8Array) return payload;
+  if (payload instanceof Uint8Array) {
+    const ab = new ArrayBuffer(payload.byteLength);
+    new Uint8Array(ab).set(payload);
+    return new Blob([ab]);
+  }
   if (typeof payload === "string") return payload;
   return JSON.stringify(payload);
 }

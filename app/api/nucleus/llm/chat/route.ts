@@ -1,18 +1,18 @@
 // =============================================================================
 // NUCLEUS BOT API - /api/nucleus/llm/chat
 // Main LLM proxy endpoint - routes requests to OpenAI/Anthropic
-// Handles credit deduction and usage logging
+// Handles credit deduction, usage logging, and optional SSE streaming
 // =============================================================================
 
 import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/clients/supabase/server';
 import { authenticateBearer, errorResponse, successResponse } from '@/lib/nucleus/auth';
 import { rateLimit, rateLimitHeaders } from '@/lib/nucleus/rate-limit';
-import { 
-  getCreditBalance, 
-  hasActiveSubscription, 
-  deductCredits, 
-  logUsage 
+import {
+  getCreditBalance,
+  hasActiveSubscription,
+  deductCredits,
+  logUsage
 } from '@/lib/nucleus/credits';
 import { DEFAULT_MODEL_PRICING } from '@/lib/nucleus/pricing';
 import type { ChatRequest, ChatResponse, ModelPricing } from '@/lib/nucleus/types';
@@ -20,6 +20,9 @@ import type { ChatRequest, ChatResponse, ModelPricing } from '@/lib/nucleus/type
 // Import LLM clients
 import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
+
+// Allow longer execution for streaming responses on Vercel Pro
+export const maxDuration = 60;
 
 // Initialize clients
 const anthropic = new Anthropic({
@@ -33,16 +36,20 @@ const openai = new OpenAI({
 /**
  * POST /api/nucleus/llm/chat
  * Main chat endpoint - proxies to appropriate LLM provider
- * Body: { model: string, messages: ChatMessage[], conversation_id?: string, max_tokens?: number, temperature?: number }
+ * Body: { model, messages, conversation_id?, max_tokens?, temperature?, stream? }
+ * When stream: true, returns SSE text/event-stream with events:
+ *   data: {"type":"chunk","content":"..."}
+ *   data: {"type":"done","credits_used":N,"credits_remaining":N,...}
+ *   data: {"type":"error","error":"...","code":"..."}
  */
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
-  
+
   const { user, error } = await authenticateBearer(request);
   if (error) return error;
   if (!user) return errorResponse('Unauthorized', 'UNAUTHORIZED', 401);
 
-  const rate = rateLimit(`llm:${user.id}`);
+  const rate = await rateLimit(`llm:${user.id}`);
   if (!rate.allowed) {
     return errorResponse(
       'Rate limit exceeded',
@@ -54,8 +61,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body: ChatRequest = await request.json();
-    const { model, messages, conversation_id, max_tokens = 4096, temperature = 0.7 } = body;
+    const body: ChatRequest & { stream?: boolean } = await request.json();
+    const { model, messages, conversation_id, max_tokens = 4096, temperature = 0.7, stream = false } = body;
 
     // Validate request
     if (!model) {
@@ -96,8 +103,8 @@ export async function POST(request: NextRequest) {
 
     if (!modelPricing) {
       return errorResponse(
-        `Model "${model}" is not supported`, 
-        'UNSUPPORTED_MODEL', 
+        `Model "${model}" is not supported`,
+        'UNSUPPORTED_MODEL',
         400,
         { supported_models: Object.keys(DEFAULT_MODEL_PRICING) }
       );
@@ -111,7 +118,7 @@ export async function POST(request: NextRequest) {
     // If not Pro, check credit balance
     if (!isProSubscriber) {
       const balance = await getCreditBalance(supabase, user.id);
-      
+
       if (balance < creditsNeeded) {
         return errorResponse(
           'Insufficient credits',
@@ -126,9 +133,96 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Route to appropriate provider
+    // ── Streaming path ──────────────────────────────────────────
+    if (stream) {
+      const rlHeaders = rateLimitHeaders(rate);
+      const responseHeaders: Record<string, string> = {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        ...rlHeaders,
+      };
+
+      const readable = new ReadableStream({
+        async start(controller) {
+          const encoder = new TextEncoder();
+          const send = (data: Record<string, unknown>) => {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+          };
+
+          try {
+            let tokensInput: number | undefined;
+            let tokensOutput: number | undefined;
+            let finishReason: string | undefined;
+
+            if (modelPricing!.provider === 'anthropic') {
+              const result = await streamAnthropic(model, messages, max_tokens, temperature, (chunk) => {
+                send({ type: 'chunk', content: chunk });
+              });
+              tokensInput = result.tokens_input;
+              tokensOutput = result.tokens_output;
+              finishReason = result.finish_reason;
+            } else if (modelPricing!.provider === 'openai') {
+              const result = await streamOpenAI(model, messages, max_tokens, temperature, (chunk) => {
+                send({ type: 'chunk', content: chunk });
+              });
+              tokensInput = result.tokens_input;
+              tokensOutput = result.tokens_output;
+              finishReason = result.finish_reason;
+            } else {
+              send({ type: 'error', error: `Provider "${modelPricing!.provider}" not implemented`, code: 'PROVIDER_NOT_IMPLEMENTED' });
+              controller.close();
+              return;
+            }
+
+            const duration = Date.now() - startTime;
+
+            // Deduct credits
+            let newBalance = user.profile.credit_balance;
+            if (!isProSubscriber) {
+              const deductResult = await deductCredits(supabase, user.id, creditsNeeded, model);
+              newBalance = deductResult.newBalance;
+            }
+
+            // Log usage
+            await logUsage(supabase, {
+              user_id: user.id,
+              model_id: model,
+              model_name: modelPricing!.model_name,
+              provider: modelPricing!.provider,
+              tier: modelPricing!.tier,
+              credits_used: isProSubscriber ? 0 : creditsNeeded,
+              tokens_input: tokensInput,
+              tokens_output: tokensOutput,
+              tokens_total: (tokensInput || 0) + (tokensOutput || 0),
+              request_duration_ms: duration,
+              conversation_id: conversation_id,
+            });
+
+            send({
+              type: 'done',
+              model,
+              credits_used: isProSubscriber ? 0 : creditsNeeded,
+              credits_remaining: isProSubscriber ? -1 : newBalance,
+              tokens_input: tokensInput,
+              tokens_output: tokensOutput,
+              finish_reason: finishReason,
+            });
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            send({ type: 'error', error: msg, code: 'STREAM_ERROR' });
+          } finally {
+            controller.close();
+          }
+        },
+      });
+
+      return new Response(readable, { headers: responseHeaders });
+    }
+
+    // ── Non-streaming path (original) ───────────────────────────
     let response: { content: string; tokens_input?: number; tokens_output?: number; finish_reason?: string };
-    
+
     if (modelPricing.provider === 'anthropic') {
       response = await callAnthropic(model, messages, max_tokens, temperature);
     } else if (modelPricing.provider === 'openai') {
@@ -143,9 +237,9 @@ export async function POST(request: NextRequest) {
     let newBalance = user.profile.credit_balance;
     if (!isProSubscriber) {
       const deductResult = await deductCredits(
-        supabase, 
-        user.id, 
-        creditsNeeded, 
+        supabase,
+        user.id,
+        creditsNeeded,
         model
       );
       newBalance = deductResult.newBalance;
@@ -184,7 +278,7 @@ export async function POST(request: NextRequest) {
 
   } catch (err: unknown) {
     console.error('LLM Chat error:', err);
-    
+
     // Handle specific API errors
     if (err instanceof Anthropic.APIError) {
       return errorResponse(
@@ -200,13 +294,13 @@ export async function POST(request: NextRequest) {
         err.status || 500
       );
     }
-    
+
     return errorResponse('Failed to process chat request', 'CHAT_ERROR', 500);
   }
 }
 
 // -----------------------------------------------------------------------------
-// Provider-specific implementations
+// Provider-specific implementations (non-streaming)
 // -----------------------------------------------------------------------------
 
 async function callAnthropic(
@@ -231,7 +325,7 @@ async function callAnthropic(
   });
 
   const textContent = response.content.find(c => c.type === 'text');
-  
+
   return {
     content: textContent?.text || '',
     tokens_input: response.usage?.input_tokens,
@@ -257,11 +351,91 @@ async function callOpenAI(
   });
 
   const choice = response.choices[0];
-  
+
   return {
     content: choice?.message?.content || '',
     tokens_input: response.usage?.prompt_tokens,
     tokens_output: response.usage?.completion_tokens,
     finish_reason: choice?.finish_reason || undefined,
   };
+}
+
+// -----------------------------------------------------------------------------
+// Provider-specific implementations (streaming)
+// -----------------------------------------------------------------------------
+
+async function streamAnthropic(
+  model: string,
+  messages: { role: 'user' | 'assistant' | 'system'; content: string }[],
+  maxTokens: number,
+  temperature: number,
+  onChunk: (text: string) => void,
+): Promise<{ tokens_input?: number; tokens_output?: number; finish_reason?: string }> {
+  const systemMsg = messages.find(m => m.role === 'system');
+  const systemPrompt = systemMsg?.content;
+
+  const filteredMessages = messages.filter(
+    (m): m is { role: 'user' | 'assistant'; content: string } => m.role !== 'system'
+  );
+
+  const stream = anthropic.messages.stream({
+    model,
+    max_tokens: maxTokens,
+    temperature,
+    system: systemPrompt,
+    messages: filteredMessages,
+  });
+
+  for await (const event of stream) {
+    if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+      onChunk(event.delta.text);
+    }
+  }
+
+  const finalMessage = await stream.finalMessage();
+  return {
+    tokens_input: finalMessage.usage?.input_tokens,
+    tokens_output: finalMessage.usage?.output_tokens,
+    finish_reason: finalMessage.stop_reason || undefined,
+  };
+}
+
+async function streamOpenAI(
+  model: string,
+  messages: { role: string; content: string }[],
+  maxTokens: number,
+  temperature: number,
+  onChunk: (text: string) => void,
+): Promise<{ tokens_input?: number; tokens_output?: number; finish_reason?: string }> {
+  const stream = await openai.chat.completions.create({
+    model,
+    messages: messages.map(m => ({
+      role: m.role as 'user' | 'assistant' | 'system',
+      content: m.content,
+    })),
+    max_tokens: maxTokens,
+    temperature,
+    stream: true,
+    stream_options: { include_usage: true },
+  });
+
+  let finishReason: string | undefined;
+  let tokensInput: number | undefined;
+  let tokensOutput: number | undefined;
+
+  for await (const chunk of stream) {
+    const delta = chunk.choices[0]?.delta;
+    if (delta?.content) {
+      onChunk(delta.content);
+    }
+    if (chunk.choices[0]?.finish_reason) {
+      finishReason = chunk.choices[0].finish_reason;
+    }
+    if (chunk.usage) {
+      tokensInput = chunk.usage.prompt_tokens;
+      tokensOutput = chunk.usage.completion_tokens;
+    }
+  }
+
+  return { tokens_input: tokensInput, tokens_output: tokensOutput, finish_reason: finishReason };
 }

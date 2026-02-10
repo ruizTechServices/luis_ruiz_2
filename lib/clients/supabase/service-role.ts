@@ -2,7 +2,10 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Builds a Supabase service-role client for server-side usage only.
- * Returns null if required environment variables are missing so callers can gracefully degrade.
+ * Does NOT use cookies — suitable for webhook handlers, background jobs,
+ * and any context where auth comes from Bearer tokens rather than cookies.
+ *
+ * Returns null if required environment variables are missing.
  */
 export const createServiceRoleClient = (): SupabaseClient | null => {
   const supabaseUrl = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;

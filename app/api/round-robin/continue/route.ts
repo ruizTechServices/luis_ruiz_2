@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { createServiceRoleClient } from "@/lib/utils/supabaseServiceRole";
+import { createServiceRoleClient } from "@/lib/clients/supabase/service-role";
 
 export const runtime = "nodejs";
 

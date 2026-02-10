@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { buildContactInsertPayload, contactFormSchema } from "@/lib/validation/contact";
-import { createServiceRoleClient } from "@/lib/utils/supabaseServiceRole";
+import { createServiceRoleClient } from "@/lib/clients/supabase/service-role";
 
 export async function POST(request: Request) {
   try {

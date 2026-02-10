@@ -130,6 +130,7 @@ export interface ChatRequest {
   conversation_id?: string;
   max_tokens?: number;
   temperature?: number;
+  stream?: boolean;
 }
 
 export interface ChatMessage {

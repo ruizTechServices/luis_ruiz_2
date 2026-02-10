@@ -173,7 +173,7 @@ export async function hasActiveSubscription(
 // -----------------------------------------------------------------------------
 
 /**
- * Add credits to user's balance (atomic operation)
+ * Add credits to user's balance (atomic via PostgreSQL function)
  */
 export async function addCredits(
   supabase: SupabaseClient,
@@ -187,18 +187,11 @@ export async function addCredits(
     stripe_checkout_session_id?: string;
   }
 ): Promise<{ newBalance: number; transactionId: string }> {
-  // Get current balance
-  const currentBalance = await getCreditBalance(supabase, userId);
-  const newBalance = currentBalance + credits;
+  const { data: newBalance, error: rpcError } = await supabase
+    .rpc('add_credits', { p_user_id: userId, p_amount: credits });
 
-  // Update balance
-  const { error: updateError } = await supabase
-    .from('nucleus_profiles')
-    .update({ credit_balance: newBalance })
-    .eq('id', userId);
-
-  if (updateError) {
-    throw new Error(`Failed to add credits: ${updateError.message}`);
+  if (rpcError) {
+    throw new Error(`Failed to add credits: ${rpcError.message}`);
   }
 
   // Log transaction
@@ -219,14 +212,13 @@ export async function addCredits(
 
   if (txError) {
     console.error('Failed to log credit transaction:', txError);
-    // Don't throw - credits were added successfully
   }
 
   return { newBalance, transactionId: txData?.id ?? '' };
 }
 
 /**
- * Deduct credits from user's balance (atomic operation)
+ * Deduct credits from user's balance (atomic via PostgreSQL function)
  */
 export async function deductCredits(
   supabase: SupabaseClient,
@@ -235,23 +227,16 @@ export async function deductCredits(
   modelUsed: string,
   description?: string
 ): Promise<{ newBalance: number; transactionId: string }> {
-  // Get current balance
-  const currentBalance = await getCreditBalance(supabase, userId);
-  
-  if (currentBalance < credits) {
-    throw new Error('INSUFFICIENT_CREDITS');
+  const { data: newBalance, error: rpcError } = await supabase
+    .rpc('deduct_credits', { p_user_id: userId, p_amount: credits });
+
+  if (rpcError) {
+    throw new Error(`Failed to deduct credits: ${rpcError.message}`);
   }
 
-  const newBalance = currentBalance - credits;
-
-  // Update balance
-  const { error: updateError } = await supabase
-    .from('nucleus_profiles')
-    .update({ credit_balance: newBalance })
-    .eq('id', userId);
-
-  if (updateError) {
-    throw new Error(`Failed to deduct credits: ${updateError.message}`);
+  // RPC returns -1 when balance is insufficient
+  if (newBalance === -1) {
+    throw new Error('INSUFFICIENT_CREDITS');
   }
 
   // Log transaction
@@ -260,7 +245,7 @@ export async function deductCredits(
     .insert({
       user_id: userId,
       type: 'usage' as TransactionType,
-      credits_change: -credits, // Negative for deduction
+      credits_change: -credits,
       balance_after: newBalance,
       model_used: modelUsed,
       description: description ?? `Used ${credits} credits for ${modelUsed}`,

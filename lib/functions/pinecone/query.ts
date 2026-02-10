@@ -1,7 +1,5 @@
 import pinecone from "@/lib/clients/pinecone/client";
 import { getTextEmbedding } from "@/lib/functions/openai/embeddings";
-import dotenv from 'dotenv'
-dotenv.config()
 
 const rawNamespace = process.env.PINECONE_NAMESPACE; // the namespace from the environment variable is temporary and for developement purposes only. The namespace is supposed to be a unique identifier for the user.
 if (!rawNamespace) {

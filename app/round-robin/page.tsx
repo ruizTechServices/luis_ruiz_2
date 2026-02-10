@@ -20,14 +20,11 @@ import {
   SUPPORTED_MODELS,
 } from "@/lib/round-robin/constants";
 import { useRoundRobinStream } from "@/lib/round-robin/useRoundRobinStream";
-
-type SessionStatus =
-  | "idle"
-  | "active"
-  | "paused"
-  | "awaiting_user"
-  | "completed"
-  | "error";
+import {
+  roundRobinReducer,
+  createInitialState,
+  type SessionStatus,
+} from "@/lib/round-robin/reducer";
 
 const DEFAULT_SELECTED = DEFAULT_TURN_ORDER as readonly string[];
 
@@ -35,39 +32,39 @@ export default function RoundRobinPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [sessionId, setSessionId] = React.useState<number | null>(null);
-  const [sessionStatus, setSessionStatus] = React.useState<SessionStatus>("idle");
-  const [topic, setTopic] = React.useState("");
-  const [selectedModels, setSelectedModels] = React.useState<string[]>([...DEFAULT_SELECTED]);
-  const [turnOrder, setTurnOrder] = React.useState<string[]>([...DEFAULT_SELECTED]);
-  const [messages, setMessages] = React.useState<ThreadMessage[]>([]);
-  const [currentlyStreaming, setCurrentlyStreaming] = React.useState<{
-    model: string;
-    content: string;
-  } | null>(null);
-  const [currentTurn, setCurrentTurn] = React.useState<{
-    model: string;
-    index: number;
-    round: number;
-  } | null>(null);
-  const [currentRound, setCurrentRound] = React.useState<number>(1);
-  const [errorState, setErrorState] = React.useState<{
-    model: string;
-    message: string;
-    retryCount: number;
-  } | null>(null);
-  const [elapsedSeconds, setElapsedSeconds] = React.useState<number>(0);
-  const [longWaitModel, setLongWaitModel] = React.useState<string | null>(null);
-  const [longWaitVisible, setLongWaitVisible] = React.useState<boolean>(false);
+  const [state, dispatch] = React.useReducer(
+    roundRobinReducer,
+    [...DEFAULT_SELECTED],
+    createInitialState,
+  );
+
+  const {
+    sessionId,
+    sessionStatus,
+    topic,
+    selectedModels,
+    turnOrder,
+    messages,
+    currentlyStreaming,
+    currentTurn,
+    currentRound,
+    errorState,
+    elapsedSeconds,
+    longWaitModel,
+    longWaitVisible,
+  } = state;
 
   const timerRef = React.useRef<number | null>(null);
+  const elapsedRef = React.useRef(0);
+  React.useEffect(() => {
+    elapsedRef.current = elapsedSeconds;
+  }, [elapsedSeconds]);
 
-  const startTimer = React.useCallback(() => {
-    if (timerRef.current) {
-      window.clearInterval(timerRef.current);
-    }
+  const startTimerActual = React.useCallback(() => {
+    if (timerRef.current) window.clearInterval(timerRef.current);
     timerRef.current = window.setInterval(() => {
-      setElapsedSeconds((prev) => prev + 1);
+      elapsedRef.current += 1;
+      dispatch({ type: "SET_ELAPSED", seconds: elapsedRef.current });
     }, 1000);
   }, []);
 
@@ -76,86 +73,54 @@ export default function RoundRobinPage() {
       window.clearInterval(timerRef.current);
       timerRef.current = null;
     }
-    setElapsedSeconds(0);
+    dispatch({ type: "STOP_TIMER" });
   }, []);
 
   const { connect, disconnect } = useRoundRobinStream({
     onSessionInit: (data) => {
-      setTopic((prev) => prev || data.topic);
-      setTurnOrder(data.turnOrder);
-      setSelectedModels(data.activeModels);
+      dispatch({
+        type: "SESSION_INIT",
+        topic: data.topic,
+        turnOrder: data.turnOrder,
+        activeModels: data.activeModels,
+      });
     },
     onTurnStart: (data) => {
-      setSessionStatus("active");
-      setErrorState(null);
-      setCurrentTurn({ model: data.model, index: data.turnIndex, round: currentRound });
-      setCurrentlyStreaming({ model: data.model, content: "" });
-      setLongWaitModel(data.model);
-      setLongWaitVisible(false);
-      startTimer();
+      dispatch({ type: "TURN_START", model: data.model, turnIndex: data.turnIndex });
+      startTimerActual();
     },
     onContentChunk: (data) => {
-      setCurrentlyStreaming((prev) => {
-        if (!prev || prev.model !== data.model) {
-          return { model: data.model, content: data.chunk };
-        }
-        return { model: data.model, content: prev.content + data.chunk };
-      });
+      dispatch({ type: "APPEND_CHUNK", model: data.model, chunk: data.chunk });
     },
     onTurnComplete: (data) => {
       stopTimer();
-      setLongWaitVisible(false);
-      setCurrentlyStreaming(null);
-      setMessages((prev) => {
-        const turnIndex = currentTurn?.index ?? prev.length;
-        return [
-          ...prev,
-          {
-            id: Date.now(),
-            model: data.model,
-            role: "assistant",
-            content: data.fullContent,
-            turnIndex,
-          },
-        ];
-      });
+      dispatch({ type: "TURN_COMPLETE", model: data.model, fullContent: data.fullContent });
     },
     onRoundComplete: (data) => {
       stopTimer();
-      setLongWaitVisible(false);
-      setSessionStatus("awaiting_user");
-      setCurrentRound(data.round);
-      setCurrentTurn(null);
-      setCurrentlyStreaming(null);
+      dispatch({ type: "ROUND_COMPLETE", round: data.round });
     },
     onTurnError: (data) => {
       stopTimer();
-      setLongWaitVisible(false);
-      setSessionStatus("error");
-      setErrorState({ model: data.model, message: data.error, retryCount: 0 });
-      setCurrentlyStreaming(null);
+      dispatch({ type: "TURN_ERROR", model: data.model, error: data.error });
     },
     onLongWait: (data) => {
-      setElapsedSeconds(data.elapsedSeconds);
-      setLongWaitModel(data.model);
-      setLongWaitVisible(true);
+      dispatch({ type: "SET_ELAPSED", seconds: data.elapsedSeconds });
+      dispatch({ type: "SET_LONG_WAIT", model: data.model, visible: true });
     },
     onError: () => {
       if (sessionStatus !== "idle") {
-        setSessionStatus("error");
+        dispatch({ type: "SET_STATUS", status: "error" });
       }
     },
     onClose: () => {
       stopTimer();
-      setLongWaitVisible(false);
     },
   });
 
   React.useEffect(() => {
     return () => {
-      if (timerRef.current) {
-        window.clearInterval(timerRef.current);
-      }
+      if (timerRef.current) window.clearInterval(timerRef.current);
     };
   }, []);
 
@@ -173,7 +138,7 @@ export default function RoundRobinPage() {
         if (!res.ok) return;
         const data = await res.json();
 
-        setSessionId(id);
+        dispatch({ type: "SET_SESSION_ID", id });
         const dbSession = data.session as {
           status: string;
           topic?: string;
@@ -182,7 +147,7 @@ export default function RoundRobinPage() {
           current_round?: number;
         };
 
-        setTopic(dbSession.topic ?? "");
+        dispatch({ type: "SET_TOPIC", topic: dbSession.topic ?? "" });
         const restoredTurnOrder =
           Array.isArray(dbSession.turn_order) && dbSession.turn_order.length
             ? dbSession.turn_order
@@ -191,9 +156,9 @@ export default function RoundRobinPage() {
           Array.isArray(dbSession.active_models) && dbSession.active_models.length
             ? dbSession.active_models
             : restoredTurnOrder;
-        setTurnOrder(restoredTurnOrder);
-        setSelectedModels(restoredActive);
-        setCurrentRound(dbSession.current_round ?? 1);
+        dispatch({ type: "SET_TURN_ORDER", order: restoredTurnOrder });
+        dispatch({ type: "SET_SELECTED_MODELS", models: restoredActive });
+        dispatch({ type: "SET_CURRENT_ROUND", round: dbSession.current_round ?? 1 });
 
         const mappedMessages: ThreadMessage[] = (data.messages ?? []).map(
           (m: {
@@ -210,10 +175,10 @@ export default function RoundRobinPage() {
             turnIndex: m.turn_index ?? 0,
           })
         );
-        setMessages(mappedMessages);
+        dispatch({ type: "SET_MESSAGES", messages: mappedMessages });
 
         const status = (dbSession.status ?? "active") as SessionStatus;
-        setSessionStatus(status);
+        dispatch({ type: "SET_STATUS", status });
 
         if (status === "active") {
           connect(id);
@@ -257,28 +222,31 @@ export default function RoundRobinPage() {
       });
 
       if (!res.ok) {
-        setSessionStatus("error");
+        dispatch({ type: "SET_STATUS", status: "error" });
         return;
       }
 
       const data = await res.json();
       const id = data.sessionId as number;
-      setSessionId(id);
-      setSessionStatus("active");
-      setMessages([
-        {
-          id: Date.now(),
-          model: "user",
-          role: "user",
-          content: topic.trim(),
-          turnIndex: 0,
-        },
-      ]);
+      dispatch({ type: "SET_SESSION_ID", id });
+      dispatch({ type: "SET_STATUS", status: "active" });
+      dispatch({
+        type: "SET_MESSAGES",
+        messages: [
+          {
+            id: Date.now(),
+            model: "user",
+            role: "user",
+            content: topic.trim(),
+            turnIndex: 0,
+          },
+        ],
+      });
       router.replace(`/round-robin?sessionId=${id}`);
       connect(id);
     } catch (err) {
       console.error("Failed to start round-robin session", err);
-      setSessionStatus("error");
+      dispatch({ type: "SET_STATUS", status: "error" });
     }
   }
 
@@ -294,7 +262,7 @@ export default function RoundRobinPage() {
         body: JSON.stringify({ sessionId, action, model }),
       });
       if (!res.ok) {
-        setSessionStatus("error");
+        dispatch({ type: "SET_STATUS", status: "error" });
         return null;
       }
       const data = await res.json();
@@ -303,17 +271,17 @@ export default function RoundRobinPage() {
         active_models?: string[];
         turn_order?: string[];
       };
-      setSessionStatus((updated.status ?? "active") as SessionStatus);
+      dispatch({ type: "SET_STATUS", status: (updated.status ?? "active") as SessionStatus });
       if (Array.isArray(updated.active_models) && updated.active_models.length) {
-        setSelectedModels(updated.active_models);
+        dispatch({ type: "SET_SELECTED_MODELS", models: updated.active_models });
       }
       if (Array.isArray(updated.turn_order) && updated.turn_order.length) {
-        setTurnOrder(updated.turn_order);
+        dispatch({ type: "SET_TURN_ORDER", order: updated.turn_order });
       }
       return updated;
     } catch (err) {
       console.error("Failed to send round-robin action", err);
-      setSessionStatus("error");
+      dispatch({ type: "SET_STATUS", status: "error" });
       return null;
     }
   }
@@ -321,18 +289,17 @@ export default function RoundRobinPage() {
   async function handlePause() {
     await sendAction("pause");
     disconnect();
-    setSessionStatus("paused");
+    dispatch({ type: "SET_STATUS", status: "paused" });
   }
 
   async function handleResumeClick() {
     if (!sessionId) return;
     if (sessionStatus === "error" && errorState) {
-      // Treat as retry of the failed model.
       await handleRetry();
       return;
     }
     await sendAction("resume");
-    setSessionStatus("active");
+    dispatch({ type: "SET_STATUS", status: "active" });
     connect(sessionId);
   }
 
@@ -341,14 +308,7 @@ export default function RoundRobinPage() {
       await sendAction("pause");
     }
     disconnect();
-    setSessionId(null);
-    setSessionStatus("idle");
-    setTopic("");
-    setMessages([]);
-    setCurrentlyStreaming(null);
-    setCurrentTurn(null);
-    setErrorState(null);
-    setCurrentRound(1);
+    dispatch({ type: "RESET", defaultSelected: [...DEFAULT_SELECTED] });
     router.replace("/round-robin");
   }
 
@@ -361,29 +321,29 @@ export default function RoundRobinPage() {
         body: JSON.stringify({ sessionId, message }),
       });
       if (!res.ok) {
-        setSessionStatus("error");
+        dispatch({ type: "SET_STATUS", status: "error" });
         return;
       }
 
       if (message && message.trim()) {
-        setMessages((prev) => [
-          ...prev,
-          {
+        dispatch({
+          type: "ADD_MESSAGE",
+          message: {
             id: Date.now(),
             model: "user",
             role: "user",
             content: message.trim(),
-            turnIndex: prev[prev.length - 1]?.turnIndex ?? 0,
+            turnIndex: messages[messages.length - 1]?.turnIndex ?? 0,
           },
-        ]);
+        });
       }
 
-      setSessionStatus("active");
-      setCurrentRound((prev) => Math.max(1, prev + 1));
+      dispatch({ type: "SET_STATUS", status: "active" });
+      dispatch({ type: "INCREMENT_ROUND" });
       connect(sessionId);
     } catch (err) {
       console.error("Failed to continue round-robin session", err);
-      setSessionStatus("error");
+      dispatch({ type: "SET_STATUS", status: "error" });
     }
   }
 
@@ -391,27 +351,25 @@ export default function RoundRobinPage() {
     if (!errorState) return;
     const updated = await sendAction("retry", errorState.model);
     if (!updated || !sessionId) return;
-    setErrorState((prev) =>
-      prev ? { ...prev, retryCount: prev.retryCount + 1 } : prev
-    );
-    setSessionStatus("active");
+    dispatch({ type: "INCREMENT_RETRY" });
+    dispatch({ type: "SET_STATUS", status: "active" });
     connect(sessionId);
   }
 
   async function handleSkip() {
     if (!errorState) return;
     await sendAction("skip", errorState.model);
-    setErrorState(null);
+    dispatch({ type: "SET_ERROR", error: null });
     if (sessionId) connect(sessionId);
   }
 
   async function handleRemove() {
     if (!errorState) return;
     const updated = await sendAction("remove", errorState.model);
-    setErrorState(null);
+    dispatch({ type: "SET_ERROR", error: null });
     if (!updated) return;
     if (updated.status === "completed") {
-      setSessionStatus("completed");
+      dispatch({ type: "SET_STATUS", status: "completed" });
       disconnect();
     } else if (sessionId) {
       connect(sessionId);
@@ -438,20 +396,24 @@ export default function RoundRobinPage() {
           <ModelSelector
             availableModels={availableModels}
             selectedModels={selectedModels}
-            onSelectionChange={setSelectedModels}
+            onSelectionChange={(models) =>
+              dispatch({ type: "SET_SELECTED_MODELS", models })
+            }
             disabled={sessionStatus !== "idle"}
           />
           <div className="grid gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
             <TopicInput
               value={topic}
-              onChange={setTopic}
+              onChange={(t) => dispatch({ type: "SET_TOPIC", topic: t })}
               onSubmit={startSession}
               disabled={sessionStatus !== "idle"}
             />
             <TurnOrderConfig
               models={selectedModels}
               turnOrder={turnOrder}
-              onOrderChange={setTurnOrder}
+              onOrderChange={(order) =>
+                dispatch({ type: "SET_TURN_ORDER", order })
+              }
               disabled={sessionStatus !== "idle"}
             />
           </div>
@@ -494,7 +456,7 @@ export default function RoundRobinPage() {
           onRetry={handleRetry}
           onSkip={handleSkip}
           onRemove={handleRemove}
-          onClose={() => setErrorState(null)}
+          onClose={() => dispatch({ type: "SET_ERROR", error: null })}
         />
       )}
 
@@ -506,4 +468,3 @@ export default function RoundRobinPage() {
     </div>
   );
 }
-

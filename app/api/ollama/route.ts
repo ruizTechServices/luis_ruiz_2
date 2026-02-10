@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import type { OllamaMessage } from "@/lib/clients/ollama/types";
 import { ollamaStream } from "@/lib/models/providers/ollama";
-import { createServiceRoleClient } from "@/lib/utils/supabaseServiceRole";
+import { createServiceRoleClient } from "@/lib/clients/supabase/service-role";
 import { createClient as createServerSupabase } from "@/lib/clients/supabase/server";
 import { getTextEmbedding } from "@/lib/functions/openai/embeddings";
 

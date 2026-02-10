@@ -10,7 +10,7 @@ import { createRoundCompleteEvent, serializeEvent } from '@/lib/round-robin/even
 import { adapterRegistry, fallbackAdapter } from '@/lib/round-robin/providers';
 import { truncateHistory } from '@/lib/round-robin/truncation';
 import type { RoundRobinMessage } from '@/lib/round-robin/types';
-import { createServiceRoleClient } from '@/lib/utils/supabaseServiceRole';
+import { createServiceRoleClient } from '@/lib/clients/supabase/service-role';
 
 export const runtime = 'nodejs';
 

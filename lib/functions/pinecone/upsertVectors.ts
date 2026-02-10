@@ -1,8 +1,6 @@
 import pinecone from "@/lib/clients/pinecone/client";
 import { getTextEmbedding } from "@/lib/functions/openai/embeddings";
 import { chunkText } from "@/lib/functions/chunkText";
-import dotenv from 'dotenv'
-dotenv.config()
 
 export async function indexDocument(docId: string, content: string) {
   const chunks = chunkText(content);
