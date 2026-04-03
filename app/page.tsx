@@ -13,7 +13,6 @@ export default function Home() {
       <Quote />
       <TechSection />
       <CallToAction />
-
     </div>
   )
 }
