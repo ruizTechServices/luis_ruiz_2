@@ -3,6 +3,7 @@
 // https://chatbot-with-browser-and-rag.replit.app/
 //https://agent-ai-practice-giovanniruiz5.replit.app/
 import Project from "@/components/app/projects/project";
+import Soundboard from "@/components/app/landing_page/soundboard";
 import { getProjects } from "@/lib/db/projects";
 
 export default async function ProjectsPage() {
@@ -12,6 +13,9 @@ export default async function ProjectsPage() {
       <main className="container mx-auto px-6 py-16 text-center">
         <h1 className="text-4xl font-bold mb-2">Projects</h1>
         <p className="text-gray-600 mb-10">Interactive demos embedded below.</p>
+        <div className="mb-10">
+          <Soundboard />
+        </div>
         <hr className="mb-10 h-px border border-gray-200"/>
         <div className="space-y-6">
           {projects.map((p) => (
