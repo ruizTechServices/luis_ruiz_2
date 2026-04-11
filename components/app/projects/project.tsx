@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowTopRightOnSquareIcon, PlayIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { cn } from "@/lib/utils";
 
 type ProjectProps = {
   url: string;
@@ -28,60 +29,60 @@ export default function Project({ url, title, description }: ProjectProps) {
 
   return (
     <section className="w-full">
-      <div className="rounded-xl border bg-card shadow-sm overflow-hidden transition-all hover:shadow-md">
-        {/* Card Header */}
-        <div className="p-6">
-          <div className="flex items-start justify-between gap-4">
+      <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] shadow-sm backdrop-blur-sm transition-all hover:border-violet-400/20 hover:bg-white/[0.06] hover:shadow-xl">
+        <div className="p-6 sm:p-8">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
             <div className="flex-1">
-              <h3 className="text-xl font-semibold mb-2">
+              <div className="mb-4 inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium uppercase tracking-[0.22em] text-slate-300">
+                Live project
+              </div>
+              <h3 className="text-2xl font-semibold text-white mb-3">
                 <a
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-current hover:text-primary transition-colors inline-flex items-center gap-2"
+                  className="inline-flex items-center gap-2 text-current transition-colors hover:text-violet-200"
                 >
                   {derivedTitle}
-                  <ArrowTopRightOnSquareIcon className="h-4 w-4 opacity-50" />
+                  <ArrowTopRightOnSquareIcon className="h-5 w-5 opacity-70" />
                 </a>
               </h3>
-              {description && (
-                <p className="text-muted-foreground leading-relaxed">{description}</p>
-              )}
+              <p className={cn("max-w-3xl leading-7 text-slate-300", !description && "italic text-slate-400")}>
+                {description || "Public project entry is live, but this item still needs stronger narrative framing, outcome details, and richer metadata."}
+              </p>
             </div>
-          </div>
-          
-          {/* Action Buttons */}
-          <div className="flex flex-wrap gap-3 mt-4">
-            <Button
-              variant={showPreview ? "secondary" : "default"}
-              size="sm"
-              onClick={() => setShowPreview(!showPreview)}
-              className="gap-2"
-            >
-              {showPreview ? (
-                <>
-                  <XMarkIcon className="h-4 w-4" />
-                  Hide Preview
-                </>
-              ) : (
-                <>
-                  <PlayIcon className="h-4 w-4" />
-                  Show Preview
-                </>
-              )}
-            </Button>
-            <Button variant="outline" size="sm" asChild>
-              <a href={url} target="_blank" rel="noopener noreferrer" className="gap-2">
-                <ArrowTopRightOnSquareIcon className="h-4 w-4" />
-                Open in New Tab
-              </a>
-            </Button>
+
+            <div className="flex flex-wrap gap-3 lg:justify-end">
+              <Button
+                variant={showPreview ? "secondary" : "default"}
+                size="sm"
+                onClick={() => setShowPreview(!showPreview)}
+                className="gap-2"
+              >
+                {showPreview ? (
+                  <>
+                    <XMarkIcon className="h-4 w-4" />
+                    Hide Preview
+                  </>
+                ) : (
+                  <>
+                    <PlayIcon className="h-4 w-4" />
+                    Show Preview
+                  </>
+                )}
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <a href={url} target="_blank" rel="noopener noreferrer" className="gap-2">
+                  <ArrowTopRightOnSquareIcon className="h-4 w-4" />
+                  Open in New Tab
+                </a>
+              </Button>
+            </div>
           </div>
         </div>
 
-        {/* Collapsible Iframe Preview */}
         {showPreview && (
-          <div className="border-t bg-muted/30">
+          <div className="border-t border-white/10 bg-slate-950/40">
             <div className="relative w-full" style={{ aspectRatio: "16 / 9" }}>
               <iframe
                 src={url}
@@ -90,7 +91,7 @@ export default function Project({ url, title, description }: ProjectProps) {
                 referrerPolicy="no-referrer"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; microphone; camera; display-capture"
                 sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-                className="h-full w-full"
+                className="h-full w-full bg-white"
               />
             </div>
           </div>
