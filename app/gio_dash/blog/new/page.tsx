@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
+export const dynamic = "force-dynamic";
+
 async function createPost(formData: FormData) {
   "use server";
   const supabase = await createServerClient();
@@ -43,9 +45,11 @@ async function createPost(formData: FormData) {
     throw new Error(error.message);
   }
 
-  // Refresh dashboard and go back
+  // Refresh dashboard and public blog surfaces, then return to blog admin
   revalidatePath("/gio_dash");
-  redirect("/gio_dash");
+  revalidatePath("/gio_dash/blog");
+  revalidatePath("/blog");
+  redirect("/gio_dash/blog");
 }
 
 export default async function NewPostPage() {
@@ -63,7 +67,7 @@ export default async function NewPostPage() {
             New Blog Post
           </h1>
           <p className="text-gray-600 dark:text-gray-300 mt-1">
-            Create and publish a new post to your blog_posts table
+            Create and publish a new post to the Supabase blog_posts table so it appears on the public Blog page.
           </p>
         </div>
 
@@ -98,7 +102,7 @@ export default async function NewPostPage() {
             <div className="flex items-center gap-3">
               <Button type="submit">Publish Post</Button>
               <Link
-                href="/gio_dash"
+                href="/gio_dash/blog"
                 className="text-sm text-gray-600 dark:text-gray-300 hover:underline"
               >
                 Cancel and go back
