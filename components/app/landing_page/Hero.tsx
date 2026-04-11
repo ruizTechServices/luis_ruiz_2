@@ -155,6 +155,7 @@ export default function Hero() {
                         className="object-cover transition-opacity duration-700 ease-in-out mix-blend-multiply"
                         style={{ opacity: idx === currentSlide ? 1 : 0 }}
                         priority={idx === 0}
+                        unoptimized={src.startsWith('http')}
                       />
                     ))}
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
