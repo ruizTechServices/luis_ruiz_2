@@ -45,11 +45,11 @@ async function createPost(formData: FormData) {
     throw new Error(error.message);
   }
 
-  // Refresh dashboard and public blog surfaces, then return to blog admin
+  // Refresh dashboard and public blog surfaces, then return to blog admin with success state
   revalidatePath("/gio_dash");
   revalidatePath("/gio_dash/blog");
   revalidatePath("/blog");
-  redirect("/gio_dash/blog");
+  redirect("/gio_dash/blog?created=1");
 }
 
 export default async function NewPostPage() {
