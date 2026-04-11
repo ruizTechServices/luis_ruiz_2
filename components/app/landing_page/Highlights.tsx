@@ -17,10 +17,10 @@ const highlights = [
     cta: 'View projects',
   },
   {
-    title: 'Build Log',
-    description: 'Public notes, blog posts, and project updates that show how the work evolves instead of hiding the process.',
+    title: 'Blog / Build Log',
+    description: 'Public notes, blog posts, and project updates that show active execution instead of hiding the process.',
     href: '/blog',
-    cta: 'Read build log',
+    cta: 'Read blog / build log',
   },
   {
     title: 'Current Direction',

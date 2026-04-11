@@ -78,7 +78,7 @@ export default async function ProjectsPage() {
                 className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-200"
               >
                 <PencilSquareIcon className="h-4 w-4" />
-                Read Build Log
+                Read Blog / Build Log
               </Link>
               <Link
                 href="/contact"
@@ -113,7 +113,7 @@ export default async function ProjectsPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 pb-20 lg:px-8">
+      <section className="mx-auto max-w-7xl px-6 pb-12 lg:px-8">
         <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.22em] text-violet-200/70">
@@ -124,6 +124,25 @@ export default async function ProjectsPage() {
           <p className="max-w-2xl text-sm leading-7 text-slate-400">
             These entries come from the site&apos;s project system. Right now the model is still lightweight, but the page framing is being upgraded so visitors understand what the work means, not just where to click.
           </p>
+        </div>
+
+        <div className="mb-8 rounded-2xl border border-white/10 bg-white/5 p-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-3xl">
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-violet-200/70">Connected public execution</p>
+              <h3 className="mt-2 text-2xl font-semibold text-white">Projects should connect to the Blog / Build Log.</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-300">
+                This page shows the work itself. The Blog / Build Log should show movement, iteration, technical choices, and what changed over time. Together, they build trust faster than either page alone.
+              </p>
+            </div>
+            <Link
+              href="/blog"
+              className="inline-flex items-center gap-2 self-start rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+            >
+              <PencilSquareIcon className="h-4 w-4" />
+              Open Blog / Build Log
+            </Link>
+          </div>
         </div>
 
         {projects.length > 0 ? (
@@ -142,6 +161,16 @@ export default async function ProjectsPage() {
             No projects are published yet. That is fixable, and the content model should be expanded next so this page can support stronger case-study style entries.
           </div>
         )}
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-20 lg:px-8">
+        <div className="rounded-2xl border border-dashed border-white/15 bg-slate-950/40 p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-violet-200/70">Next content layer</p>
+          <h2 className="mt-2 text-2xl font-bold text-white">Use the Blog / Build Log to keep these projects alive.</h2>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">
+            The fastest trust move now is consistent public execution. Each serious project should eventually point to posts about decisions, revisions, launches, failures, and what happened next.
+          </p>
+        </div>
       </section>
     </main>
   );

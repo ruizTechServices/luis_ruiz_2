@@ -93,24 +93,20 @@ export default function Hero() {
             ) : null}
 
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-blue-100 mb-6">
-              Founder-Builder • AI Systems • ruizTechServices
+              Founder-Builder • ruizTechServices
             </div>
 
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-5">
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 animate-gradient">
                 Luis Ruiz
               </span>
               <span className="block text-white mt-3 leading-tight">
-                Building AI products, public software experiments, and practical digital systems.
+                Building real software, in public.
               </span>
             </h1>
 
-            <p className="text-xl sm:text-2xl text-violet-300 font-medium mb-6 max-w-2xl">
-              Founder-builder creating through ruizTechServices, with a focus on real software, visible proof, and systems that can grow into actual businesses.
-            </p>
-
-            <p className="text-lg text-gray-300 mb-10 leading-relaxed max-w-2xl">
-              This site is the public front door for what I am building: projects, experiments, build logs, and the technical direction behind the work. Less portfolio theater, more proof.
+            <p className="text-lg sm:text-xl text-violet-300 font-medium mb-8 max-w-xl">
+              Projects, Blog / Build Log, and practical systems through ruizTechServices.
             </p>
 
             <div className="flex flex-wrap gap-4">
@@ -129,7 +125,7 @@ export default function Hero() {
 
               <Button variant="cta-outline" size="lg" className="px-8 py-6 text-base group" asChild>
                 <Link href="/blog">
-                  Read Build Log
+                  Read Blog / Build Log
                 </Link>
               </Button>
             </div>
