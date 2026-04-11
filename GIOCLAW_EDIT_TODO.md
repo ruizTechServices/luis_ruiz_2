@@ -1,5 +1,12 @@
 # GioClaw Edit, Codebase Analysis and Execution To-Do
 
+## Executive Summary
+
+This document is meant to do three things:
+- describe what the repo actually is today
+- identify the highest-value strategic and technical corrections
+- provide a realistic execution order so the project does not drift into scattered redesign work
+
 ## Intro Summary
 
 This repository is not a simple portfolio site.
@@ -38,6 +45,17 @@ But it also clearly shows:
 My strongest codebase-grounded conclusion:
 
 **luis-ruiz.com should be reworked into a founder-builder gateway that proves technical capability through projects, public build activity, and selective business routing to ruizTechServices, instead of continuing as a generic full-stack portfolio.**
+
+## Short version, what this project actually needs first
+
+Before adding more systems, the repo needs four corrections:
+1. a sharper public identity
+2. a cleaner homepage information architecture
+3. richer content models for projects and build-log content
+4. an admin surface defined around real workflows instead of scattered utilities
+
+If those four are handled well, the later automation ideas become assets.
+If those four are not handled well, the automation ideas will amplify confusion.
 
 ---
 
@@ -339,11 +357,36 @@ Not:
 - pure AI demo site
 - pure blog
 
+## Recommended public site model
+
+### Homepage job
+The homepage should:
+- establish who Luis is
+- show what kind of work he is building
+- prove technical seriousness quickly
+- route trust toward projects, build log, and contact
+- promote ruizTechServices without collapsing the whole site into a company brochure
+
+### Supporting sections and routes
+- **Projects** should show proof and completed or substantial builds
+- **Build Log / Blog** should document active work and public progress
+- **About** should carry the more personal story and long-term direction
+- **Contact** should serve as the intake point for collaboration and client work
+- **ruizTechServices** should be visible as the business layer behind the work
+
+### Brand model
+- **Luis Ruiz** = primary public identity
+- **ruizTechServices** = business/studio layer
+- **24Hour-AI** = featured side project or flagship experiment, not the whole site identity
+
 ---
 
 # Detailed To-Do List
 
 ## Phase 0, establish truth before redesign
+
+### Deliverable for this phase
+A short source-of-truth planning doc that locks identity, content buckets, and nav direction before visual changes start.
 
 - [ ] Audit all current homepage copy and remove claims that are generic, inflated, or not strongly evidenced by the repo or public outputs.
 - [ ] Make a source-of-truth content doc for site identity:
@@ -362,6 +405,9 @@ Not:
 ---
 
 ## Phase 1, rewrite the homepage around the actual direction
+
+### Deliverable for this phase
+A rewritten homepage with corrected hero, corrected section structure, and copy that reflects the actual repo direction.
 
 ### Hero
 - [ ] Replace the current "Full-Stack Developer" hero framing.
@@ -385,6 +431,16 @@ Not:
   - Contact CTA
 - [ ] Decide whether `Quote` still belongs on the homepage at all.
 - [ ] Re-evaluate whether `TechSection` should remain a full homepage block, be condensed, or be repositioned as proof rather than filler.
+- [ ] Preserve the image carousel, but give it a more intentional role in communicating proof, identity, or active work.
+
+### Suggested first homepage rewrite scope
+- [ ] `Hero.tsx`
+- [ ] `Highlights.tsx`
+- [ ] `app/page.tsx`
+- [ ] `components/app/landing_page/Navbar.tsx`
+- [ ] `components/app/landing_page/navbarItems.ts`
+- [ ] `components/app/landing_page/CallToAction.tsx`
+- [ ] `app/layout.tsx` metadata
 
 ### Copy discipline
 - [ ] Rewrite all homepage text to reflect facts, not aspiration theater.
@@ -398,6 +454,9 @@ Not:
 ---
 
 ## Phase 2, redesign the information architecture
+
+### Deliverable for this phase
+A stable public structure for homepage, projects, build log, about, and contact that can absorb future automation without becoming messy.
 
 ### Navigation
 - [ ] Modify the navbar to reflect the real site architecture.
@@ -422,6 +481,9 @@ Not:
 ---
 
 ## Phase 3, fix the data models so the site can grow correctly
+
+### Deliverable for this phase
+A content model that supports products/projects/build-log publishing, filtering, SEO, and future automation.
 
 ### Projects model
 - [ ] Expand the `projects` table and related types beyond `url`, `title`, `description`.
@@ -464,6 +526,9 @@ Not:
 
 ## Phase 4, build the repo -> analysis -> blog pipeline correctly
 
+### Deliverable for this phase
+A trustworthy repo-ingestion and review pipeline that produces factual build-log drafts and, when appropriate, structured project entries.
+
 This is one of the highest-leverage features you described.
 
 ### Required pipeline steps
@@ -503,6 +568,9 @@ This is one of the highest-leverage features you described.
 
 ## Phase 5, define the admin dashboard around real workflows
 
+### Deliverable for this phase
+An admin dashboard that reflects real business and publishing operations rather than miscellaneous internal tools.
+
 ### Admin should eventually manage
 - [ ] contacts and lead intake
 - [ ] project records
@@ -530,6 +598,9 @@ This is one of the highest-leverage features you described.
 
 ## Phase 6, contact, booking, and payment system
 
+### Deliverable for this phase
+A realistic intake system: contact first, then scheduling, then deposits, each added only when the workflow is clearly defined.
+
 ### Contact
 - [ ] Rewrite contact page copy so it reflects your actual business and collaboration goals.
 - [ ] Replace placeholder direct email (`hello@example.com`) with real business contact info.
@@ -555,6 +626,9 @@ This is one of the highest-leverage features you described.
 
 ## Phase 7, frontend quality and design system cleanup
 
+### Deliverable for this phase
+A more coherent visual system where trust, clarity, and seriousness beat decoration for decoration’s sake.
+
 You explicitly called out current design as a weakness.
 That deserves real treatment, not vague remarks.
 
@@ -577,6 +651,9 @@ That deserves real treatment, not vague remarks.
 ---
 
 ## Phase 8, modularity and codebase cleanup
+
+### Deliverable for this phase
+Cleaner boundaries between marketing, admin, experiments, content models, and data access.
 
 You specifically mentioned lack of correct modularity.
 That is a real concern here.
@@ -603,6 +680,9 @@ That is a real concern here.
 
 ## Phase 9, SEO and public discoverability
 
+### Deliverable for this phase
+Accurate metadata and route-level SEO that reflect the founder-builder and ruizTechServices direction.
+
 You explicitly want correct SEO.
 Right now the base metadata is weak.
 
@@ -626,6 +706,9 @@ This is too generic and does not match your stated direction.
 
 ## Phase 10, public proof strategy
 
+### Deliverable for this phase
+A public proof system where projects, build-log entries, and selected products reinforce one another.
+
 Because your goal is trust, proof must become more legible.
 
 ### Proof tasks
@@ -642,7 +725,7 @@ Because your goal is trust, proof must become more legible.
 
 ---
 
-## Priority order I recommend
+## Implementation sequence I recommend
 
 ## Immediate first moves
 - [ ] Rewrite hero and homepage framing
@@ -664,6 +747,29 @@ Because your goal is trust, proof must become more legible.
 - [ ] Evaluate whether a customer dashboard is actually needed
 
 ---
+
+## Suggested milestone sequence
+
+### Milestone 1, identity and homepage correction
+- rewrite hero and homepage framing
+- replace generic highlights
+- adjust nav and metadata
+- preserve carousel while giving it a clearer purpose
+
+### Milestone 2, content model correction
+- define Products vs Projects vs Build Log
+- expand project schema
+- decide whether Blog is publicly branded as Build Log
+
+### Milestone 3, operational correction
+- define admin workflows
+- clean contact/admin pipeline
+- decide what booking and deposits really mean before coding them
+
+### Milestone 4, automation and growth systems
+- repo analysis pipeline
+- build-log generation workflow
+- project auto-draft logic with human review
 
 ## Final blunt assessment
 
