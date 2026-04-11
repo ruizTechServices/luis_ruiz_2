@@ -14,8 +14,15 @@ export default function Hero() {
   const { isAvailable, availabilityText } = useAvailability();
   const { slides, currentSlide } = useHeroSlides();
 
+  const carouselNotes = [
+    'A rotating visual layer showing the person behind the work, not just the code.',
+    'Built to make the hero feel active and human without turning the homepage into fluff.',
+    'Kept intentionally as a proof-of-presence element, now cleaner and less intrusive.',
+  ];
+
   const [isVisible, setIsVisible] = useState(false);
   const [particles, setParticles] = useState<{ left: number; top: number; delay: number; duration: number }[]>([]);
+  const [noteIndex, setNoteIndex] = useState(0);
 
   useEffect(() => {
     setIsVisible(true);
@@ -29,6 +36,14 @@ export default function Hero() {
     }));
     setParticles(generated);
   }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNoteIndex((prev) => (prev + 1) % carouselNotes.length);
+    }, 3200);
+
+    return () => clearInterval(interval);
+  }, [carouselNotes.length]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
@@ -128,13 +143,6 @@ export default function Hero() {
                 <div className="absolute -top-4 -right-4 h-20 w-20 bg-gradient-to-br from-pink-500 to-violet-500 rounded-full blur-2xl opacity-60"></div>
                 <div className="absolute -bottom-4 -left-4 h-24 w-24 bg-gradient-to-tr from-blue-500 to-cyan-500 rounded-full blur-2xl opacity-60"></div>
 
-                <div className="mb-5">
-                  <p className="text-sm uppercase tracking-[0.2em] text-violet-200/80 mb-2">Active visual proof</p>
-                  <p className="text-sm text-slate-300 leading-relaxed">
-                    The carousel stays, but it should support credibility, active work, and technical seriousness, not just decoration.
-                  </p>
-                </div>
-
                 <div className="relative aspect-square rounded-2xl bg-transparent overflow-hidden group">
                   <div className="absolute inset-0">
                     {slides.map((src, idx) => (
@@ -152,6 +160,16 @@ export default function Hero() {
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-r from-violet-600/0 to-indigo-600/0 group-hover:from-violet-600/20 group-hover:to-indigo-600/20 transition-all duration-300"></div>
+                </div>
+
+                <div className="mt-5 min-h-[64px] border-t border-white/10 pt-4">
+                  <p className="text-xs uppercase tracking-[0.22em] text-violet-200/60 mb-2">Carousel notes</p>
+                  <p
+                    key={noteIndex}
+                    className="text-sm text-slate-300 leading-relaxed animate-fadeNote"
+                  >
+                    {carouselNotes[noteIndex]}
+                  </p>
                 </div>
               </div>
             </div>
@@ -175,9 +193,20 @@ export default function Hero() {
           50% { background-position: 100% 50%; }
         }
 
+        @keyframes fadeNote {
+          0% { opacity: 0; transform: translateY(6px); }
+          15% { opacity: 1; transform: translateY(0); }
+          85% { opacity: 1; transform: translateY(0); }
+          100% { opacity: 0; transform: translateY(-4px); }
+        }
+
         .animate-gradient {
           background-size: 200% 200%;
           animation: gradient 3s ease infinite;
+        }
+
+        .animate-fadeNote {
+          animation: fadeNote 3.2s ease-in-out;
         }
       `}</style>
     </div>
