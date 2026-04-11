@@ -8,7 +8,7 @@ import { getBlogPostsForAdmin, type BlogPostWithStats } from "@/lib/db/blog";
 import BlogPostsClient from "./BlogPostsClient";
 
 interface BlogAdminPageProps {
-  searchParams: Promise<{ created?: string }>;
+  searchParams: Promise<{ created?: string; updated?: string }>;
 }
 
 export default async function BlogAdminPage({ searchParams }: BlogAdminPageProps) {
@@ -26,6 +26,7 @@ export default async function BlogAdminPage({ searchParams }: BlogAdminPageProps
 
   const params = await searchParams;
   const created = params.created === "1";
+  const updated = params.updated === "1";
 
   // Fetch posts with stats
   let posts: BlogPostWithStats[] = [];
@@ -66,6 +67,15 @@ export default async function BlogAdminPage({ searchParams }: BlogAdminPageProps
             <p className="text-green-700 dark:text-green-300 font-medium">Blog post published successfully.</p>
             <p className="text-green-600 dark:text-green-400 text-sm mt-1">
               The post was saved to Supabase and should now appear on the public blog page.
+            </p>
+          </div>
+        )}
+
+        {updated && (
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-6">
+            <p className="text-blue-700 dark:text-blue-300 font-medium">Blog post updated successfully.</p>
+            <p className="text-blue-600 dark:text-blue-400 text-sm mt-1">
+              The latest changes were saved to Supabase and the public blog was revalidated.
             </p>
           </div>
         )}
