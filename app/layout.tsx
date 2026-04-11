@@ -10,8 +10,9 @@ import { Analytics } from "@vercel/analytics/next";
 import { BackToTop } from "@/components/ui/back-to-top";
 
 export const metadata: Metadata = {
-  title: "Luis Ruiz: your Tech Partner!",
-  description: "A portfolio website for Luis Ruiz",
+  title: "Luis Ruiz | Founder-Builder at ruizTechServices",
+  description:
+    "Founder-builder creating AI products, public software experiments, and practical digital systems through ruizTechServices.",
 };
 
 export default function RootLayout({

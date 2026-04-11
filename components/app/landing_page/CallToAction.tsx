@@ -1,11 +1,11 @@
 import Link from 'next/link';
-import { ArrowRightIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 
 const stats = [
-  { value: 'Full-stack', label: 'Web applications' },
-  { value: 'AI-ready', label: 'Modern workflows' },
-  { value: 'Production', label: 'Focused delivery' },
+  { value: 'Build in public', label: 'Projects and blog updates stay visible' },
+  { value: 'ruizTechServices', label: 'Business layer behind the work' },
+  { value: 'Founder-builder', label: 'Product direction plus technical execution' },
 ];
 
 export default function CallToAction() {
@@ -24,16 +24,15 @@ export default function CallToAction() {
             <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
               <div>
                 <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-blue-100">
-                  <SparklesIcon className="h-4 w-4" />
-                  Available for select projects
+                  Public work, real direction
                 </div>
 
                 <h2 className="mt-6 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-                  Let&apos;s build something fast, reliable, and maintainable.
+                  Need someone who can think through the system and still ship the work?
                 </h2>
 
                 <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-200 sm:text-lg">
-                  If you need a portfolio site, a business platform, or an AI-enabled product, I can help design and ship a solution that fits the product goals and the user experience.
+                  If you want a builder who can combine product direction, technical execution, and honest iteration, start the conversation here. ruizTechServices is the business layer behind that work.
                 </p>
 
                 <div className="mt-8 flex flex-col gap-4 sm:flex-row">
@@ -45,8 +44,8 @@ export default function CallToAction() {
                   </Button>
 
                   <Button asChild size="lg" variant="cta-outline" className="rounded-full px-7 py-6">
-                    <Link href="/projects">
-                      View projects
+                    <Link href="/blog">
+                      Read build log
                     </Link>
                   </Button>
                 </div>

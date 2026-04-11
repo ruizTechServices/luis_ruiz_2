@@ -2,7 +2,7 @@
 import Hero from "../components/app/landing_page/Hero";
 import { Highlights } from "../components/app/landing_page/Highlights";
 import TechSection from "../components/app/landing_page/techSection";
-import Quote from "../components/app/landing_page/quotes";  
+import Quote from "../components/app/landing_page/quotes";
 import CallToAction from "../components/app/landing_page/CallToAction";
 
 export default function Home() {
@@ -14,5 +14,5 @@ export default function Home() {
       <TechSection />
       <CallToAction />
     </div>
-  )
+  );
 }
