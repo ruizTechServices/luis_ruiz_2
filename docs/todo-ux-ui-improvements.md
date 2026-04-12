@@ -9,31 +9,30 @@ Portfolio polish tasks to improve usability, accessibility, and visual cohesion.
 ### 1. Streamline the Hero Section
 **File:** `components/app/landing_page/Hero.tsx`
 
-Current issues:
-- "Booked" badge on avatar card adds visual clutter
-- Too many icons distract from CTAs
-- Missing clear value proposition tagline
+Updated status:
+- Hero has already been materially rewritten away from generic portfolio positioning
+- Copy is now faster, more minimal, and oriented around public execution
+- Carousel treatment was refined and supporting notes moved below the image
 
 **Tasks:**
 - [x] Remove or simplify the "booked" badge
-- [x] Add a brief tagline (e.g. "Building fast, scalable web experiences")
+- [x] Add a brief tagline
 - [x] Reduce icon count to focus attention on CTAs
-- [ ] Consider replacing avatar card with simple photo/illustration
+- [ ] Consider replacing avatar/card treatment with a simpler or more intentional visual system later
 
 ---
 
 ### 2. Consolidate Metrics into Highlights Section
 **Files:** `components/app/landing_page/Hero.tsx` or new component
 
-Current issues:
-- Stats like "5+ Projects" and "100% Resilient" are scattered
-- No context or explanations for metrics
-- Not linked to supporting evidence
+Updated status:
+- Old vanity metrics were removed from the public direction
+- Highlights was repurposed into a site-purpose / routing section instead of a stats block
 
 **Tasks:**
-- [x] Group metrics into a single "Highlights" section below intro
-- [x] Add explanatory captions (e.g. "100% uptime on deployed apps")
-- [x] Link each metric to relevant case studies or project pages
+- [x] Remove weak scattered metrics
+- [x] Replace them with a stronger Highlights section aligned to site direction
+- [ ] Revisit whether a future proof section should include stronger evidence cards instead of metrics
 
 ---
 
@@ -88,16 +87,16 @@ Current issues:
 ### 6. Polish Project Cards
 **Files:** `app/projects/`, project-related components
 
-Current issues:
-- Visual weight flips between left-content/right-iframe inconsistently
-- Embedded iframes make page very long
-- Not easily scannable
+Updated status:
+- Projects page has been substantially rewritten
+- Cards are more intentional and now support linked Blog / Build Log context
+- Inline preview behavior is still present, but overall framing is much stronger
 
 **Tasks:**
-- [x] Create consistent card layout: thumbnail, synopsis, "View project" button
+- [x] Create a more consistent project card layout
 - [x] Collapse iframes behind a "Preview" button
-- [ ] Open full demos in modal instead of inline embedding
-- [x] Ensure responsive behavior is consistent
+- [ ] Decide whether modal preview is actually better than new-tab behavior
+- [x] Ensure responsive behavior is more consistent
 
 ---
 

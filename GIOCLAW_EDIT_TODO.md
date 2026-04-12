@@ -91,8 +91,8 @@ If those four are not handled well, the automation ideas will amplify confusion.
 - `TechSection`
 - `CallToAction`
 
-This is structurally still a classic personal portfolio homepage.
-It is not yet structured like a founder-builder gateway, build log front page, or business routing hub.
+This is still built from the older homepage component structure, but the messaging layer has already been materially rewritten away from a generic personal portfolio.
+It is now moving toward a founder-builder gateway, even though deeper structural cleanup is still needed.
 
 ---
 
@@ -100,50 +100,36 @@ It is not yet structured like a founder-builder gateway, build log front page, o
 
 ## 1. Homepage identity is currently inaccurate to the repo
 
-### What the code says now
-In `components/app/landing_page/Hero.tsx`, the hero currently presents Luis as:
-- "Luis Giovanni Ruiz"
-- "Full-Stack Developer"
-- "Building fast, scalable web experiences"
-- generic copy about next-generation digital experiences
+### Updated status
+This was one of the first major corrections already completed.
 
-### Why this is strategically weak
-This is the single clearest messaging mismatch in the repo.
-The broader codebase shows:
-- AI experimentation surfaces
-- local-first / Ollama support
-- multi-provider model routing
-- founder-like product exploration
-- admin/content tooling
-- public blog and project systems
+The hero no longer frames Luis as a generic "Full-Stack Developer" and has been tightened further to be faster and more direct.
+It now positions the site around public execution, real software, ruizTechServices, and stronger routing toward Projects and Blog / Build Log.
 
-That means the hero is underselling the actual technical and strategic direction.
+### Remaining issue
+The hero direction is much better, but the overall homepage still needs deeper structural tightening so the rest of the page keeps up with the improved top-of-page framing.
 
 ### Conclusion
-Hero messaging should be rewritten first.
+Hero rewrite is in progress enough to count as materially completed, but homepage cohesion work is still active.
 
 ---
 
 ## 2. Highlights section is generic and likely hurting trust
 
-`components/app/landing_page/Highlights.tsx` currently uses:
-- 5+ Projects
-- 100% Uptime
-- 10+ Clients
-- 5+ yrs Experience
-- section title: "Why Work With Me"
+`components/app/landing_page/Highlights.tsx` was already rewritten.
 
-### Problem
-These are generic freelancer-portfolio metrics, and some are weak without explicit proof on the page.
-They also clash with the founder-builder direction you want.
+### Updated status
+The generic freelancer metrics were removed and replaced with a more truthful founder-builder framing around:
+- ruizTechServices
+- Projects
+- Blog / Build Log
+- Current Direction
+
+### Remaining issue
+This section is directionally better, but still may need another quality pass once the broader site architecture settles.
 
 ### Conclusion
-This section should be replaced or heavily reframed.
-Most likely into one of these:
-- What I’m Building
-- Selected Work
-- Proof of Work
-- Current Focus
+This item is materially completed at first-pass level.
 
 ---
 
@@ -213,9 +199,15 @@ You are not starting from zero.
 The blog is currently more of a standard content system than a deliberate build-log engine.
 There is no visible repo-to-blog automation pipeline yet in the code I reviewed.
 
+### Updated status
+This has been partially completed.
+The public language now uses Blog / Build Log framing, the `/blog` page has been rewritten to feel more like a public execution layer, and the site now connects blog content more deliberately to projects.
+
+### Remaining issue
+The blog still needs deeper content and stronger population, but the direction and framing are no longer stuck at generic blog-CMS level.
+
 ### Conclusion
-The blog system should be repositioned and expanded into a true build log.
-This is one of the highest leverage directions in the repo.
+This item is in active implementation, not untouched.
 
 ---
 
@@ -388,19 +380,19 @@ The homepage should:
 ### Deliverable for this phase
 A short source-of-truth planning doc that locks identity, content buckets, and nav direction before visual changes start.
 
-- [ ] Audit all current homepage copy and remove claims that are generic, inflated, or not strongly evidenced by the repo or public outputs.
+- [x] Audit all current homepage copy and remove claims that are generic, inflated, or not strongly evidenced by the repo or public outputs.
 - [ ] Make a source-of-truth content doc for site identity:
   - public name to display
   - short positioning statement
   - one-sentence business relationship to ruizTechServices
   - role of 24Hour-AI
   - whether "Gio" appears publicly at all, and where
-- [ ] Define the exact public distinction between:
+- [x] Define the exact public distinction between:
   - Products
   - Projects
   - Build Log
   - ruizTechServices
-- [ ] Decide whether `/ollama` and `/round-robin` are public proof surfaces, sandbox experiments, or things that should be de-emphasized in the main nav.
+- [x] Decide whether `/ollama` and `/round-robin` are public proof surfaces, sandbox experiments, or things that should be de-emphasized in the main nav.
 
 ---
 
@@ -410,18 +402,18 @@ A short source-of-truth planning doc that locks identity, content buckets, and n
 A rewritten homepage with corrected hero, corrected section structure, and copy that reflects the actual repo direction.
 
 ### Hero
-- [ ] Replace the current "Full-Stack Developer" hero framing.
-- [ ] Rewrite the hero headline/subheadline around founder-builder + AI/product/systems direction.
-- [ ] Decide whether the primary CTA should be:
+- [x] Replace the current "Full-Stack Developer" hero framing.
+- [x] Rewrite the hero headline/subheadline around founder-builder + AI/product/systems direction.
+- [x] Decide whether the primary CTA should be:
   - Contact / Work With Me
   - View Projects
   - Read Build Log
-- [ ] Keep the slideshow/carousel concept, but ensure it supports trust instead of feeling decorative-only.
+- [x] Keep the slideshow/carousel concept, but ensure it supports trust instead of feeling decorative-only.
 - [ ] Re-evaluate whether the availability badge text reflects actual availability and desired business positioning.
 
 ### Section architecture
-- [ ] Replace or rework `Highlights.tsx` entirely.
-- [ ] Remove generic freelancer metrics unless each one is explicitly supportable.
+- [x] Replace or rework `Highlights.tsx` entirely.
+- [x] Remove generic freelancer metrics unless each one is explicitly supportable.
 - [ ] Reorder homepage sections around this likely sequence:
   - Hero
   - Mini About
@@ -429,27 +421,27 @@ A rewritten homepage with corrected hero, corrected section structure, and copy 
   - Build Log / latest updates
   - ruizTechServices block
   - Contact CTA
-- [ ] Decide whether `Quote` still belongs on the homepage at all.
+- [x] Decide whether `Quote` still belongs on the homepage at all.
 - [ ] Re-evaluate whether `TechSection` should remain a full homepage block, be condensed, or be repositioned as proof rather than filler.
-- [ ] Preserve the image carousel, but give it a more intentional role in communicating proof, identity, or active work.
+- [x] Preserve the image carousel, but give it a more intentional role in communicating proof, identity, or active work.
 
 ### Suggested first homepage rewrite scope
-- [ ] `Hero.tsx`
-- [ ] `Highlights.tsx`
-- [ ] `app/page.tsx`
-- [ ] `components/app/landing_page/Navbar.tsx`
-- [ ] `components/app/landing_page/navbarItems.ts`
-- [ ] `components/app/landing_page/CallToAction.tsx`
-- [ ] `app/layout.tsx` metadata
+- [x] `Hero.tsx`
+- [x] `Highlights.tsx`
+- [x] `app/page.tsx`
+- [x] `components/app/landing_page/Navbar.tsx`
+- [x] `components/app/landing_page/navbarItems.ts`
+- [x] `components/app/landing_page/CallToAction.tsx`
+- [x] `app/layout.tsx` metadata
 
 ### Copy discipline
-- [ ] Rewrite all homepage text to reflect facts, not aspiration theater.
-- [ ] Remove vague phrases like:
+- [x] Rewrite all homepage text to reflect facts, not aspiration theater.
+- [x] Remove vague phrases like:
   - next-generation digital experiences
   - scalable web experiences
   - production-ready without context
   - generic service/freelancer promises
-- [ ] Move more personal identity details, like Bronx-born and bilingual, into mini-about or About page rather than hero.
+- [x] Move more personal identity details, like Bronx-born and bilingual, into mini-about or About page rather than hero.
 
 ---
 
@@ -459,7 +451,7 @@ A rewritten homepage with corrected hero, corrected section structure, and copy 
 A stable public structure for homepage, projects, build log, about, and contact that can absorb future automation without becoming messy.
 
 ### Navigation
-- [ ] Modify the navbar to reflect the real site architecture.
+- [x] Modify the navbar to reflect the real site architecture.
 - [ ] Reconsider whether default public nav should be something like:
   - Home
   - Projects
@@ -467,11 +459,11 @@ A stable public structure for homepage, projects, build log, about, and contact 
   - About
   - Contact
   - ruizTechServices
-- [ ] Decide whether Chat and Round-Robin belong in the top-level nav or should move under an experiments/tools area.
-- [ ] Align nav labels with the founder-builder direction instead of portfolio-era labels.
+- [x] Decide whether Chat and Round-Robin belong in the top-level nav or should move under an experiments/tools area.
+- [x] Align nav labels with the founder-builder direction instead of portfolio-era labels.
 
 ### Public route model
-- [ ] Decide whether `/blog` should remain named Blog publicly or be reframed as Build Log while preserving the route.
+- [x] Decide whether `/blog` should remain named Blog publicly or be reframed as Build Log while preserving the route.
 - [ ] Decide whether `/projects` should eventually split into:
   - `/projects`
   - `/products`
@@ -503,14 +495,16 @@ A content model that supports products/projects/build-log publishing, filtering,
 - [ ] Add enough metadata to power homepage cards, project pages, and automated publishing.
 
 ### Blog/build-log model
-- [ ] Decide whether current `blog_posts` schema is enough for build-log content.
-- [ ] Add fields if needed for:
+- [x] Decide whether current `blog_posts` schema is enough for build-log content.
+- [x] Add fields if needed for:
   - post type (`build-log`, `essay`, `announcement`, `project-update`)
   - linked project id
   - publish status
   - canonical slug
   - SEO metadata
 - [ ] Ensure blog content can support repo-generated updates without becoming junk.
+
+Note: a structural project-to-blog relationship layer has now been added via a join table approach (`project_blog_links`), but the broader blog/project content model is still too shallow.
 
 ### Contact and lead model
 - [ ] Extend contact submission handling to support lead stages, not just raw intake.
@@ -694,7 +688,7 @@ Right now the base metadata is weak.
 This is too generic and does not match your stated direction.
 
 ### SEO to-do
-- [ ] Rewrite global metadata.
+- [x] Rewrite global metadata.
 - [ ] Add route-level metadata for homepage, blog, projects, contact, and future about/products pages.
 - [ ] Create proper titles/descriptions aligned with founder-builder + ruizTechServices direction.
 - [ ] Add Open Graph and Twitter metadata.
@@ -712,7 +706,7 @@ A public proof system where projects, build-log entries, and selected products r
 Because your goal is trust, proof must become more legible.
 
 ### Proof tasks
-- [ ] Reframe existing projects as evidence, not just embeds.
+- [x] Reframe existing projects as evidence, not just embeds.
 - [ ] Add context to project cards/pages:
   - what it is
   - why it exists
@@ -728,15 +722,15 @@ Because your goal is trust, proof must become more legible.
 ## Implementation sequence I recommend
 
 ## Immediate first moves
-- [ ] Rewrite hero and homepage framing
-- [ ] Replace Highlights with a truthful, founder-builder-aligned section
+- [x] Rewrite hero and homepage framing
+- [x] Replace Highlights with a truthful, founder-builder-aligned section
 - [ ] Redefine navbar and homepage section order
-- [ ] Rewrite site metadata
-- [ ] Define Products vs Projects vs Build Log cleanly
+- [x] Rewrite site metadata
+- [x] Define Products vs Projects vs Build Log cleanly
 
 ## Next moves
 - [ ] Expand project content model
-- [ ] Reframe blog into build-log strategy
+- [x] Reframe blog into build-log strategy
 - [ ] Define admin workflows and simplify dashboard purpose
 - [ ] Clean contact/business intake language and admin visibility
 
@@ -744,7 +738,7 @@ Because your goal is trust, proof must become more legible.
 - [ ] Build repo-analysis-to-blog pipeline
 - [ ] Implement booking/privacy-safe calendar flow
 - [ ] Implement Stripe $50 deposit flow
-- [ ] Evaluate whether a customer dashboard is actually needed
+- [x] Evaluate whether a customer dashboard is actually needed
 
 ---
 
@@ -756,20 +750,28 @@ Because your goal is trust, proof must become more legible.
 - adjust nav and metadata
 - preserve carousel while giving it a clearer purpose
 
+Status: materially underway. Core first-pass homepage, nav, metadata, carousel treatment, and high-level messaging corrections are already implemented.
+
 ### Milestone 2, content model correction
 - define Products vs Projects vs Build Log
 - expand project schema
 - decide whether Blog is publicly branded as Build Log
+
+Status: partially underway. Products vs Projects vs Blog / Build Log is clearer in public framing, and project-to-blog structural linking has been added, but richer schema expansion is still pending.
 
 ### Milestone 3, operational correction
 - define admin workflows
 - clean contact/admin pipeline
 - decide what booking and deposits really mean before coding them
 
+Status: admin blog workflow is materially improved, but the broader admin/dashboard model is still not sufficiently defined.
+
 ### Milestone 4, automation and growth systems
 - repo analysis pipeline
 - build-log generation workflow
 - project auto-draft logic with human review
+
+Status: not started yet beyond planning.
 
 ## Final blunt assessment
 
