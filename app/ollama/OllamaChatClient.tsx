@@ -346,7 +346,7 @@ export default function OllamaChatPage() {
               </div>
             </div>
 
-            <div className="space-y-3 rounded-[1.2rem] border border-white/8 bg-slate-950/40 p-3 max-h-[52vh] min-h-[320px] overflow-auto sm:p-4 lg:max-h-[620px]">
+            <div className="h-[360px] overflow-y-auto space-y-3 rounded-[1.2rem] border border-white/8 bg-slate-950/40 p-3 sm:h-[420px] sm:p-4 lg:h-[520px]">
               {messages.length === 0 ? <div className="text-sm text-slate-400">No messages yet.</div> : messages.map((m, i) => (
                 <div key={i} className={`rounded-[1.15rem] border p-3 sm:p-4 text-sm shadow-[0_10px_25px_rgba(15,23,42,0.10)] ${m.role === 'user' ? 'ml-auto max-w-[92%] border-sky-300/15 bg-sky-300/10 text-sky-50 sm:max-w-[85%]' : 'mr-auto max-w-[96%] border-white/10 bg-white/[0.06] text-slate-100 sm:max-w-[90%]'}`}>
                   <div className="mb-1 text-[10px] uppercase tracking-[0.2em] opacity-55">{m.role}</div>
