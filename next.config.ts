@@ -21,8 +21,35 @@ const nextConfig: NextConfig = {
         hostname: 'huyhgdsjpdjzokjwaspb.supabase.co',
         pathname: '/storage/v1/object/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'ghchart.rshah.org',
+      },
+      {
+        protocol: 'https',
+        hostname: 'nextjs.org',
+      },
+      {
+        protocol: 'https',
+        hostname: 'react.dev',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.typescriptlang.org',
+      },
+      {
+        protocol: 'https',
+        hostname: 'tailwindcss.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ui.shadcn.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'supabase.com',
+      },
     ],
-    domains: ['ghchart.rshah.org', 'nextjs.org', 'react.dev', 'www.typescriptlang.org', 'tailwindcss.com', 'ui.shadcn.com', 'supabase.com'],
   },
 };
 
