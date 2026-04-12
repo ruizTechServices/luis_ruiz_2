@@ -114,37 +114,16 @@ export default async function ProjectsPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 pb-10 lg:px-8">
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.8fr)]">
-          <div className="rounded-2xl border border-white/10 bg-white/[0.08] p-6 shadow-[0_18px_45px_rgba(15,23,42,0.16)] backdrop-blur-xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-100/70">Case study direction</p>
-            <h2 className="mt-2 text-2xl font-semibold text-white">The model is now built to hold more honest project depth.</h2>
-            <p className="mt-3 text-sm leading-7 text-slate-300">
-              Projects can now carry structured case-study fields like role, context, problem, constraints, architecture, key decisions, outcomes, repo links, status, and category. That fixes the core limitation that was keeping this page shallow.
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-white/[0.08] p-6 shadow-[0_18px_45px_rgba(15,23,42,0.16)] backdrop-blur-xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-100/70">Featured work</p>
-            <h2 className="mt-2 text-2xl font-semibold text-white">{featuredProjects.length > 0 ? `${featuredProjects.length} featured ${featuredProjects.length === 1 ? "project" : "projects"}` : "No featured projects yet"}</h2>
-            <p className="mt-3 text-sm leading-7 text-slate-300">
-              The next honest move is to fill this structure in for the strongest two or three entries first, instead of pretending the whole catalog is equally mature.
-            </p>
-          </div>
-        </div>
-      </section>
-
       <section className="mx-auto max-w-7xl px-6 pb-12 lg:px-8">
-        <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-100/70">
-              Live project index
-            </p>
-            <h2 className="mt-2 text-3xl font-bold text-white">Current public work</h2>
-          </div>
-          <p className="max-w-2xl text-sm leading-7 text-slate-400">
-            These entries come from the site&apos;s project system. The structure is now richer, but the strongest value will come from actually converting the top entries into real case studies instead of generic cards.
+        <div className="mb-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-100/70">
+            Current public work
           </p>
+          <h2 className="mt-2 text-3xl font-bold text-white">
+            {featuredProjects.length > 0
+              ? `${featuredProjects.length} featured ${featuredProjects.length === 1 ? "project" : "projects"} and the wider project index`
+              : "Current public work"}
+          </h2>
         </div>
 
         <div className="mb-8 rounded-2xl border border-white/10 bg-white/[0.08] p-6 shadow-[0_18px_45px_rgba(15,23,42,0.16)] backdrop-blur-xl">
@@ -180,12 +159,23 @@ export default async function ProjectsPage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-6 pb-20 lg:px-8">
-        <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.05] p-8 shadow-[0_18px_45px_rgba(15,23,42,0.14)] backdrop-blur-xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-100/70">Next content layer</p>
-          <h2 className="mt-2 text-2xl font-bold text-white">Fill the strongest projects with honest detail, then let the build log support them.</h2>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">
-            The schema and rendering can finally support that. The next valuable step is content work: pick the strongest 2 to 3 projects, write the case-study fields properly, and link each one to public updates where possible.
-          </p>
+        <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-8 shadow-[0_18px_45px_rgba(15,23,42,0.14)] backdrop-blur-xl">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-3xl">
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-100/70">Keep following the work</p>
+              <h2 className="mt-2 text-2xl font-bold text-white">The build log shows movement, not just outcomes.</h2>
+              <p className="mt-3 text-sm leading-7 text-slate-300">
+                If you want the ongoing thinking, iteration, and technical decisions behind these projects, the Blog / Build Log is where that shows up in public.
+              </p>
+            </div>
+            <Link
+              href="/blog"
+              className="inline-flex items-center gap-2 self-start rounded-full border border-white/15 bg-white/[0.08] px-5 py-3 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-white/[0.12]"
+            >
+              <PencilSquareIcon className="h-4 w-4" />
+              Open Blog / Build Log
+            </Link>
+          </div>
         </div>
       </section>
     </main>
