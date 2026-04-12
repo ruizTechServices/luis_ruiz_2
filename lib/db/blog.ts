@@ -154,14 +154,17 @@ export async function getPostById(id: number): Promise<BlogPost | null> {
   const supabase = await supa();
   const { data, error } = await supabase
     .from("blog_posts")
+    .select("id, created_at, title, summary, tags, references, body")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+
+  let relatedProjects: ProjectRow[] = [];
+  const relationQuery = await supabase
+    .from("blog_posts")
     .select(`
       id,
-      created_at,
-      title,
-      summary,
-      tags,
-      references,
-      body,
       project_blog_links(
         projects(
           id,
@@ -175,19 +178,21 @@ export async function getPostById(id: number): Promise<BlogPost | null> {
     `)
     .eq("id", id)
     .maybeSingle();
-  if (error) throw error;
-  if (!data) return null;
 
-  const row = data as RawBlogPostRow;
+  if (!relationQuery.error && relationQuery.data) {
+    const relationRow = relationQuery.data as RawBlogPostRow;
+    relatedProjects = normalizeRelatedProjects(relationRow.project_blog_links);
+  }
+
   return {
-    id: row.id,
-    created_at: row.created_at,
-    title: row.title,
-    summary: row.summary,
-    tags: row.tags,
-    references: row.references,
-    body: row.body,
-    relatedProjects: normalizeRelatedProjects(row.project_blog_links),
+    id: data.id,
+    created_at: data.created_at,
+    title: data.title,
+    summary: data.summary,
+    tags: data.tags,
+    references: data.references,
+    body: data.body,
+    relatedProjects,
   };
 }
 

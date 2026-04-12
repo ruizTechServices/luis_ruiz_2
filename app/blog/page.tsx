@@ -19,22 +19,7 @@ export default async function BlogIndexPage({ searchParams }: { searchParams: Pr
 
   let query = supabase
     .from('blog_posts')
-    .select(`
-      id,
-      created_at,
-      title,
-      summary,
-      tags,
-      references,
-      body,
-      project_blog_links(
-        projects(
-          id,
-          title,
-          url
-        )
-      )
-    `, { count: 'exact' })
+    .select('id, created_at, title, summary, tags, references, body', { count: 'exact' })
 
   if (tag && tag.length > 0) {
     query = query.ilike('tags', `%${tag}%`)
@@ -48,13 +33,26 @@ export default async function BlogIndexPage({ searchParams }: { searchParams: Pr
     console.error('Failed to load blog posts:', error)
   }
 
+  const postIds = (posts ?? []).map((post) => post.id)
+  const relationMap = new Map<number, { id: number; title: string | null; url: string }[]>()
+
+  if (postIds.length > 0) {
+    const relationRes = await supabase
+      .from('project_blog_links')
+      .select('blog_post_id, projects(id, title, url)')
+      .in('blog_post_id', postIds)
+
+    if (!relationRes.error && relationRes.data) {
+      for (const row of relationRes.data as Array<{ blog_post_id: number; projects: { id: number; title: string | null; url: string } | { id: number; title: string | null; url: string }[] | null }>) {
+        const entries = row.projects ? (Array.isArray(row.projects) ? row.projects : [row.projects]) : []
+        relationMap.set(row.blog_post_id, [...(relationMap.get(row.blog_post_id) ?? []), ...entries])
+      }
+    }
+  }
+
   const normalizedPosts = (posts ?? []).map((post) => ({
     ...post,
-    relatedProjects: (post.project_blog_links ?? []).flatMap((link) => {
-      const project = link.projects
-      if (!project) return []
-      return Array.isArray(project) ? project : [project]
-    }),
+    relatedProjects: relationMap.get(post.id) ?? [],
   }))
 
   const totalPages = typeof count === 'number' ? Math.max(1, Math.ceil(count / pageSize)) : 1

@@ -9,10 +9,6 @@ type ProjectLinkRow = {
   blog_posts: RelatedBlogPost | RelatedBlogPost[] | null;
 };
 
-type RawProjectRow = Omit<ProjectRow, "relatedPosts"> & {
-  project_blog_links?: ProjectLinkRow[] | null;
-};
-
 function normalizeRelatedPosts(links: ProjectLinkRow[] | null | undefined): RelatedBlogPost[] {
   if (!links?.length) return [];
 
@@ -27,15 +23,20 @@ function normalizeRelatedPosts(links: ProjectLinkRow[] | null | undefined): Rela
 
 export async function getProjects(): Promise<ProjectRow[]> {
   const supabase = await supa();
-  const { data, error } = await supabase
+
+  const baseQuery = await supabase
+    .from("projects")
+    .select("id, url, title, description, created_at, updated_at")
+    .order("created_at", { ascending: true });
+
+  if (baseQuery.error) throw baseQuery.error;
+
+  const baseProjects = (baseQuery.data ?? []) as Omit<ProjectRow, "relatedPosts">[];
+
+  const relationQuery = await supabase
     .from("projects")
     .select(`
       id,
-      url,
-      title,
-      description,
-      created_at,
-      updated_at,
       project_blog_links(
         blog_posts(
           id,
@@ -47,16 +48,17 @@ export async function getProjects(): Promise<ProjectRow[]> {
     `)
     .order("created_at", { ascending: true });
 
-  if (error) throw error;
+  const relationMap = new Map<number, RelatedBlogPost[]>();
 
-  return ((data ?? []) as RawProjectRow[]).map((project) => ({
-    id: project.id,
-    url: project.url,
-    title: project.title,
-    description: project.description,
-    created_at: project.created_at,
-    updated_at: project.updated_at,
-    relatedPosts: normalizeRelatedPosts(project.project_blog_links),
+  if (!relationQuery.error && relationQuery.data) {
+    for (const project of relationQuery.data as Array<Pick<ProjectRow, "id"> & { project_blog_links?: ProjectLinkRow[] | null }>) {
+      relationMap.set(project.id, normalizeRelatedPosts(project.project_blog_links));
+    }
+  }
+
+  return baseProjects.map((project) => ({
+    ...project,
+    relatedPosts: relationMap.get(project.id) ?? [],
   }));
 }
 
