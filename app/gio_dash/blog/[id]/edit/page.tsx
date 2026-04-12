@@ -10,6 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { getProjectsForSelection } from "@/lib/db/projects";
+import { getRelatedProjectIdsForPost, replaceRelatedProjectsForPost } from "@/lib/db/blog";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +33,11 @@ export default async function EditBlogPostPage({ params }: EditBlogPostPageProps
   const post = await getPostById(postId);
   if (!post) redirect("/gio_dash/blog");
 
+  const [projects, relatedProjectIds] = await Promise.all([
+    getProjectsForSelection(),
+    getRelatedProjectIdsForPost(postId),
+  ]);
+
   async function updatePostAction(formData: FormData) {
     "use server";
 
@@ -49,6 +56,10 @@ export default async function EditBlogPostPage({ params }: EditBlogPostPageProps
     const tags = (formData.get("tags") || "").toString().trim();
     const references = (formData.get("references") || "").toString().trim();
     const body = (formData.get("body") || "").toString().trim();
+    const relatedProjectIds = formData
+      .getAll("relatedProjectIds")
+      .map((value) => Number(value))
+      .filter((value) => Number.isInteger(value) && value > 0);
 
     if (!title || !body) {
       throw new Error("Title and body are required");
@@ -69,6 +80,8 @@ export default async function EditBlogPostPage({ params }: EditBlogPostPageProps
       console.error("Failed to update post:", error);
       throw new Error(error.message);
     }
+
+    await replaceRelatedProjectsForPost(postId, relatedProjectIds);
 
     revalidatePath("/gio_dash");
     revalidatePath("/gio_dash/blog");
@@ -115,6 +128,31 @@ export default async function EditBlogPostPage({ params }: EditBlogPostPageProps
             <div className="space-y-2">
               <Label htmlFor="body">Body</Label>
               <Textarea id="body" name="body" rows={16} defaultValue={post.body ?? ""} placeholder="Write your post content here..." required />
+            </div>
+
+            <div className="space-y-3">
+              <Label>Related Projects</Label>
+              {projects.length > 0 ? (
+                <div className="grid grid-cols-1 gap-3 rounded-xl border p-4 md:grid-cols-2">
+                  {projects.map((project) => (
+                    <label key={project.id} className="flex items-start gap-3 rounded-lg border p-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                      <input
+                        type="checkbox"
+                        name="relatedProjectIds"
+                        value={project.id}
+                        defaultChecked={relatedProjectIds.includes(project.id)}
+                        className="mt-1"
+                      />
+                      <div>
+                        <div className="font-medium">{project.title || project.url}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 break-all">{project.url}</div>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 dark:text-gray-400">No projects available yet to link.</p>
+              )}
             </div>
 
             <div className="flex items-center gap-3">

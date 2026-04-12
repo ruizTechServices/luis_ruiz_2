@@ -1,3 +1,5 @@
+import type { ProjectRow } from "@/lib/types/project";
+
 export interface BlogPost {
   id: number;
   created_at: string;
@@ -6,6 +8,7 @@ export interface BlogPost {
   tags: string | null;        // CSV string for now
   references: string | null;
   body: string | null;
+  relatedProjects?: ProjectRow[];
 }
 
 export interface Comment {

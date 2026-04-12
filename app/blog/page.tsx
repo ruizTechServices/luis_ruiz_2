@@ -19,7 +19,22 @@ export default async function BlogIndexPage({ searchParams }: { searchParams: Pr
 
   let query = supabase
     .from('blog_posts')
-    .select('id, created_at, title, summary, tags, references, body', { count: 'exact' })
+    .select(`
+      id,
+      created_at,
+      title,
+      summary,
+      tags,
+      references,
+      body,
+      project_blog_links(
+        projects(
+          id,
+          title,
+          url
+        )
+      )
+    `, { count: 'exact' })
 
   if (tag && tag.length > 0) {
     query = query.ilike('tags', `%${tag}%`)
@@ -33,8 +48,17 @@ export default async function BlogIndexPage({ searchParams }: { searchParams: Pr
     console.error('Failed to load blog posts:', error)
   }
 
+  const normalizedPosts = (posts ?? []).map((post) => ({
+    ...post,
+    relatedProjects: (post.project_blog_links ?? []).flatMap((link) => {
+      const project = link.projects
+      if (!project) return []
+      return Array.isArray(project) ? project : [project]
+    }),
+  }))
+
   const totalPages = typeof count === 'number' ? Math.max(1, Math.ceil(count / pageSize)) : 1
-  const latestPosts = posts?.slice(0, 3) ?? []
+  const latestPosts = normalizedPosts.slice(0, 3)
   const makeHref = (p: number) => {
     const params = new URLSearchParams()
     if (tag) params.set('tag', tag)
@@ -157,8 +181,8 @@ export default async function BlogIndexPage({ searchParams }: { searchParams: Pr
           </form>
 
           <section className="space-y-4">
-            {posts?.length ? (
-              posts.map((p) => <BlogPostCard key={p.id} blogPost={p} />)
+            {normalizedPosts.length ? (
+              normalizedPosts.map((p) => <BlogPostCard key={p.id} blogPost={p} />)
             ) : (
               <div className="text-sm text-slate-400">No posts yet.</div>
             )}

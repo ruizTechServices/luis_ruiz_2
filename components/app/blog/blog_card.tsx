@@ -28,9 +28,10 @@ interface BlogPost {
   created_at: string;
   title: string;
   summary: string;
-  tags: string; // or string[] if you update the schema
+  tags: string;
   references: string;
   body: string;
+  relatedProjects?: { id: number; title: string | null; url: string }[];
 }
 
 interface BlogCardProps {
@@ -73,15 +74,31 @@ export function BlogPostCard({ blogPost }: BlogCardProps) {
           })}
       </div>
 
-      <div className="flex items-center justify-between gap-4 text-sm text-slate-400">
-        <span>
-          {blogPost.created_at
-            ? new Date(blogPost.created_at).toLocaleDateString()
-            : "No date"}
-        </span>
-        <Link href="/projects" className="font-medium text-violet-300 hover:text-violet-200">
-          See related project work →
-        </Link>
+      <div className="flex flex-col gap-3 text-sm text-slate-400">
+        {blogPost.relatedProjects && blogPost.relatedProjects.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {blogPost.relatedProjects.slice(0, 3).map((project) => (
+              <Link
+                key={project.id}
+                href="/projects"
+                className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-300 hover:border-violet-400/20 hover:text-violet-200"
+              >
+                Related: {project.title || project.url}
+              </Link>
+            ))}
+          </div>
+        ) : null}
+
+        <div className="flex items-center justify-between gap-4">
+          <span>
+            {blogPost.created_at
+              ? new Date(blogPost.created_at).toLocaleDateString()
+              : "No date"}
+          </span>
+          <Link href="/projects" className="font-medium text-violet-300 hover:text-violet-200">
+            See project work →
+          </Link>
+        </div>
       </div>
     </article>
   );
@@ -93,7 +110,22 @@ export async function BlogCard() {
 
   const { data: posts, error } = await supabase
     .from("blog_posts")
-    .select("id, created_at, title, summary, tags, references, body")
+    .select(`
+      id,
+      created_at,
+      title,
+      summary,
+      tags,
+      references,
+      body,
+      project_blog_links(
+        projects(
+          id,
+          title,
+          url
+        )
+      )
+    `)
     .order("created_at", { ascending: false })
     .limit(5);
 
@@ -105,10 +137,19 @@ export async function BlogCard() {
     return <div className="text-sm text-gray-500">No posts yet.</div>;
   }
 
+  const normalizedPosts = posts.map((post) => ({
+    ...post,
+    relatedProjects: (post.project_blog_links ?? []).flatMap((link) => {
+      const project = link.projects;
+      if (!project) return [];
+      return Array.isArray(project) ? project : [project];
+    }),
+  }));
+
   return (
     <Carousel opts={{ align: "start", loop: true }} className="w-full">
       <CarouselContent>
-        {posts.map((p) => (
+        {normalizedPosts.map((p) => (
           <CarouselItem key={p.id}>
             <BlogPostCard blogPost={p} />
           </CarouselItem>

@@ -9,6 +9,7 @@ type ProjectProps = {
   url: string;
   title?: string;
   description?: string;
+  relatedPosts?: { id: number; title: string | null; created_at: string }[];
   /**
    * When true, places the description on the right on large screens.
    * On small screens the layout stacks with the iframe first, description second.
@@ -16,7 +17,7 @@ type ProjectProps = {
   reverse?: boolean;
 };
 
-export default function Project({ url, title, description }: ProjectProps) {
+export default function Project({ url, title, description, relatedPosts }: ProjectProps) {
   const [showPreview, setShowPreview] = useState(false);
   
   const derivedTitle = title || (() => {
@@ -50,6 +51,20 @@ export default function Project({ url, title, description }: ProjectProps) {
               <p className={cn("max-w-3xl leading-7 text-slate-300", !description && "italic text-slate-400")}>
                 {description || "Public project entry is live, but this item still needs stronger narrative framing, outcome details, and richer metadata."}
               </p>
+
+              {relatedPosts && relatedPosts.length > 0 ? (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {relatedPosts.slice(0, 3).map((post) => (
+                    <a
+                      key={post.id}
+                      href={`/blog/${post.id}`}
+                      className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-violet-200 transition hover:border-violet-400/30 hover:bg-white/10"
+                    >
+                      Blog / Build Log: {post.title || `Post #${post.id}`}
+                    </a>
+                  ))}
+                </div>
+              ) : null}
             </div>
 
             <div className="flex flex-wrap gap-3 lg:justify-end">

@@ -153,6 +153,7 @@ export default async function ProjectsPage() {
                 url={project.url}
                 title={project.title ?? undefined}
                 description={project.description ?? undefined}
+                relatedPosts={project.relatedPosts}
               />
             ))}
           </div>
