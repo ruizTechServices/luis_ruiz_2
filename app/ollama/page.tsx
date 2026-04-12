@@ -85,39 +85,38 @@ export default function ExperimentsPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 pb-12 lg:px-8">
-        <div className="mb-6 max-w-3xl">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-sky-100 backdrop-blur-md">
+      <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
+        <div className="mb-8 max-w-4xl">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-sky-200/15 bg-sky-200/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-100 backdrop-blur-md">
             <CpuChipIcon className="h-4 w-4" />
             Local AI experiment
           </div>
-          <h2 className="text-3xl font-bold text-white">Ollama Lab</h2>
-          <p className="mt-3 text-sm leading-7 text-slate-300">
-            This should feel like its own serious tool surface, not a squeezed afterthought. The chatbot gets the primary interaction space here, with clearer breathing room and a more focused layout.
+          <h2 className="text-3xl font-bold text-white sm:text-4xl">Ollama Lab</h2>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300 sm:text-base">
+            The goal here is simple, make local AI testing feel clean, capable, and product-like. The chat should be the focus, with supporting context that helps without crowding it.
           </p>
         </div>
 
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_320px] xl:items-start">
-          <div className="rounded-3xl border border-white/10 bg-white/[0.08] p-3 shadow-[0_24px_60px_rgba(15,23,42,0.22)] backdrop-blur-xl sm:p-5">
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_290px] xl:items-start">
+          <div className="rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.88),rgba(15,23,42,0.72))] p-2 shadow-[0_30px_90px_rgba(2,6,23,0.45)] ring-1 ring-white/5 backdrop-blur-2xl sm:p-4">
             <OllamaChatPage />
           </div>
 
-          <div className="space-y-4">
-            <div className="rounded-2xl border border-white/10 bg-white/[0.08] p-5 shadow-[0_18px_45px_rgba(15,23,42,0.18)] backdrop-blur-xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-100/75">Why it is here</p>
-              <h3 className="mt-2 text-xl font-semibold text-white">Local model testing, not portfolio filler.</h3>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+            <div className="rounded-[1.6rem] border border-white/10 bg-white/[0.06] p-5 shadow-[0_18px_45px_rgba(15,23,42,0.18)] backdrop-blur-xl">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-100/75">What this is</p>
+              <h3 className="mt-2 text-lg font-semibold text-white">A focused local model workspace.</h3>
               <p className="mt-3 text-sm leading-7 text-slate-300">
-                This surface is for real local AI experimentation, model behavior checks, and system-level interaction testing. It belongs in the lab, but it still deserves a clean product-like presentation.
+                This is for real local prompting, streaming checks, and retrieval experiments. It should feel reliable and calm, not like a stack of random demo boxes.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-white/[0.08] p-5 shadow-[0_18px_45px_rgba(15,23,42,0.18)] backdrop-blur-xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-100/75">Use it well</p>
+            <div className="rounded-[1.6rem] border border-white/10 bg-white/[0.06] p-5 shadow-[0_18px_45px_rgba(15,23,42,0.18)] backdrop-blur-xl">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-100/75">Quick guidance</p>
               <ul className="mt-3 space-y-3 text-sm leading-7 text-slate-300">
-                <li>Choose a local model first.</li>
-                <li>Send a plain prompt and confirm streaming works.</li>
-                <li>Toggle context only when you want retrieval behavior involved.</li>
-                <li>Use this page like a lab tool, not just a decorative embed.</li>
+                <li>Start with a simple prompt to confirm streaming.</li>
+                <li>Adjust temperature and top-p only when behavior actually needs tuning.</li>
+                <li>Use retrieval only when you want context involved.</li>
               </ul>
             </div>
           </div>

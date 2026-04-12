@@ -311,71 +311,119 @@ export default function OllamaChatPage() {
   }
 
   return (
-    <div className="rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.04))] p-4 text-white shadow-[0_20px_50px_rgba(15,23,42,0.18)] backdrop-blur-2xl sm:p-6">
+    <div className="rounded-[1.75rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.92),rgba(15,23,42,0.82))] p-3 text-white shadow-[0_24px_70px_rgba(2,6,23,0.35)] backdrop-blur-2xl sm:p-5 lg:p-6">
       <Toaster richColors position="top-right" />
 
-      <div className="mb-6 flex flex-col gap-3 border-b border-white/10 pb-5 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-100/70">Ollama Lab</p>
-          <h3 className="mt-2 text-2xl font-semibold text-white sm:text-3xl">Local chat workspace</h3>
-          <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-300">
-            Use this as a real local-model chat surface. Pick a model, test streaming, and adjust the knobs without the interface feeling crushed into the page.
-          </p>
-        </div>
-      </div>
-
-      <div className="mb-4 grid gap-4 xl:grid-cols-[minmax(0,1fr)_180px_180px] xl:items-end">
-        <div className="min-w-[220px] flex-1">
-          <Label className="mb-2 block">Model</Label>
-          <Select value={model} onValueChange={setModel}>
-            <SelectTrigger><SelectValue placeholder="Select model" /></SelectTrigger>
-            <SelectContent>
-              {models.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="w-full xl:w-auto">
-          <Label className="mb-2 block">Temperature</Label>
-          <Slider value={[temperature]} min={0} max={1} step={0.1} onValueChange={([v]) => setTemperature(v)} />
-        </div>
-        <div className="w-full xl:w-auto">
-          <Label className="mb-2 block">Top P</Label>
-          <Slider value={[topP]} min={0} max={1} step={0.1} onValueChange={([v]) => setTopP(v)} />
-        </div>
-      </div>
-
-      <div className="mb-4 rounded-2xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur-xl">
-        <div className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-sky-100/70">Retrieval controls</div>
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-2"><Switch checked={useContext} onCheckedChange={setUseContext} /><Label>Use context</Label></div>
-          <div className="w-28"><Label className="mb-2 block">Top K</Label><NumberInput value={topK} onChange={(e) => setTopK(Number(e.target.value || 5))} /></div>
-          <div className="w-28"><Label className="mb-2 block">Min Sim</Label><NumberInput value={minSim} onChange={(e) => setMinSim(Number(e.target.value || 0.75))} /></div>
-        </div>
-      </div>
-
-      <div className="mb-4 rounded-2xl border border-white/10 bg-white/[0.05] p-4 text-sm text-slate-300 backdrop-blur-xl">
-        {error ? <div className="text-red-300">{error}</div> : isOnline ? 'Ollama connection ready.' : 'Ollama appears offline.'}
-        {dbPersist ? <div className="mt-1 text-xs text-slate-400">DB persist: {dbPersist}</div> : null}
-        {siteOrigin ? <div className="mt-1 text-xs text-slate-500">Origin: {siteOrigin}</div> : null}
-        {checkingOnline ? <div className="mt-1 text-xs text-slate-500">Checking Ollama...</div> : null}
-      </div>
-
-      <div className="mb-4 space-y-3 rounded-2xl border border-white/10 bg-white/[0.05] p-4 max-h-[560px] overflow-auto backdrop-blur-xl">
-        {messages.length === 0 ? <div className="text-sm text-slate-400">No messages yet.</div> : messages.map((m, i) => (
-          <div key={i} className={`rounded-2xl border p-4 text-sm shadow-[0_10px_25px_rgba(15,23,42,0.12)] ${m.role === 'user' ? 'border-sky-200/20 bg-sky-200/10 text-sky-50' : 'border-white/10 bg-white/[0.06] text-slate-100'}`}>
-            <div className="mb-1 text-xs uppercase tracking-wide opacity-60">{m.role}</div>
-            <div className="whitespace-pre-wrap">{m.content}</div>
+      <div className="mb-5 rounded-[1.4rem] border border-white/10 bg-white/[0.04] p-4 sm:p-5">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-sky-100/65">Ollama Lab</p>
+        <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h3 className="text-2xl font-semibold tracking-tight text-white sm:text-[2rem]">Local chat workspace</h3>
+            <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-300 sm:text-[15px]">
+              A cleaner local model interface for prompt testing, streaming checks, and retrieval experiments without the muddy stacked-card feel.
+            </p>
           </div>
-        ))}
+          <div className="inline-flex w-full flex-wrap gap-2 lg:w-auto lg:justify-end">
+            <div className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-200">
+              {error ? 'Needs attention' : isOnline ? 'Ollama ready' : 'Ollama offline'}
+            </div>
+            {dbPersist ? (
+              <div className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs font-medium text-slate-300">
+                DB persist: {dbPersist}
+              </div>
+            ) : null}
+          </div>
+        </div>
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-3 backdrop-blur-xl">
-        <EmbedInput onSubmitText={sendPrompt} disabled={streaming} loading={streaming} />
-      </div>
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(260px,320px)] lg:items-start">
+        <div className="space-y-4 order-2 lg:order-1">
+          <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.045] p-3 sm:p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-100/65">Conversation</p>
+                <p className="mt-1 text-sm text-slate-400">Stream responses here and keep space for actual back-and-forth.</p>
+              </div>
+            </div>
 
-      <div className="mt-4 flex gap-3">
-        <Button variant="outline" onClick={() => controllerRef.current?.abort()} disabled={!streaming}>Stop</Button>
-        <Button variant="outline" onClick={() => { setMessages([]); if (model) localStorage.removeItem(`ollama_chat_${model}`) }}>Clear</Button>
+            <div className="space-y-3 rounded-[1.2rem] border border-white/8 bg-slate-950/40 p-3 max-h-[52vh] min-h-[320px] overflow-auto sm:p-4 lg:max-h-[620px]">
+              {messages.length === 0 ? <div className="text-sm text-slate-400">No messages yet.</div> : messages.map((m, i) => (
+                <div key={i} className={`rounded-[1.15rem] border p-3 sm:p-4 text-sm shadow-[0_10px_25px_rgba(15,23,42,0.10)] ${m.role === 'user' ? 'ml-auto max-w-[92%] border-sky-300/15 bg-sky-300/10 text-sky-50 sm:max-w-[85%]' : 'mr-auto max-w-[96%] border-white/10 bg-white/[0.06] text-slate-100 sm:max-w-[90%]'}`}>
+                  <div className="mb-1 text-[10px] uppercase tracking-[0.2em] opacity-55">{m.role}</div>
+                  <div className="whitespace-pre-wrap leading-7">{m.content}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.045] p-3 sm:p-4">
+            <EmbedInput onSubmitText={sendPrompt} disabled={streaming} loading={streaming} />
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+              <Button variant="outline" onClick={() => controllerRef.current?.abort()} disabled={!streaming} className="w-full sm:w-auto">Stop</Button>
+              <Button variant="outline" onClick={() => { setMessages([]); if (model) localStorage.removeItem(`ollama_chat_${model}`) }} className="w-full sm:w-auto">Clear</Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4 order-1 lg:order-2">
+          <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.045] p-4 sm:p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-100/65">Model settings</p>
+            <div className="mt-4 space-y-4">
+              <div>
+                <Label className="mb-2 block text-slate-200">Model</Label>
+                <Select value={model} onValueChange={setModel}>
+                  <SelectTrigger className="h-11 rounded-xl border-white/10 bg-slate-950/50"><SelectValue placeholder="Select model" /></SelectTrigger>
+                  <SelectContent>
+                    {models.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center justify-between text-sm text-slate-300">
+                  <Label className="text-slate-200">Temperature</Label>
+                  <span>{temperature.toFixed(1)}</span>
+                </div>
+                <Slider value={[temperature]} min={0} max={1} step={0.1} onValueChange={([v]) => setTemperature(v)} />
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center justify-between text-sm text-slate-300">
+                  <Label className="text-slate-200">Top P</Label>
+                  <span>{topP.toFixed(1)}</span>
+                </div>
+                <Slider value={[topP]} min={0} max={1} step={0.1} onValueChange={([v]) => setTopP(v)} />
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.045] p-4 sm:p-5">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-100/65">Retrieval</p>
+                <p className="mt-1 text-sm text-slate-400">Only use context when you actually want augmentation.</p>
+              </div>
+              <Switch checked={useContext} onCheckedChange={setUseContext} />
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div>
+                <Label className="mb-2 block text-slate-200">Top K</Label>
+                <NumberInput value={topK} onChange={(e) => setTopK(Number(e.target.value || 5))} className="h-11 rounded-xl border-white/10 bg-slate-950/50" />
+              </div>
+              <div>
+                <Label className="mb-2 block text-slate-200">Min similarity</Label>
+                <NumberInput value={minSim} onChange={(e) => setMinSim(Number(e.target.value || 0.75))} className="h-11 rounded-xl border-white/10 bg-slate-950/50" />
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.045] p-4 sm:p-5 text-sm text-slate-300">
+            {error ? <div className="text-red-300">{error}</div> : isOnline ? 'Ollama connection ready.' : 'Ollama appears offline.'}
+            {siteOrigin ? <div className="mt-2 text-xs text-slate-500">Origin: {siteOrigin}</div> : null}
+            {checkingOnline ? <div className="mt-2 text-xs text-slate-500">Checking Ollama...</div> : null}
+          </div>
+        </div>
       </div>
     </div>
   )
