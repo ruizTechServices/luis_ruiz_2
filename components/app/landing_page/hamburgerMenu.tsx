@@ -26,7 +26,7 @@ export function HamburgerMenu({ items, isAuthenticated, avatarUrl, email }: Hamb
       <SheetContent side="left" className="sm:w-1/2">
         <SheetHeader className="m-2">
           <SheetTitle className="text-lg font-bold">
-            Luis Ruiz: Full-Stack Developer
+            Luis Ruiz • Founder-Builder
           </SheetTitle>
         </SheetHeader>
         <div className="flex flex-1 flex-col justify-between">
