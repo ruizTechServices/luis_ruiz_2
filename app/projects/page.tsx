@@ -14,7 +14,7 @@ import { getProjects } from "@/lib/db/projects";
 export const metadata: Metadata = {
   title: "Projects | Luis Ruiz",
   description:
-    "Projects, software experiments, and proof-of-work from Luis Ruiz, founder-builder behind ruizTechServices.",
+    "Case-study style projects, software experiments, and proof-of-work from Luis Ruiz, founder-builder behind ruizTechServices.",
 };
 
 const proofPoints = [
@@ -42,6 +42,7 @@ const projectFilters = ["AI systems", "Web products", "Public build work", "Clie
 
 export default async function ProjectsPage() {
   const projects = await getProjects();
+  const featuredProjects = projects.filter((project) => project.featured);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-violet-950 text-white">
@@ -54,11 +55,11 @@ export default async function ProjectsPage() {
             </div>
 
             <h1 className="max-w-4xl text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Projects, experiments, and live systems that show how I actually build.
+              Projects, case studies, and live systems that show how I actually build.
             </h1>
 
             <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300 sm:text-xl">
-              This is the stronger second layer behind the homepage. Instead of a generic project grid, this page is meant to show visible execution, product thinking, and the technical direction behind Luis Ruiz and ruizTechServices.
+              This page should function like evidence, not decoration. The goal is to show what the work is, what problems it addresses, how it was built, and how it connects back to Luis Ruiz, ruizTechServices, and the broader founder-builder direction of the site.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -113,6 +114,26 @@ export default async function ProjectsPage() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-7xl px-6 pb-10 lg:px-8">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.8fr)]">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-violet-200/70">Case study direction</p>
+            <h2 className="mt-2 text-2xl font-semibold text-white">The model is now built to hold more honest project depth.</h2>
+            <p className="mt-3 text-sm leading-7 text-slate-300">
+              Projects can now carry structured case-study fields like role, context, problem, constraints, architecture, key decisions, outcomes, repo links, status, and category. That fixes the core limitation that was keeping this page shallow.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-violet-200/70">Featured work</p>
+            <h2 className="mt-2 text-2xl font-semibold text-white">{featuredProjects.length > 0 ? `${featuredProjects.length} featured ${featuredProjects.length === 1 ? "project" : "projects"}` : "No featured projects yet"}</h2>
+            <p className="mt-3 text-sm leading-7 text-slate-300">
+              The next honest move is to fill this structure in for the strongest two or three entries first, instead of pretending the whole catalog is equally mature.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-7xl px-6 pb-12 lg:px-8">
         <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
@@ -122,7 +143,7 @@ export default async function ProjectsPage() {
             <h2 className="mt-2 text-3xl font-bold text-white">Current public work</h2>
           </div>
           <p className="max-w-2xl text-sm leading-7 text-slate-400">
-            These entries come from the site&apos;s project system. Right now the model is still lightweight, but the page framing is being upgraded so visitors understand what the work means, not just where to click.
+            These entries come from the site&apos;s project system. The structure is now richer, but the strongest value will come from actually converting the top entries into real case studies instead of generic cards.
           </p>
         </div>
 
@@ -148,18 +169,12 @@ export default async function ProjectsPage() {
         {projects.length > 0 ? (
           <div className="space-y-6">
             {projects.map((project) => (
-              <Project
-                key={project.id}
-                url={project.url}
-                title={project.title ?? undefined}
-                description={project.description ?? undefined}
-                relatedPosts={project.relatedPosts}
-              />
+              <Project key={project.id} {...project} />
             ))}
           </div>
         ) : (
           <div className="rounded-2xl border border-dashed border-white/15 bg-white/5 p-10 text-center text-slate-300">
-            No projects are published yet. That is fixable, and the content model should be expanded next so this page can support stronger case-study style entries.
+            No projects are published yet. That is fixable, and the next practical move is to seed the strongest entries with real case-study content.
           </div>
         )}
       </section>
@@ -167,9 +182,9 @@ export default async function ProjectsPage() {
       <section className="mx-auto max-w-7xl px-6 pb-20 lg:px-8">
         <div className="rounded-2xl border border-dashed border-white/15 bg-slate-950/40 p-8">
           <p className="text-sm font-semibold uppercase tracking-[0.22em] text-violet-200/70">Next content layer</p>
-          <h2 className="mt-2 text-2xl font-bold text-white">Use the Blog / Build Log to keep these projects alive.</h2>
+          <h2 className="mt-2 text-2xl font-bold text-white">Fill the strongest projects with honest detail, then let the build log support them.</h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">
-            The fastest trust move now is consistent public execution. Each serious project should eventually point to posts about decisions, revisions, launches, failures, and what happened next.
+            The schema and rendering can finally support that. The next valuable step is content work: pick the strongest 2 to 3 projects, write the case-study fields properly, and link each one to public updates where possible.
           </p>
         </div>
       </section>

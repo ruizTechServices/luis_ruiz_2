@@ -21,13 +21,45 @@ function normalizeRelatedPosts(links: ProjectLinkRow[] | null | undefined): Rela
     .filter((post): post is RelatedBlogPost => Boolean(post?.id));
 }
 
+const projectSelect = [
+  "id",
+  "url",
+  "title",
+  "description",
+  "slug",
+  "summary",
+  "status",
+  "category",
+  "featured",
+  "visibility",
+  "stack",
+  "role",
+  "context",
+  "problem",
+  "constraints",
+  "approach",
+  "architecture",
+  "decisions",
+  "outcomes",
+  "current_status",
+  "repo_url",
+  "live_url",
+  "cover_image_url",
+  "started_at",
+  "completed_at",
+  "created_at",
+  "updated_at",
+].join(", ");
+
 export async function getProjects(): Promise<ProjectRow[]> {
   const supabase = await supa();
 
   const baseQuery = await supabase
     .from("projects")
-    .select("id, url, title, description, created_at, updated_at")
-    .order("created_at", { ascending: true });
+    .select(projectSelect)
+    .in("visibility", ["public", "unlisted"])
+    .order("featured", { ascending: false })
+    .order("created_at", { ascending: false });
 
   if (baseQuery.error) throw baseQuery.error;
 
@@ -46,7 +78,9 @@ export async function getProjects(): Promise<ProjectRow[]> {
         )
       )
     `)
-    .order("created_at", { ascending: true });
+    .in("visibility", ["public", "unlisted"])
+    .order("featured", { ascending: false })
+    .order("created_at", { ascending: false });
 
   const relationMap = new Map<number, RelatedBlogPost[]>();
 
@@ -62,13 +96,14 @@ export async function getProjects(): Promise<ProjectRow[]> {
   }));
 }
 
-export async function getProjectsForSelection(): Promise<Pick<ProjectRow, "id" | "title" | "url">[]> {
+export async function getProjectsForSelection(): Promise<Pick<ProjectRow, "id" | "title" | "url" | "slug">[]> {
   const supabase = await supa();
   const { data, error } = await supabase
     .from("projects")
-    .select("id, title, url")
-    .order("created_at", { ascending: true });
+    .select("id, title, url, slug")
+    .order("featured", { ascending: false })
+    .order("created_at", { ascending: false });
 
   if (error) throw error;
-  return (data ?? []) as Pick<ProjectRow, "id" | "title" | "url">[];
+  return (data ?? []) as Pick<ProjectRow, "id" | "title" | "url" | "slug">[];
 }
