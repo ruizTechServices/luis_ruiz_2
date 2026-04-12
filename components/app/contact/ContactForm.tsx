@@ -100,7 +100,7 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
               <FormItem>
                 <FormLabel>First Name *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Luis" {...field} />
+                  <Input placeholder="first name" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -113,7 +113,7 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
               <FormItem>
                 <FormLabel>Last Name *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ruiz" {...field} />
+                  <Input placeholder="last name" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -142,7 +142,7 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
               <FormItem>
                 <FormLabel>Phone Number</FormLabel>
                 <FormControl>
-                  <Input placeholder="+1 (347) 901-3772" type="tel" {...field} />
+                  <Input placeholder="+1 (phone number)" type="tel" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
