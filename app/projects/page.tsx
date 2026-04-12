@@ -45,11 +45,11 @@ export default async function ProjectsPage() {
   const featuredProjects = projects.filter((project) => project.featured);
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-violet-950 text-white">
-      <section className="border-b border-white/10">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(148,163,184,0.18),_transparent_28%),linear-gradient(135deg,_#0f172a_0%,_#162033_38%,_#1d2b3f_100%)] text-white">
+      <section className="border-b border-white/10 bg-white/[0.03] backdrop-blur-xl">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:py-24 lg:px-8">
           <div className="max-w-4xl">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-violet-400/20 bg-violet-400/10 px-4 py-2 text-sm font-medium text-violet-200">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-sky-200/20 bg-white/10 px-4 py-2 text-sm font-medium text-sky-100 shadow-[0_8px_30px_rgba(15,23,42,0.16)] backdrop-blur-xl">
               <CpuChipIcon className="h-4 w-4" />
               Proof of work, not portfolio theater
             </div>
@@ -66,7 +66,7 @@ export default async function ProjectsPage() {
               {projectFilters.map((label) => (
                 <span
                   key={label}
-                  className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200"
+                  className="rounded-full border border-white/10 bg-white/8 px-4 py-2 text-sm text-slate-200 backdrop-blur-md"
                 >
                   {label}
                 </span>
@@ -76,14 +76,14 @@ export default async function ProjectsPage() {
             <div className="mt-10 flex flex-wrap gap-4">
               <Link
                 href="/blog"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-200"
+                className="inline-flex items-center gap-2 rounded-full border border-sky-100/20 bg-white/90 px-6 py-3 text-sm font-semibold text-slate-900 shadow-[0_14px_32px_rgba(148,163,184,0.18)] transition hover:bg-white"
               >
                 <PencilSquareIcon className="h-4 w-4" />
                 Read Blog / Build Log
               </Link>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-6 py-3 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-white/[0.12]"
               >
                 <ArrowTopRightOnSquareIcon className="h-4 w-4" />
                 Start a Conversation
@@ -101,9 +101,9 @@ export default async function ProjectsPage() {
             return (
               <div
                 key={item.title}
-                className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm"
+                className="rounded-2xl border border-white/10 bg-white/[0.08] p-6 shadow-[0_18px_45px_rgba(15,23,42,0.18)] backdrop-blur-xl"
               >
-                <div className="mb-4 inline-flex rounded-xl border border-violet-400/20 bg-violet-400/10 p-3 text-violet-200">
+                <div className="mb-4 inline-flex rounded-xl border border-sky-200/20 bg-white/10 p-3 text-sky-100 backdrop-blur-lg">
                   <Icon className="h-6 w-6" />
                 </div>
                 <h2 className="text-lg font-semibold text-white">{item.title}</h2>
@@ -116,16 +116,16 @@ export default async function ProjectsPage() {
 
       <section className="mx-auto max-w-7xl px-6 pb-10 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.8fr)]">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-violet-200/70">Case study direction</p>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.08] p-6 shadow-[0_18px_45px_rgba(15,23,42,0.16)] backdrop-blur-xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-100/70">Case study direction</p>
             <h2 className="mt-2 text-2xl font-semibold text-white">The model is now built to hold more honest project depth.</h2>
             <p className="mt-3 text-sm leading-7 text-slate-300">
               Projects can now carry structured case-study fields like role, context, problem, constraints, architecture, key decisions, outcomes, repo links, status, and category. That fixes the core limitation that was keeping this page shallow.
             </p>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-violet-200/70">Featured work</p>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.08] p-6 shadow-[0_18px_45px_rgba(15,23,42,0.16)] backdrop-blur-xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-100/70">Featured work</p>
             <h2 className="mt-2 text-2xl font-semibold text-white">{featuredProjects.length > 0 ? `${featuredProjects.length} featured ${featuredProjects.length === 1 ? "project" : "projects"}` : "No featured projects yet"}</h2>
             <p className="mt-3 text-sm leading-7 text-slate-300">
               The next honest move is to fill this structure in for the strongest two or three entries first, instead of pretending the whole catalog is equally mature.
@@ -137,7 +137,7 @@ export default async function ProjectsPage() {
       <section className="mx-auto max-w-7xl px-6 pb-12 lg:px-8">
         <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-violet-200/70">
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-100/70">
               Live project index
             </p>
             <h2 className="mt-2 text-3xl font-bold text-white">Current public work</h2>
@@ -147,10 +147,10 @@ export default async function ProjectsPage() {
           </p>
         </div>
 
-        <div className="mb-8 rounded-2xl border border-white/10 bg-white/5 p-6">
+        <div className="mb-8 rounded-2xl border border-white/10 bg-white/[0.08] p-6 shadow-[0_18px_45px_rgba(15,23,42,0.16)] backdrop-blur-xl">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-violet-200/70">Connected public execution</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-100/70">Connected public execution</p>
               <h3 className="mt-2 text-2xl font-semibold text-white">Projects should connect to the Blog / Build Log.</h3>
               <p className="mt-3 text-sm leading-7 text-slate-300">
                 This page shows the work itself. The Blog / Build Log should show movement, iteration, technical choices, and what changed over time. Together, they build trust faster than either page alone.
@@ -158,7 +158,7 @@ export default async function ProjectsPage() {
             </div>
             <Link
               href="/blog"
-              className="inline-flex items-center gap-2 self-start rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+              className="inline-flex items-center gap-2 self-start rounded-full border border-white/15 bg-white/[0.08] px-5 py-3 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-white/[0.12]"
             >
               <PencilSquareIcon className="h-4 w-4" />
               Open Blog / Build Log
@@ -173,15 +173,15 @@ export default async function ProjectsPage() {
             ))}
           </div>
         ) : (
-          <div className="rounded-2xl border border-dashed border-white/15 bg-white/5 p-10 text-center text-slate-300">
+          <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.06] p-10 text-center text-slate-300 backdrop-blur-lg">
             No projects are published yet. That is fixable, and the next practical move is to seed the strongest entries with real case-study content.
           </div>
         )}
       </section>
 
       <section className="mx-auto max-w-7xl px-6 pb-20 lg:px-8">
-        <div className="rounded-2xl border border-dashed border-white/15 bg-slate-950/40 p-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-violet-200/70">Next content layer</p>
+        <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.05] p-8 shadow-[0_18px_45px_rgba(15,23,42,0.14)] backdrop-blur-xl">
+          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-100/70">Next content layer</p>
           <h2 className="mt-2 text-2xl font-bold text-white">Fill the strongest projects with honest detail, then let the build log support them.</h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">
             The schema and rendering can finally support that. The next valuable step is content work: pick the strongest 2 to 3 projects, write the case-study fields properly, and link each one to public updates where possible.

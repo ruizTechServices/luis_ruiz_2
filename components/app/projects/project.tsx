@@ -38,10 +38,10 @@ type ProjectProps = Pick<
 >;
 
 const statusTone: Record<ProjectStatus, string> = {
-  draft: "border-amber-400/30 bg-amber-400/10 text-amber-200",
-  active: "border-emerald-400/30 bg-emerald-400/10 text-emerald-200",
-  complete: "border-sky-400/30 bg-sky-400/10 text-sky-200",
-  archived: "border-slate-400/30 bg-slate-400/10 text-slate-200",
+  draft: "border-amber-200/30 bg-white/10 text-amber-100",
+  active: "border-emerald-200/30 bg-emerald-200/10 text-emerald-100",
+  complete: "border-sky-200/30 bg-sky-200/10 text-sky-100",
+  archived: "border-slate-200/20 bg-white/10 text-slate-200",
 };
 
 const statusLabel: Record<ProjectStatus, string> = {
@@ -92,19 +92,19 @@ export default function Project(props: ProjectProps) {
 
   return (
     <section className="w-full">
-      <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] shadow-sm backdrop-blur-sm transition-all hover:border-violet-400/20 hover:bg-white/[0.06] hover:shadow-xl">
+      <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.08] shadow-[0_20px_50px_rgba(15,23,42,0.16)] backdrop-blur-xl transition-all hover:border-sky-200/20 hover:bg-white/[0.1] hover:shadow-[0_24px_60px_rgba(15,23,42,0.2)]">
         <div className="p-6 sm:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="flex-1">
               <div className="mb-4 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium uppercase tracking-[0.22em] text-slate-300">
+                <span className="inline-flex items-center rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.22em] text-slate-200 backdrop-blur-md">
                   {categoryLabel[props.category]}
                 </span>
                 <span className={cn("inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium uppercase tracking-[0.22em]", statusTone[props.status])}>
                   {statusLabel[props.status]}
                 </span>
                 {props.featured ? (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-violet-400/30 bg-violet-400/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.22em] text-violet-200">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-sky-200/30 bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.22em] text-sky-100 backdrop-blur-md">
                     <SparklesIcon className="h-3.5 w-3.5" />
                     Featured
                   </span>
@@ -116,7 +116,7 @@ export default function Project(props: ProjectProps) {
                   href={liveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-current transition-colors hover:text-violet-200"
+                  className="inline-flex items-center gap-2 text-current transition-colors hover:text-sky-100"
                 >
                   {derivedTitle}
                   <ArrowTopRightOnSquareIcon className="h-5 w-5 opacity-70" />
@@ -128,8 +128,8 @@ export default function Project(props: ProjectProps) {
               </p>
 
               {props.current_status ? (
-                <div className="mt-5 rounded-2xl border border-emerald-400/15 bg-emerald-400/10 p-4 text-sm leading-7 text-emerald-100">
-                  <div className="mb-1 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200/90">
+                <div className="mt-5 rounded-2xl border border-emerald-200/20 bg-emerald-200/10 p-4 text-sm leading-7 text-emerald-50 backdrop-blur-lg">
+                  <div className="mb-1 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-100/90">
                     <CheckBadgeIcon className="h-4 w-4" />
                     Current status
                   </div>
@@ -142,7 +142,7 @@ export default function Project(props: ProjectProps) {
                   {stack.map((item) => (
                     <span
                       key={item}
-                      className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-200"
+                      className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-slate-100 backdrop-blur-md"
                     >
                       {item}
                     </span>
@@ -190,8 +190,8 @@ export default function Project(props: ProjectProps) {
           <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.9fr)]">
             <div className="space-y-4">
               {props.role ? (
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-violet-200/70">Role</p>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.08] p-5 shadow-[0_16px_36px_rgba(15,23,42,0.14)] backdrop-blur-xl">
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-100/70">Role</p>
                   <p className="mt-2 text-sm leading-7 text-slate-300">{props.role}</p>
                 </div>
               ) : null}
@@ -199,8 +199,8 @@ export default function Project(props: ProjectProps) {
               {caseStudySections.length > 0 ? (
                 <div className="grid gap-4 md:grid-cols-2">
                   {caseStudySections.map((section) => (
-                    <div key={section.label} className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-violet-200/70">{section.label}</p>
+                    <div key={section.label} className="rounded-2xl border border-white/10 bg-white/[0.08] p-5 shadow-[0_16px_36px_rgba(15,23,42,0.14)] backdrop-blur-xl">
+                      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-100/70">{section.label}</p>
                       <div className="mt-2 space-y-3 text-sm leading-7 text-slate-300">
                         {compactParagraphs(section.value).map((paragraph, index) => (
                           <p key={`${section.label}-${index}`}>{paragraph}</p>
@@ -210,7 +210,7 @@ export default function Project(props: ProjectProps) {
                   ))}
                 </div>
               ) : (
-                <div className="rounded-2xl border border-dashed border-white/15 bg-white/5 p-5 text-sm leading-7 text-slate-400">
+                <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.06] p-5 text-sm leading-7 text-slate-300 backdrop-blur-lg">
                   This entry still needs the full case-study layer. The schema can hold it now, but the content has to be written project by project.
                 </div>
               )}
@@ -218,14 +218,14 @@ export default function Project(props: ProjectProps) {
 
             <div className="space-y-4">
               {props.relatedPosts && props.relatedPosts.length > 0 ? (
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-violet-200/70">Related build log posts</p>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.08] p-5 shadow-[0_16px_36px_rgba(15,23,42,0.14)] backdrop-blur-xl">
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-100/70">Related build log posts</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {props.relatedPosts.slice(0, 4).map((post) => (
                       <a
                         key={post.id}
                         href={`/blog/${post.id}`}
-                        className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-violet-200 transition hover:border-violet-400/30 hover:bg-white/10"
+                        className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-sky-100 backdrop-blur-md transition hover:border-sky-200/30 hover:bg-white/[0.14]"
                       >
                         {post.title || `Post #${post.id}`}
                       </a>
@@ -234,8 +234,8 @@ export default function Project(props: ProjectProps) {
                 </div>
               ) : null}
 
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-violet-200/70">Why this matters</p>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.08] p-5 shadow-[0_16px_36px_rgba(15,23,42,0.14)] backdrop-blur-xl">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-100/70">Why this matters</p>
                 <p className="mt-2 text-sm leading-7 text-slate-300">
                   The point is not to show a pile of links. It is to make the work legible, so a client, collaborator, or future partner can see what was built, why it mattered, and how decisions were made.
                 </p>
@@ -245,7 +245,7 @@ export default function Project(props: ProjectProps) {
         </div>
 
         {showPreview && (
-          <div className="border-t border-white/10 bg-slate-950/40">
+          <div className="border-t border-white/10 bg-slate-950/25 backdrop-blur-xl">
             <div className="relative w-full" style={{ aspectRatio: "16 / 9" }}>
               <iframe
                 src={liveUrl}

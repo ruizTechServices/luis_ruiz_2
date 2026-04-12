@@ -17,7 +17,7 @@ export default async function ProjectAdminPage() {
   const projects = await getProjects().catch(() => []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-slate-800 dark:to-indigo-900">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(191,219,254,0.34),_transparent_26%),linear-gradient(135deg,_#eef4f8_0%,_#dde7f0_40%,_#d6e3ec_100%)] dark:bg-[radial-gradient(circle_at_top,_rgba(148,163,184,0.16),_transparent_26%),linear-gradient(135deg,_#0f172a_0%,_#182334_42%,_#1d2938_100%)]">
       <div className="container mx-auto px-6 py-8">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -30,7 +30,7 @@ export default async function ProjectAdminPage() {
           </div>
           <Link
             href="/projects"
-            className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+            className="inline-flex items-center justify-center rounded-lg border border-white/30 bg-white/55 px-4 py-2 text-sm font-medium text-slate-700 shadow-[0_16px_35px_rgba(148,163,184,0.18)] backdrop-blur-xl transition hover:bg-white/70 dark:border-white/10 dark:bg-white/10 dark:text-gray-200 dark:hover:bg-white/15"
           >
             View public projects page
           </Link>

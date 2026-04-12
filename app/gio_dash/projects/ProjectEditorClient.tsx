@@ -203,7 +203,7 @@ export default function ProjectEditorClient({ initialProjects }: { initialProjec
 
   return (
     <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
-      <aside className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+      <aside className="rounded-2xl border border-white/35 bg-white/55 p-4 shadow-[0_18px_45px_rgba(148,163,184,0.18)] backdrop-blur-xl dark:border-white/10 dark:bg-white/10">
         <div className="mb-4 flex items-center justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Projects</h2>
@@ -212,7 +212,7 @@ export default function ProjectEditorClient({ initialProjects }: { initialProjec
           <button
             type="button"
             onClick={() => loadProject("new")}
-            className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-700"
+            className="rounded-lg border border-white/40 bg-white/45 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white/70 dark:border-white/10 dark:bg-white/10 dark:text-gray-200 dark:hover:bg-white/15"
           >
             New
           </button>
@@ -224,21 +224,21 @@ export default function ProjectEditorClient({ initialProjects }: { initialProjec
               key={project.id}
               type="button"
               onClick={() => loadProject(project.id)}
-              className={`w-full rounded-xl border px-4 py-3 text-left transition ${selectedId === project.id ? "border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/30" : "border-gray-200 bg-gray-50 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900/40 dark:hover:bg-gray-700/60"}`}
+              className={`w-full rounded-xl border px-4 py-3 text-left transition backdrop-blur-lg ${selectedId === project.id ? "border-sky-200/60 bg-white/75 shadow-[0_14px_30px_rgba(148,163,184,0.18)] dark:border-sky-200/20 dark:bg-white/15" : "border-white/30 bg-white/40 hover:bg-white/60 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"}`}
             >
               <div className="text-sm font-semibold text-gray-900 dark:text-white">{project.title || project.slug || project.url}</div>
               <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">{project.category} • {project.status}</div>
             </button>
           ))}
           {projects.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-gray-300 px-4 py-6 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+            <div className="rounded-xl border border-dashed border-white/35 bg-white/30 px-4 py-6 text-sm text-gray-500 backdrop-blur-lg dark:border-white/10 dark:bg-white/5 dark:text-gray-400">
               No projects loaded yet.
             </div>
           ) : null}
         </div>
       </aside>
 
-      <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+      <section className="rounded-2xl border border-white/35 bg-white/55 p-6 shadow-[0_18px_45px_rgba(148,163,184,0.18)] backdrop-blur-xl dark:border-white/10 dark:bg-white/10">
         <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
@@ -252,14 +252,14 @@ export default function ProjectEditorClient({ initialProjects }: { initialProjec
             type="button"
             onClick={handleSave}
             disabled={isPending}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:opacity-50"
+            className="rounded-lg border border-sky-100/40 bg-white/85 px-4 py-2 text-sm font-medium text-slate-800 shadow-[0_12px_28px_rgba(148,163,184,0.18)] transition hover:bg-white disabled:opacity-50 dark:border-white/10 dark:bg-white/15 dark:text-white dark:hover:bg-white/20"
           >
             {isPending ? "Saving..." : "Save Project"}
           </button>
         </div>
 
         {message ? (
-          <div className="mb-6 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-200">
+          <div className="mb-6 rounded-xl border border-white/35 bg-white/45 px-4 py-3 text-sm text-slate-700 backdrop-blur-lg dark:border-white/10 dark:bg-white/10 dark:text-gray-200">
             {message}
           </div>
         ) : null}
@@ -353,27 +353,32 @@ export default function ProjectEditorClient({ initialProjects }: { initialProjec
             width: 100%;
             height: 2.75rem;
             border-radius: 0.75rem;
-            border: 1px solid rgb(229 231 235);
-            background: transparent;
+            border: 1px solid rgba(255,255,255,0.38);
+            background: rgba(255,255,255,0.42);
+            backdrop-filter: blur(16px);
             padding: 0.625rem 0.875rem;
             font-size: 0.875rem;
+            color: rgb(30 41 59);
           }
           .textarea {
             min-height: 7rem;
             width: 100%;
             border-radius: 0.75rem;
-            border: 1px solid rgb(229 231 235);
-            background: transparent;
+            border: 1px solid rgba(255,255,255,0.38);
+            background: rgba(255,255,255,0.42);
+            backdrop-filter: blur(16px);
             padding: 0.75rem 0.875rem;
             font-size: 0.875rem;
             line-height: 1.65;
+            color: rgb(30 41 59);
           }
           .textarea.tall {
             min-height: 10rem;
           }
           :global(.dark) .input,
           :global(.dark) .textarea {
-            border-color: rgb(55 65 81);
+            border-color: rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.06);
             color: white;
           }
         `}</style>
