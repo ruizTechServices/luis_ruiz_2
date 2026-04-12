@@ -355,7 +355,7 @@ export default function OllamaChatPage() {
         ))}
       </div>
 
-      <EmbedInput onSend={sendPrompt} disabled={streaming} />
+      <EmbedInput onSubmitText={sendPrompt} disabled={streaming} loading={streaming} />
 
       <div className="mt-4 flex gap-3">
         <Button variant="outline" onClick={() => controllerRef.current?.abort()} disabled={!streaming}>Stop</Button>

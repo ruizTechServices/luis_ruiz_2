@@ -370,7 +370,7 @@ export default function OllamaChatPage() {
       </div>
 
       <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-3 backdrop-blur-xl">
-        <EmbedInput onSend={sendPrompt} disabled={streaming} />
+        <EmbedInput onSubmitText={sendPrompt} disabled={streaming} loading={streaming} />
       </div>
 
       <div className="mt-4 flex gap-3">
