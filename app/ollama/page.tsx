@@ -33,11 +33,11 @@ const experimentNotes = [
 
 export default function ExperimentsPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
-      <section className="border-b border-white/10">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(125,211,252,0.12),_transparent_24%),linear-gradient(135deg,_#020617_0%,_#0f172a_42%,_#111827_100%)] text-white">
+      <section className="border-b border-white/10 bg-white/[0.03] backdrop-blur-xl">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:py-24 lg:px-8">
           <div className="max-w-4xl">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-violet-400/20 bg-violet-400/10 px-4 py-2 text-sm font-medium text-violet-200">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-sky-200/20 bg-white/10 px-4 py-2 text-sm font-medium text-sky-100 shadow-[0_12px_35px_rgba(15,23,42,0.2)] backdrop-blur-xl">
               <BeakerIcon className="h-4 w-4" />
               Experiments / Lab
             </div>
@@ -53,13 +53,13 @@ export default function ExperimentsPage() {
             <div className="mt-10 flex flex-wrap gap-4">
               <Link
                 href="/projects"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-200"
+                className="inline-flex items-center gap-2 rounded-full border border-sky-100/20 bg-white/90 px-6 py-3 text-sm font-semibold text-slate-900 shadow-[0_14px_32px_rgba(148,163,184,0.18)] transition hover:bg-white"
               >
                 See Projects
               </Link>
               <Link
                 href="/blog"
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-6 py-3 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-white/[0.12]"
               >
                 Read Blog / Build Log
               </Link>
@@ -73,8 +73,8 @@ export default function ExperimentsPage() {
           {experimentNotes.map((item) => {
             const Icon = item.icon;
             return (
-              <div key={item.title} className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-                <div className="mb-4 inline-flex rounded-xl border border-violet-400/20 bg-violet-400/10 p-3 text-violet-200">
+              <div key={item.title} className="rounded-2xl border border-white/10 bg-white/[0.08] p-6 shadow-[0_18px_45px_rgba(15,23,42,0.18)] backdrop-blur-xl">
+                <div className="mb-4 inline-flex rounded-xl border border-sky-200/20 bg-white/10 p-3 text-sky-100 backdrop-blur-lg">
                   <Icon className="h-6 w-6" />
                 </div>
                 <h2 className="text-lg font-semibold text-white">{item.title}</h2>
@@ -87,34 +87,56 @@ export default function ExperimentsPage() {
 
       <section className="mx-auto max-w-7xl px-6 pb-12 lg:px-8">
         <div className="mb-6 max-w-3xl">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-slate-300">
-            <MusicalNoteIcon className="h-4 w-4" />
-            Public experiment
-          </div>
-          <h2 className="text-3xl font-bold text-white">Soundboard</h2>
-          <p className="mt-3 text-sm leading-7 text-slate-300">
-            This stays public because it is part of the experimentation layer, interactive, playful, fast to use, and very clearly one of your experiments.
-          </p>
-        </div>
-
-        <Soundboard />
-      </section>
-
-      <section className="mx-auto max-w-7xl px-6 pb-20 lg:px-8">
-        <div className="mb-6 max-w-3xl">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-slate-300">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-sky-100 backdrop-blur-md">
             <CpuChipIcon className="h-4 w-4" />
             Local AI experiment
           </div>
           <h2 className="text-3xl font-bold text-white">Ollama Lab</h2>
           <p className="mt-3 text-sm leading-7 text-slate-300">
-            Local model routing and chat testing still belong here. Useful, real, but not part of the main trust path for clients landing on the site.
+            This should feel like its own serious tool surface, not a squeezed afterthought. The chatbot gets the primary interaction space here, with clearer breathing room and a more focused layout.
           </p>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-2 sm:p-4">
-          <OllamaChatPage />
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_320px] xl:items-start">
+          <div className="rounded-3xl border border-white/10 bg-white/[0.08] p-3 shadow-[0_24px_60px_rgba(15,23,42,0.22)] backdrop-blur-xl sm:p-5">
+            <OllamaChatPage />
+          </div>
+
+          <div className="space-y-4">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.08] p-5 shadow-[0_18px_45px_rgba(15,23,42,0.18)] backdrop-blur-xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-100/75">Why it is here</p>
+              <h3 className="mt-2 text-xl font-semibold text-white">Local model testing, not portfolio filler.</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-300">
+                This surface is for real local AI experimentation, model behavior checks, and system-level interaction testing. It belongs in the lab, but it still deserves a clean product-like presentation.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/[0.08] p-5 shadow-[0_18px_45px_rgba(15,23,42,0.18)] backdrop-blur-xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-100/75">Use it well</p>
+              <ul className="mt-3 space-y-3 text-sm leading-7 text-slate-300">
+                <li>Choose a local model first.</li>
+                <li>Send a plain prompt and confirm streaming works.</li>
+                <li>Toggle context only when you want retrieval behavior involved.</li>
+                <li>Use this page like a lab tool, not just a decorative embed.</li>
+              </ul>
+            </div>
+          </div>
         </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-20 lg:px-8">
+        <div className="mb-6 max-w-3xl">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-sky-100 backdrop-blur-md">
+            <MusicalNoteIcon className="h-4 w-4" />
+            Public experiment
+          </div>
+          <h2 className="text-3xl font-bold text-white">Soundboard</h2>
+          <p className="mt-3 text-sm leading-7 text-slate-300">
+            This stays exactly what it is, a playful interactive experiment. It just no longer competes with the Ollama chat surface for top billing on the page.
+          </p>
+        </div>
+
+        <Soundboard />
       </section>
     </main>
   );
