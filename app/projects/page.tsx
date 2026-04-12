@@ -45,11 +45,12 @@ export default async function ProjectsPage() {
   const featuredProjects = projects.filter((project) => project.featured);
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(148,163,184,0.18),_transparent_28%),linear-gradient(135deg,_#0f172a_0%,_#162033_38%,_#1d2b3f_100%)] text-white">
-      <section className="border-b border-white/10 bg-white/[0.03] backdrop-blur-xl">
-        <div className="mx-auto max-w-7xl px-6 py-20 sm:py-24 lg:px-8">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(125,211,252,0.14),_transparent_22%),radial-gradient(circle_at_80%_20%,_rgba(59,130,246,0.10),_transparent_20%),linear-gradient(145deg,_#020617_0%,_#0f172a_40%,_#162033_100%)] text-white">
+      <section className="relative overflow-hidden border-b border-white/10">
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))]" />
+        <div className="relative mx-auto max-w-7xl px-6 py-20 sm:py-24 lg:px-8">
           <div className="max-w-4xl">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-sky-200/20 bg-white/10 px-4 py-2 text-sm font-medium text-sky-100 shadow-[0_8px_30px_rgba(15,23,42,0.16)] backdrop-blur-xl">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-sky-200/20 bg-white/[0.08] px-4 py-2 text-sm font-medium text-sky-100 shadow-[0_10px_30px_rgba(15,23,42,0.22)] ring-1 ring-white/8 backdrop-blur-2xl">
               <CpuChipIcon className="h-4 w-4" />
               Proof of work, not portfolio theater
             </div>
@@ -66,7 +67,7 @@ export default async function ProjectsPage() {
               {projectFilters.map((label) => (
                 <span
                   key={label}
-                  className="rounded-full border border-white/10 bg-white/8 px-4 py-2 text-sm text-slate-200 backdrop-blur-md"
+                  className="rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-sm text-slate-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl"
                 >
                   {label}
                 </span>
@@ -76,14 +77,14 @@ export default async function ProjectsPage() {
             <div className="mt-10 flex flex-wrap gap-4">
               <Link
                 href="/blog"
-                className="inline-flex items-center gap-2 rounded-full border border-sky-100/20 bg-white/90 px-6 py-3 text-sm font-semibold text-slate-900 shadow-[0_14px_32px_rgba(148,163,184,0.18)] transition hover:bg-white"
+                className="inline-flex items-center gap-2 rounded-full border border-sky-100/15 bg-white/90 px-6 py-3 text-sm font-semibold text-slate-900 shadow-[0_16px_40px_rgba(148,163,184,0.18)] transition hover:bg-white"
               >
                 <PencilSquareIcon className="h-4 w-4" />
                 Read Blog / Build Log
               </Link>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-6 py-3 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-white/[0.12]"
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-6 py-3 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl transition hover:bg-white/[0.1]"
               >
                 <ArrowTopRightOnSquareIcon className="h-4 w-4" />
                 Start a Conversation
@@ -94,16 +95,16 @@ export default async function ProjectsPage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-5 md:grid-cols-3">
           {proofPoints.map((item) => {
             const Icon = item.icon;
 
             return (
               <div
                 key={item.title}
-                className="rounded-2xl border border-white/10 bg-white/[0.08] p-6 shadow-[0_18px_45px_rgba(15,23,42,0.18)] backdrop-blur-xl"
+                className="rounded-[1.75rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.04))] p-6 shadow-[0_24px_60px_rgba(2,6,23,0.26)] ring-1 ring-white/6 backdrop-blur-2xl"
               >
-                <div className="mb-4 inline-flex rounded-xl border border-sky-200/20 bg-white/10 p-3 text-sky-100 backdrop-blur-lg">
+                <div className="mb-4 inline-flex rounded-2xl border border-sky-200/20 bg-white/[0.08] p-3 text-sky-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl">
                   <Icon className="h-6 w-6" />
                 </div>
                 <h2 className="text-lg font-semibold text-white">{item.title}</h2>
@@ -115,33 +116,23 @@ export default async function ProjectsPage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-6 pb-12 lg:px-8">
-        <div className="mb-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-100/70">
-            Current public work
-          </p>
-          <h2 className="mt-2 text-3xl font-bold text-white">
-            {featuredProjects.length > 0
-              ? `${featuredProjects.length} featured ${featuredProjects.length === 1 ? "project" : "projects"} and the wider project index`
-              : "Current public work"}
-          </h2>
-        </div>
+        <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-100/70">
+              Current public work
+            </p>
+            <h2 className="mt-2 text-3xl font-bold text-white">
+              {featuredProjects.length > 0
+                ? `${featuredProjects.length} featured ${featuredProjects.length === 1 ? "project" : "projects"} and the wider project index`
+                : "Current public work"}
+            </h2>
+          </div>
 
-        <div className="mb-8 rounded-2xl border border-white/10 bg-white/[0.08] p-6 shadow-[0_18px_45px_rgba(15,23,42,0.16)] backdrop-blur-xl">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="max-w-3xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-100/70">Connected public execution</p>
-              <h3 className="mt-2 text-2xl font-semibold text-white">Projects should connect to the Blog / Build Log.</h3>
-              <p className="mt-3 text-sm leading-7 text-slate-300">
-                This page shows the work itself. The Blog / Build Log should show movement, iteration, technical choices, and what changed over time. Together, they build trust faster than either page alone.
-              </p>
-            </div>
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-2 self-start rounded-full border border-white/15 bg-white/[0.08] px-5 py-3 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-white/[0.12]"
-            >
-              <PencilSquareIcon className="h-4 w-4" />
-              Open Blog / Build Log
-            </Link>
+          <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.05] px-5 py-4 shadow-[0_18px_45px_rgba(2,6,23,0.2)] ring-1 ring-white/6 backdrop-blur-2xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-100/70">Connected public execution</p>
+            <p className="mt-2 max-w-xl text-sm leading-7 text-slate-300">
+              The strongest signal here is the work itself, backed by public iteration in the build log.
+            </p>
           </div>
         </div>
 
@@ -159,8 +150,8 @@ export default async function ProjectsPage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-6 pb-20 lg:px-8">
-        <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-8 shadow-[0_18px_45px_rgba(15,23,42,0.14)] backdrop-blur-xl">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div className="rounded-[1.9rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.03))] p-8 shadow-[0_24px_65px_rgba(2,6,23,0.24)] ring-1 ring-white/6 backdrop-blur-2xl">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl">
               <p className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-100/70">Keep following the work</p>
               <h2 className="mt-2 text-2xl font-bold text-white">The build log shows movement, not just outcomes.</h2>
@@ -170,7 +161,7 @@ export default async function ProjectsPage() {
             </div>
             <Link
               href="/blog"
-              className="inline-flex items-center gap-2 self-start rounded-full border border-white/15 bg-white/[0.08] px-5 py-3 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-white/[0.12]"
+              className="inline-flex items-center gap-2 self-start rounded-full border border-white/15 bg-white/[0.07] px-5 py-3 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl transition hover:bg-white/[0.12]"
             >
               <PencilSquareIcon className="h-4 w-4" />
               Open Blog / Build Log

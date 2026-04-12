@@ -92,19 +92,19 @@ export default function Project(props: ProjectProps) {
 
   return (
     <section className="w-full">
-      <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.08] shadow-[0_20px_50px_rgba(15,23,42,0.16)] backdrop-blur-xl transition-all hover:border-sky-200/20 hover:bg-white/[0.1] hover:shadow-[0_24px_60px_rgba(15,23,42,0.2)]">
+      <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.04))] shadow-[0_28px_75px_rgba(2,6,23,0.24)] ring-1 ring-white/6 backdrop-blur-2xl transition-all hover:border-sky-200/20 hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05))] hover:shadow-[0_30px_85px_rgba(2,6,23,0.28)]">
         <div className="p-6 sm:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="flex-1">
               <div className="mb-4 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.22em] text-slate-200 backdrop-blur-md">
+                <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.07] px-3 py-1 text-xs font-medium uppercase tracking-[0.22em] text-slate-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl">
                   {categoryLabel[props.category]}
                 </span>
                 <span className={cn("inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium uppercase tracking-[0.22em]", statusTone[props.status])}>
                   {statusLabel[props.status]}
                 </span>
                 {props.featured ? (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-sky-200/30 bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.22em] text-sky-100 backdrop-blur-md">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-sky-200/30 bg-white/[0.08] px-3 py-1 text-xs font-medium uppercase tracking-[0.22em] text-sky-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl">
                     <SparklesIcon className="h-3.5 w-3.5" />
                     Featured
                   </span>
@@ -128,7 +128,7 @@ export default function Project(props: ProjectProps) {
               </p>
 
               {props.current_status ? (
-                <div className="mt-5 rounded-2xl border border-emerald-200/20 bg-emerald-200/10 p-4 text-sm leading-7 text-emerald-50 backdrop-blur-lg">
+                <div className="mt-5 rounded-[1.4rem] border border-emerald-200/20 bg-[linear-gradient(180deg,rgba(16,185,129,0.16),rgba(16,185,129,0.10))] p-4 text-sm leading-7 text-emerald-50 shadow-[0_16px_38px_rgba(6,78,59,0.18)] backdrop-blur-xl">
                   <div className="mb-1 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-100/90">
                     <CheckBadgeIcon className="h-4 w-4" />
                     Current status
@@ -142,7 +142,7 @@ export default function Project(props: ProjectProps) {
                   {stack.map((item) => (
                     <span
                       key={item}
-                      className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-slate-100 backdrop-blur-md"
+                      className="rounded-full border border-white/10 bg-white/[0.07] px-3 py-1 text-xs font-medium text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl"
                     >
                       {item}
                     </span>
@@ -190,7 +190,7 @@ export default function Project(props: ProjectProps) {
           <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.9fr)]">
             <div className="space-y-4">
               {props.role ? (
-                <div className="rounded-2xl border border-white/10 bg-white/[0.08] p-5 shadow-[0_16px_36px_rgba(15,23,42,0.14)] backdrop-blur-xl">
+                <div className="rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.04))] p-5 shadow-[0_18px_42px_rgba(2,6,23,0.18)] ring-1 ring-white/6 backdrop-blur-2xl">
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-100/70">Role</p>
                   <p className="mt-2 text-sm leading-7 text-slate-300">{props.role}</p>
                 </div>
@@ -199,7 +199,7 @@ export default function Project(props: ProjectProps) {
               {caseStudySections.length > 0 ? (
                 <div className="grid gap-4 md:grid-cols-2">
                   {caseStudySections.map((section) => (
-                    <div key={section.label} className="rounded-2xl border border-white/10 bg-white/[0.08] p-5 shadow-[0_16px_36px_rgba(15,23,42,0.14)] backdrop-blur-xl">
+                    <div key={section.label} className="rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.04))] p-5 shadow-[0_18px_42px_rgba(2,6,23,0.18)] ring-1 ring-white/6 backdrop-blur-2xl">
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-100/70">{section.label}</p>
                       <div className="mt-2 space-y-3 text-sm leading-7 text-slate-300">
                         {compactParagraphs(section.value).map((paragraph, index) => (
@@ -210,7 +210,7 @@ export default function Project(props: ProjectProps) {
                   ))}
                 </div>
               ) : (
-                <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.06] p-5 text-sm leading-7 text-slate-300 backdrop-blur-lg">
+                <div className="rounded-[1.5rem] border border-dashed border-white/15 bg-white/[0.05] p-5 text-sm leading-7 text-slate-300 shadow-[0_16px_36px_rgba(2,6,23,0.14)] ring-1 ring-white/5 backdrop-blur-xl">
                   This entry still needs the full case-study layer. The schema can hold it now, but the content has to be written project by project.
                 </div>
               )}
@@ -218,14 +218,14 @@ export default function Project(props: ProjectProps) {
 
             <div className="space-y-4">
               {props.relatedPosts && props.relatedPosts.length > 0 ? (
-                <div className="rounded-2xl border border-white/10 bg-white/[0.08] p-5 shadow-[0_16px_36px_rgba(15,23,42,0.14)] backdrop-blur-xl">
+                <div className="rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.04))] p-5 shadow-[0_18px_42px_rgba(2,6,23,0.18)] ring-1 ring-white/6 backdrop-blur-2xl">
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-100/70">Related build log posts</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {props.relatedPosts.slice(0, 4).map((post) => (
                       <a
                         key={post.id}
                         href={`/blog/${post.id}`}
-                        className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-sky-100 backdrop-blur-md transition hover:border-sky-200/30 hover:bg-white/[0.14]"
+                        className="rounded-full border border-white/10 bg-white/[0.07] px-3 py-1 text-xs font-medium text-sky-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl transition hover:border-sky-200/30 hover:bg-white/[0.14]"
                       >
                         {post.title || `Post #${post.id}`}
                       </a>
@@ -234,7 +234,7 @@ export default function Project(props: ProjectProps) {
                 </div>
               ) : null}
 
-              <div className="rounded-2xl border border-white/10 bg-white/[0.08] p-5 shadow-[0_16px_36px_rgba(15,23,42,0.14)] backdrop-blur-xl">
+              <div className="rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.04))] p-5 shadow-[0_18px_42px_rgba(2,6,23,0.18)] ring-1 ring-white/6 backdrop-blur-2xl">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-100/70">Why this matters</p>
                 <p className="mt-2 text-sm leading-7 text-slate-300">
                   The point is not to show a pile of links. It is to make the work legible, so a client, collaborator, or future partner can see what was built, why it mattered, and how decisions were made.
@@ -245,7 +245,7 @@ export default function Project(props: ProjectProps) {
         </div>
 
         {showPreview && (
-          <div className="border-t border-white/10 bg-slate-950/25 backdrop-blur-xl">
+          <div className="border-t border-white/10 bg-slate-950/30 backdrop-blur-2xl">
             <div className="relative w-full" style={{ aspectRatio: "16 / 9" }}>
               <iframe
                 src={liveUrl}
