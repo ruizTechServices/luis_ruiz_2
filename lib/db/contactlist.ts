@@ -54,6 +54,7 @@ export async function getContactsForAdmin(options?: {
   const { data, error } = await supabase
     .from("contactlist")
     .select(CONTACT_SELECT)
+    .returns<ContactRow[]>()
     .order("created_at", { ascending: false })
     .range(from, to);
 
@@ -73,11 +74,12 @@ export async function getContactById(id: number): Promise<ContactRecord | null> 
   const { data, error } = await supabase
     .from("contactlist")
     .select(CONTACT_SELECT)
+    .returns<ContactRow>()
     .eq("id", id)
     .maybeSingle();
 
   if (error) throw error;
-  return data ? mapContactRow(data as ContactRow) : null;
+  return data ? mapContactRow(data) : null;
 }
 
 function mapContactRow(row: ContactRow): ContactRecord {
