@@ -4,6 +4,7 @@ import { Highlights } from "../components/app/landing_page/Highlights";
 import TechSection from "../components/app/landing_page/techSection";
 import Quote from "../components/app/landing_page/quotes";
 import CallToAction from "../components/app/landing_page/CallToAction";
+import LatestPushesSection from "../components/app/landing_page/LatestPushesSection";
 
 export default function Home() {
   return (
@@ -11,6 +12,7 @@ export default function Home() {
       <Hero />
       <Highlights />
       <Quote />
+      <LatestPushesSection />
       <TechSection />
       <CallToAction />
     </div>
