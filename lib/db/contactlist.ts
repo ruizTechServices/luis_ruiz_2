@@ -1,6 +1,23 @@
 import { createClient as createServerClient } from "@/lib/clients/supabase/server";
 import type { ContactAdminFilters, ContactListResult, ContactRecord } from "@/lib/types/contact";
 
+interface ContactRow {
+  id: number;
+  created_at: string;
+  full_name: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  email: string | null;
+  phone: string | null;
+  company: string | null;
+  subject: string | null;
+  message: string | null;
+  budget: string | null;
+  timeline: string | null;
+  preferred_contact: string | null;
+  newsletter: boolean | null;
+}
+
 const CONTACT_SELECT = [
   "id",
   "created_at",
@@ -43,7 +60,7 @@ export async function getContactsForAdmin(options?: {
   if (error) throw error;
 
   return {
-    data: (data ?? []) as ContactRecord[],
+    data: (data ?? []).map(mapContactRow),
     count: count ?? 0,
     page,
     pageSize,
@@ -60,7 +77,16 @@ export async function getContactById(id: number): Promise<ContactRecord | null> 
     .maybeSingle();
 
   if (error) throw error;
-  return (data as ContactRecord | null) ?? null;
+  return data ? mapContactRow(data as ContactRow) : null;
+}
+
+function mapContactRow(row: ContactRow): ContactRecord {
+  return {
+    ...row,
+    subject: row.subject,
+    preferred_contact: row.preferred_contact,
+    newsletter: Boolean(row.newsletter),
+  };
 }
 
 export async function deleteContact(id: number): Promise<void> {
