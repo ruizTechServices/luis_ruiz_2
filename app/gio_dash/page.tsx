@@ -12,6 +12,7 @@ import StatCard from "@/components/app/gio_dashboard/StatCard";
 import { getCounts } from "@/lib/functions/dashboard/getCounts";
 import { BlogCard } from "@/components/app/blog/blog_card"; // slideshow component
 import GithubApiTesterCard from "@/components/app/gio_dashboard/GithubApiTesterCard";
+import ContactsInboxCard from "@/components/app/gio_dashboard/ContactsInboxCard";
 
 export default async function GioDashboard() {
   const supabase = await createServerClient();
@@ -99,6 +100,7 @@ export default async function GioDashboard() {
           <RecentActivityCard />
           <SettingsConfigCard />
           <GithubApiTesterCard />
+          <ContactsInboxCard />
         </div>
 
         {/* Errors */}
