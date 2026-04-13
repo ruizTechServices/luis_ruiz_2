@@ -68,9 +68,9 @@ export default function ContactsInboxCardClient({ contacts, totalCount }: Contac
         />
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(260px,0.9fr)]">
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-          <div className="max-h-[420px] overflow-y-auto divide-y divide-gray-200 dark:divide-gray-700">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(260px,0.9fr)] xl:h-[430px]">
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden xl:h-[430px]">
+          <div className="h-[320px] overflow-y-auto divide-y divide-gray-200 dark:divide-gray-700 xl:h-[430px]">
             {filtered.length === 0 ? (
               <div className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                 No contacts match this search.
@@ -102,7 +102,7 @@ export default function ContactsInboxCardClient({ contacts, totalCount }: Contac
           </div>
         </div>
 
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-4 bg-gray-50/80 dark:bg-gray-900/40">
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-4 bg-gray-50/80 dark:bg-gray-900/40 h-[320px] overflow-y-auto xl:h-[430px]">
           {selected ? (
             <div className="space-y-4">
               <div className="flex items-start justify-between gap-3">
