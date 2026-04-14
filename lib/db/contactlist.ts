@@ -74,9 +74,9 @@ export async function getContactById(id: number): Promise<ContactRecord | null> 
   const { data, error } = await supabase
     .from("contactlist")
     .select(CONTACT_SELECT)
-    .returns<ContactRow>()
     .eq("id", id)
-    .maybeSingle();
+    .maybeSingle()
+    .overrideTypes<ContactRow | null>();
 
   if (error) throw error;
   return data ? mapContactRow(data) : null;
