@@ -1,73 +1,76 @@
-﻿"use client";
+"use client";
 
 import { useMemo, useState, useTransition } from "react";
+import Link from "next/link";
 import { githubProxyFetch } from "@/lib/clients/github";
 
-type ResponseState = {
+type GithubBranch = {
+  name: string;
+  commit?: {
+    sha?: string;
+    commit?: {
+      author?: {
+        date?: string;
+      };
+      message?: string;
+    };
+    html_url?: string;
+  };
+};
+
+type GithubRepo = {
+  name: string;
+  html_url: string;
+  pushed_at?: string;
+  private?: boolean;
+  default_branch?: string;
+};
+
+type PanelState = {
   status: "idle" | "loading" | "success" | "error";
-  statusCode?: number;
-  body?: string;
   error?: string;
 };
 
-const METHOD_OPTIONS = ["GET", "POST", "PATCH", "PUT", "DELETE"] as const;
+function shortSha(value?: string) {
+  return value ? value.slice(0, 7) : "unknown";
+}
 
-type MethodOption = (typeof METHOD_OPTIONS)[number];
-
-const DEFAULT_PATH = "/users/ruizTechServices";
-const DEFAULT_QUERY = "";
+function formatUtc(value?: string) {
+  if (!value) return "Unknown time";
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "UTC",
+  }).format(new Date(value));
+}
 
 export default function GithubApiTesterCard() {
-  const [method, setMethod] = useState<MethodOption>("GET");
-  const [path, setPath] = useState(DEFAULT_PATH);
-  const [query, setQuery] = useState(DEFAULT_QUERY);
-  const [bodyInput, setBodyInput] = useState("");
-  const [proxySecret, setProxySecret] = useState("");
-  const [raw, setRaw] = useState(false);
-  const [response, setResponse] = useState<ResponseState>({ status: "idle" });
   const [isPending, startTransition] = useTransition();
+  const [state, setState] = useState<PanelState>({ status: "idle" });
+  const [branch, setBranch] = useState<GithubBranch | null>(null);
+  const [repos, setRepos] = useState<GithubRepo[]>([]);
 
-  const canSend = useMemo(() => path.trim().length > 0, [path]);
+  const latestCommit = useMemo(() => branch?.commit?.commit, [branch]);
 
-  const submit = () => {
-    const trimmedPath = path.trim();
-    if (!trimmedPath) {
-      setResponse({ status: "error", error: "Path is required." });
-      return;
-    }
-
-    let parsedBody: unknown = undefined;
-    const bodyText = bodyInput.trim();
-    if (bodyText) {
-      try {
-        parsedBody = JSON.parse(bodyText);
-      } catch (error) {
-        setResponse({
-          status: "error",
-          error: error instanceof Error ? error.message : "Invalid JSON body.",
-        });
-        return;
-      }
-    }
-
-    const parsedQuery = parseQuery(query);
-
-    setResponse({ status: "loading" });
+  const refreshGithubSnapshot = () => {
+    setState({ status: "loading" });
     startTransition(async () => {
       try {
-        const data = await githubProxyFetch({
-          path: trimmedPath,
-          method,
-          query: parsedQuery,
-          body: parsedBody,
-          raw,
-          proxySecret: proxySecret.trim() || undefined,
-        });
+        const [branchData, repoData] = await Promise.all([
+          githubProxyFetch<GithubBranch>({
+            path: "/repos/ruizTechServices/luis_ruiz_2/branches/GioClaw-Edit",
+          }),
+          githubProxyFetch<GithubRepo[]>({
+            path: "/users/ruizTechServices/repos",
+            query: { sort: "updated", per_page: 4 },
+          }),
+        ]);
 
-        const bodyString = typeof data === "string" ? data : JSON.stringify(data, null, 2);
-        setResponse({ status: "success", body: bodyString });
+        setBranch(branchData);
+        setRepos(repoData);
+        setState({ status: "success" });
       } catch (error) {
-        setResponse({
+        setState({
           status: "error",
           error: error instanceof Error ? error.message : String(error),
         });
@@ -77,125 +80,119 @@ export default function GithubApiTesterCard() {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">GitHub API Tester</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">GitHub Snapshot</h3>
           <p className="text-gray-600 dark:text-gray-300 text-sm">
-            Run quick GitHub REST calls through the /api/github proxy
+            Plain-English GitHub status for this site work, so you can quickly confirm branch activity and recent repo movement without dealing with API plumbing.
           </p>
         </div>
-        <span className="text-xs text-gray-500 dark:text-gray-400">Owner only</span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">Owner tool</span>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-3">
-        <label className="text-xs font-medium text-gray-600 dark:text-gray-300">
-          Method
-          <select
-            value={method}
-            onChange={(e) => setMethod(e.target.value as MethodOption)}
-            className="mt-1 w-full rounded-md border border-gray-200 dark:border-gray-700 bg-transparent px-3 py-2 text-sm"
-          >
-            {METHOD_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </label>
+      <div className="mt-5 flex flex-wrap items-center gap-3">
+        <button
+          onClick={refreshGithubSnapshot}
+          disabled={isPending}
+          className="px-4 py-2 rounded-md border text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
+        >
+          {isPending ? "Refreshing..." : "Refresh GitHub snapshot"}
+        </button>
+        <Link
+          href="https://github.com/ruizTechServices/luis_ruiz_2/tree/GioClaw-Edit"
+          className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400"
+        >
+          Open GioClaw-Edit branch
+        </Link>
+      </div>
 
-        <label className="text-xs font-medium text-gray-600 dark:text-gray-300">
-          Path
-          <input
-            type="text"
-            value={path}
-            onChange={(e) => setPath(e.target.value)}
-            placeholder="/users/ruizTechServices"
-            className="mt-1 w-full rounded-md border border-gray-200 dark:border-gray-700 bg-transparent px-3 py-2 text-sm"
-          />
-        </label>
+      <div className="mt-5 grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-900/40 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
+            Current branch head
+          </p>
 
-        <label className="text-xs font-medium text-gray-600 dark:text-gray-300">
-          Query (optional)
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="per_page=5&sort=updated"
-            className="mt-1 w-full rounded-md border border-gray-200 dark:border-gray-700 bg-transparent px-3 py-2 text-sm"
-          />
-        </label>
-
-        <label className="text-xs font-medium text-gray-600 dark:text-gray-300">
-          JSON Body (optional)
-          <textarea
-            value={bodyInput}
-            onChange={(e) => setBodyInput(e.target.value)}
-            placeholder='{"name":"new-repo","private":false}'
-            className="mt-1 min-h-24 w-full rounded-md border border-gray-200 dark:border-gray-700 bg-transparent px-3 py-2 text-sm"
-          />
-        </label>
-
-        <label className="text-xs font-medium text-gray-600 dark:text-gray-300">
-          Proxy Secret (required for write actions)
-          <input
-            type="password"
-            value={proxySecret}
-            onChange={(e) => setProxySecret(e.target.value)}
-            placeholder="GITHUB_PROXY_SECRET"
-            className="mt-1 w-full rounded-md border border-gray-200 dark:border-gray-700 bg-transparent px-3 py-2 text-sm"
-          />
-        </label>
-
-        <label className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300">
-          <input
-            type="checkbox"
-            checked={raw}
-            onChange={(e) => setRaw(e.target.checked)}
-            className="h-4 w-4"
-          />
-          Return raw response text
-        </label>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={submit}
-            disabled={!canSend || isPending}
-            className="px-4 py-2 rounded-md border text-xs hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
-          >
-            {isPending ? "Sending..." : "Send"}
-          </button>
-          <span className="text-xs text-gray-500 dark:text-gray-400">
-            Paths only (no full URLs)
-          </span>
+          {branch ? (
+            <div className="mt-3 space-y-3">
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Branch</p>
+                <p className="text-base font-semibold text-gray-900 dark:text-white">{branch.name}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Latest commit</p>
+                <p className="text-base font-semibold text-gray-900 dark:text-white">
+                  {latestCommit?.message || "No commit message returned"}
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <p className="text-gray-500 dark:text-gray-400">Commit SHA</p>
+                  <p className="font-mono text-gray-900 dark:text-white">{shortSha(branch.commit?.sha)}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500 dark:text-gray-400">Updated</p>
+                  <p className="text-gray-900 dark:text-white">{formatUtc(latestCommit?.author?.date)}</p>
+                </div>
+              </div>
+              {branch.commit?.html_url ? (
+                <Link
+                  href={branch.commit.html_url}
+                  className="inline-flex text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                >
+                  View latest commit on GitHub
+                </Link>
+              ) : null}
+            </div>
+          ) : (
+            <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+              Run the snapshot to load the current branch head, last commit message, and update time.
+            </p>
+          )}
         </div>
 
-        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-900/30 p-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-700 dark:text-gray-200">Response</span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              {response.status === "loading" ? "Loading" : response.status}
-            </span>
-          </div>
-          <pre className="mt-2 max-h-64 overflow-auto text-xs text-gray-700 dark:text-gray-200">
-            {response.error
-              ? response.error
-              : response.body || "Run a request to see output."}
-          </pre>
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-900/40 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
+            Recently updated repos
+          </p>
+
+          {repos.length > 0 ? (
+            <div className="mt-3 space-y-3">
+              {repos.map((repo) => (
+                <div
+                  key={repo.name}
+                  className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{repo.name}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Last push: {formatUtc(repo.pushed_at)}
+                      </p>
+                    </div>
+                    <span className="text-[11px] uppercase tracking-[0.18em] text-gray-400">
+                      {repo.private ? "Private" : "Public"}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+              This will show the most recently updated GitHub repos after you refresh the snapshot.
+            </p>
+          )}
         </div>
       </div>
+
+      <div className="mt-4 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 p-3 text-xs leading-6 text-gray-500 dark:text-gray-400">
+        Productive use-case: quickly confirm that your current branch moved, check the latest commit, and see whether repo activity looks alive, without opening GitHub in another tab.
+      </div>
+
+      {state.status === "error" ? (
+        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-300">
+          {state.error}
+        </div>
+      ) : null}
     </div>
   );
-}
-
-function parseQuery(input: string): Record<string, string> | undefined {
-  const trimmed = input.trim();
-  if (!trimmed) return undefined;
-
-  const normalized = trimmed.startsWith("?") ? trimmed.slice(1) : trimmed;
-  const params = new URLSearchParams(normalized);
-  const query: Record<string, string> = {};
-  for (const [key, value] of params.entries()) {
-    query[key] = value;
-  }
-  return Object.keys(query).length ? query : undefined;
 }
