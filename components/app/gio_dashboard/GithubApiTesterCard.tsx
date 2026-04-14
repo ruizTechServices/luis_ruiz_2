@@ -79,7 +79,7 @@ export default function GithubApiTesterCard() {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow h-[430px] overflow-hidden flex flex-col">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow h-[430px] flex flex-col">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">GitHub Snapshot</h3>
@@ -106,7 +106,7 @@ export default function GithubApiTesterCard() {
         </Link>
       </div>
 
-      <div className="mt-5 grid gap-4 lg:grid-cols-[1.05fr_0.95fr] flex-1 min-h-0 overflow-hidden">
+      <div className="mt-5 grid gap-4 lg:grid-cols-[1.05fr_0.95fr] flex-1 min-h-0">
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-900/40 p-4 min-h-0 overflow-y-auto">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
             Current branch head
