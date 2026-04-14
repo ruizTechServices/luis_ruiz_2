@@ -9,6 +9,12 @@ type ProjectLinkRow = {
   blog_posts: RelatedBlogPost | RelatedBlogPost[] | null;
 };
 
+type ProjectBaseRow = Omit<ProjectRow, "relatedPosts">;
+type ProjectRelationRow = Pick<ProjectRow, "id"> & {
+  project_blog_links: ProjectLinkRow[] | null;
+};
+type ProjectSelectionRow = Pick<ProjectRow, "id" | "title" | "url" | "slug">;
+
 function normalizeRelatedPosts(links: ProjectLinkRow[] | null | undefined): RelatedBlogPost[] {
   if (!links?.length) return [];
 
@@ -54,18 +60,17 @@ const projectSelect = [
 export async function getProjects(): Promise<ProjectRow[]> {
   const supabase = await supa();
 
-  const baseQuery = await supabase
+  const { data: baseProjects, error: baseError } = await supabase
     .from("projects")
     .select(projectSelect)
     .in("visibility", ["public", "unlisted"])
     .order("featured", { ascending: false })
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .overrideTypes<ProjectBaseRow[], { merge: false }>();
 
-  if (baseQuery.error) throw baseQuery.error;
+  if (baseError) throw baseError;
 
-  const baseProjects = (baseQuery.data ?? []) as Omit<ProjectRow, "relatedPosts">[];
-
-  const relationQuery = await supabase
+  const { data: relationProjects, error: relationError } = await supabase
     .from("projects")
     .select(`
       id,
@@ -80,30 +85,32 @@ export async function getProjects(): Promise<ProjectRow[]> {
     `)
     .in("visibility", ["public", "unlisted"])
     .order("featured", { ascending: false })
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .overrideTypes<ProjectRelationRow[], { merge: false }>();
 
   const relationMap = new Map<number, RelatedBlogPost[]>();
 
-  if (!relationQuery.error && relationQuery.data) {
-    for (const project of relationQuery.data as Array<Pick<ProjectRow, "id"> & { project_blog_links?: ProjectLinkRow[] | null }>) {
+  if (!relationError && relationProjects) {
+    for (const project of relationProjects) {
       relationMap.set(project.id, normalizeRelatedPosts(project.project_blog_links));
     }
   }
 
-  return baseProjects.map((project) => ({
+  return (baseProjects ?? []).map((project) => ({
     ...project,
     relatedPosts: relationMap.get(project.id) ?? [],
   }));
 }
 
-export async function getProjectsForSelection(): Promise<Pick<ProjectRow, "id" | "title" | "url" | "slug">[]> {
+export async function getProjectsForSelection(): Promise<ProjectSelectionRow[]> {
   const supabase = await supa();
   const { data, error } = await supabase
     .from("projects")
     .select("id, title, url, slug")
     .order("featured", { ascending: false })
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .overrideTypes<ProjectSelectionRow[], { merge: false }>();
 
   if (error) throw error;
-  return (data ?? []) as Pick<ProjectRow, "id" | "title" | "url" | "slug">[];
+  return data ?? [];
 }

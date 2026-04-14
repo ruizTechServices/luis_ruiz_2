@@ -76,7 +76,7 @@ export async function getContactById(id: number): Promise<ContactRecord | null> 
     .select(CONTACT_SELECT)
     .eq("id", id)
     .maybeSingle()
-    .overrideTypes<ContactRow | null>();
+    .overrideTypes<ContactRow, { merge: false }>();
 
   if (error) throw error;
   return data ? mapContactRow(data) : null;
