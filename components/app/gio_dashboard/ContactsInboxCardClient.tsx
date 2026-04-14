@@ -64,6 +64,7 @@ export default function ContactsInboxCardClient({ contacts, totalCount }: Contac
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Search name, email, company, subject, message"
+          autoComplete="off"
           className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none transition focus:border-blue-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
         />
       </div>
