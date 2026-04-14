@@ -79,7 +79,7 @@ export default function GithubApiTesterCard() {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow h-[430px] overflow-hidden flex flex-col">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">GitHub Snapshot</h3>
@@ -90,7 +90,7 @@ export default function GithubApiTesterCard() {
         <span className="text-xs text-gray-500 dark:text-gray-400">Owner tool</span>
       </div>
 
-      <div className="mt-5 flex flex-wrap items-center gap-3">
+      <div className="mt-5 flex flex-wrap items-center gap-3 shrink-0">
         <button
           onClick={refreshGithubSnapshot}
           disabled={isPending}
@@ -106,8 +106,8 @@ export default function GithubApiTesterCard() {
         </Link>
       </div>
 
-      <div className="mt-5 grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-900/40 p-4">
+      <div className="mt-5 grid gap-4 lg:grid-cols-[1.05fr_0.95fr] flex-1 min-h-0 overflow-hidden">
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-900/40 p-4 min-h-0 overflow-y-auto">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
             Current branch head
           </p>
@@ -150,7 +150,7 @@ export default function GithubApiTesterCard() {
           )}
         </div>
 
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-900/40 p-4">
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-900/40 p-4 min-h-0 overflow-y-auto">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
             Recently updated repos
           </p>
@@ -184,12 +184,12 @@ export default function GithubApiTesterCard() {
         </div>
       </div>
 
-      <div className="mt-4 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 p-3 text-xs leading-6 text-gray-500 dark:text-gray-400">
+      <div className="mt-4 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 p-3 text-xs leading-6 text-gray-500 dark:text-gray-400 shrink-0">
         Productive use-case: quickly confirm that your current branch moved, check the latest commit, and see whether repo activity looks alive, without opening GitHub in another tab.
       </div>
 
       {state.status === "error" ? (
-        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-300">
+        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-300 shrink-0">
           {state.error}
         </div>
       ) : null}
