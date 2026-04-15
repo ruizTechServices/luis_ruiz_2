@@ -79,7 +79,7 @@ export default function GithubApiTesterCard() {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow h-[430px] flex flex-col">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow min-h-[330px] h-full flex flex-col">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">GitHub Snapshot</h3>
@@ -103,7 +103,7 @@ export default function GithubApiTesterCard() {
           className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400"
         >
           Open GioClaw-Edit branch
-        </Link>
+        </Link>{<>This should be the branch that is being worked on in development or the branch that is currently in production</>}
       </div>
 
       <div className="mt-5 grid gap-4 lg:grid-cols-[1.05fr_0.95fr] flex-1 min-h-0">
