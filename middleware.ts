@@ -1,8 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 const NUCLEUS_CORS_ORIGINS =
   process.env.NUCLEUS_CORS_ORIGINS || "https://luis-ruiz.com,https://www.luis-ruiz.com";
@@ -45,39 +41,9 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // Auth cookie refresh for page routes (not API routes)
-  let response = NextResponse.next({
+  return NextResponse.next({
     request: { headers: request.headers },
   });
-
-  if (!supabaseUrl || !supabaseKey) return response;
-
-  const supabase = createServerClient(supabaseUrl, supabaseKey, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
-      },
-      setAll(
-        cookiesToSet: { name: string; value: string; options: CookieOptions }[]
-      ) {
-        cookiesToSet.forEach(({ name, value }) =>
-          request.cookies.set(name, value)
-        );
-        response = NextResponse.next({ request });
-        cookiesToSet.forEach(({ name, value, options }) =>
-          response.cookies.set(name, value, options)
-        );
-      },
-    },
-  });
-
-  try {
-    await supabase.auth.getUser();
-  } catch (e) {
-    console.error("[middleware] auth refresh failed:", e);
-  }
-
-  return response;
 }
 
 export const config = {
