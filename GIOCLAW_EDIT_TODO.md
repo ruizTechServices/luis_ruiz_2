@@ -75,6 +75,7 @@ If those four are not handled well, the automation ideas will amplify confusion.
 - `/blog`
 - `/projects`
 - `/contact`
+- `/about`
 - `/ollama`
 - `/round-robin`
 - `/login`
@@ -82,12 +83,15 @@ If those four are not handled well, the automation ideas will amplify confusion.
 - `/dashboard`
 - `/gio_dash`
 - `/nucleus/...`
+- `/robots.txt`
+- `/sitemap.xml`
 
 ## Current homepage composition
 `app/page.tsx` currently renders:
 - `Hero`
 - `Highlights`
 - `Quote`
+- `LatestPushesSection`
 - `TechSection`
 - `CallToAction`
 
@@ -381,7 +385,7 @@ The homepage should:
 A short source-of-truth planning doc that locks identity, content buckets, and nav direction before visual changes start.
 
 - [x] Audit all current homepage copy and remove claims that are generic, inflated, or not strongly evidenced by the repo or public outputs.
-- [ ] Make a source-of-truth content doc for site identity:
+- [x] Make a source-of-truth content doc for site identity:
   - public name to display
   - short positioning statement
   - one-sentence business relationship to ruizTechServices
@@ -409,20 +413,16 @@ A rewritten homepage with corrected hero, corrected section structure, and copy 
   - View Projects
   - Read Build Log
 - [x] Keep the slideshow/carousel concept, but ensure it supports trust instead of feeling decorative-only.
-- [ ] Re-evaluate whether the availability badge text reflects actual availability and desired business positioning.
+- [x] Re-evaluate whether the availability badge text reflects actual availability and desired business positioning.
 
 ### Section architecture
 - [x] Replace or rework `Highlights.tsx` entirely.
 - [x] Remove generic freelancer metrics unless each one is explicitly supportable.
-- [ ] Reorder homepage sections around this likely sequence:
-  - Hero
-  - Mini About
-  - Selected Projects / Proof
-  - Build Log / latest updates
-  - ruizTechServices block
-  - Contact CTA
+- [ ] Reorder homepage sections around a deliberate founder-builder sequence.
+  - Current reality: homepage now includes `LatestPushesSection`, but it still renders `Quote` and `TechSection`, and does not yet have a true mini-about or selected-projects-first structure.
 - [x] Decide whether `Quote` still belongs on the homepage at all.
 - [ ] Re-evaluate whether `TechSection` should remain a full homepage block, be condensed, or be repositioned as proof rather than filler.
+  - Current reality: it still exists as a full homepage section.
 - [x] Preserve the image carousel, but give it a more intentional role in communicating proof, identity, or active work.
 
 ### Suggested first homepage rewrite scope
@@ -459,6 +459,7 @@ A stable public structure for homepage, projects, build log, about, and contact 
   - About
   - Contact
   - ruizTechServices
+  - Current reality: nav is improved, but still uses `Experiments` and `Round-Robin`, and does not yet include `About` or an explicit ruizTechServices route.
 - [x] Decide whether Chat and Round-Robin belong in the top-level nav or should move under an experiments/tools area.
 - [x] Align nav labels with the founder-builder direction instead of portfolio-era labels.
 
@@ -468,7 +469,7 @@ A stable public structure for homepage, projects, build log, about, and contact 
   - `/projects`
   - `/products`
   or whether one route can handle filtered categories.
-- [ ] Determine whether an `/about` route should be added or expanded to better hold your story and long-term vision.
+- [x] Determine whether an `/about` route should be added or expanded to better hold your story and long-term vision.
 
 ---
 
@@ -596,9 +597,9 @@ An admin dashboard that reflects real business and publishing operations rather 
 A realistic intake system: contact first, then scheduling, then deposits, each added only when the workflow is clearly defined.
 
 ### Contact
-- [ ] Rewrite contact page copy so it reflects your actual business and collaboration goals.
-- [ ] Replace placeholder direct email (`hello@example.com`) with real business contact info.
-- [ ] Ensure the contact form language matches Luis + ruizTechServices branding.
+- [x] Rewrite contact page copy so it reflects your actual business and collaboration goals.
+- [x] Replace placeholder direct email (`hello@example.com`) with real business contact info.
+- [x] Ensure the contact form language matches Luis + ruizTechServices branding.
 
 ### Booking
 - [ ] Design a scheduling concept before coding it.
@@ -681,15 +682,16 @@ You explicitly want correct SEO.
 Right now the base metadata is weak.
 
 ### Observed current issue
-`app/layout.tsx` currently uses:
-- title: `Luis Ruiz: your Tech Partner!`
-- description: `A portfolio website for Luis Ruiz`
+This was previously true, but has already been corrected.
 
-This is too generic and does not match your stated direction.
+`app/layout.tsx` now uses:
+- title: `Luis Ruiz | Founder-Builder at ruizTechServices`
+- description: `Founder-builder creating AI products, public software experiments, and practical digital systems through ruizTechServices.`
 
 ### SEO to-do
 - [x] Rewrite global metadata.
 - [ ] Add route-level metadata for homepage, blog, projects, contact, and future about/products pages.
+  - Current reality: `about` and `projects` have explicit metadata, but this is not yet consistently done across the full public surface.
 - [ ] Create proper titles/descriptions aligned with founder-builder + ruizTechServices direction.
 - [ ] Add Open Graph and Twitter metadata.
 - [ ] Add structured data where useful.
@@ -750,14 +752,14 @@ Because your goal is trust, proof must become more legible.
 - adjust nav and metadata
 - preserve carousel while giving it a clearer purpose
 
-Status: materially underway. Core first-pass homepage, nav, metadata, carousel treatment, and high-level messaging corrections are already implemented.
+Status: materially underway. Core first-pass homepage, nav, metadata, carousel treatment, `/about`, `robots.txt`, and `sitemap.xml` are already implemented, but the homepage section order is still not fully aligned with the intended information architecture.
 
 ### Milestone 2, content model correction
 - define Products vs Projects vs Build Log
 - expand project schema
 - decide whether Blog is publicly branded as Build Log
 
-Status: partially underway. Products vs Projects vs Blog / Build Log is clearer in public framing, and project-to-blog structural linking has been added, but richer schema expansion is still pending.
+Status: partially underway. Products vs Projects vs Blog / Build Log is clearer in public framing, project-to-blog structural linking has been added, but richer schema expansion is still pending.
 
 ### Milestone 3, operational correction
 - define admin workflows
@@ -772,6 +774,27 @@ Status: admin blog workflow is materially improved, but the broader admin/dashbo
 - project auto-draft logic with human review
 
 Status: not started yet beyond planning.
+
+---
+
+## Accuracy corrections added after QA and follow-up implementation
+
+These were completed after the earlier planning pass and should no longer sit as implied open problems:
+
+- [x] Add `/about` route
+- [x] Add `robots.txt`
+- [x] Add `sitemap.xml`
+- [x] Fix homepage/global metadata away from generic portfolio language
+- [x] Remove Edge-runtime Supabase middleware import path that was causing build/runtime warning pressure
+
+These remain open because the work is still only partially done or not yet done:
+
+- [ ] Finalize homepage section order and mini-about/proof structure
+- [ ] Finish public nav architecture, including whether `Experiments` and `Round-Robin` stay top-level
+- [ ] Expand project schema into a true case-study/product model
+- [ ] Define actual admin workflows before further dashboard growth
+- [ ] Build the repo → analysis → build-log pipeline
+- [ ] Define booking/deposit workflow before implementing it
 
 ## Final blunt assessment
 
