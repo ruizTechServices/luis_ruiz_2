@@ -57,16 +57,21 @@ Purpose:
 - capture leads
 - route visitors to contact/hire flows
 
-Important public routes:
+Current public routes:
 
 ```txt
 /
-/services
-/systems
 /projects
 /blog
 /contact
 /login
+```
+
+Planned public routes:
+
+```txt
+/services
+/systems
 ```
 
 ### Layer 2 — Owner-Only Master Dashboard
@@ -153,6 +158,11 @@ The first useful version is complete when:
 3. Core dashboard records can be persisted in Supabase.
 4. Projects, leads, money, decisions, and system links are visible in the owner dashboard.
 5. The progress tracker reflects what was implemented and verified.
+
+Current status:
+
+- Item 1 is implemented in `components/app/home/*`.
+- Items 2-5 remain the active roadmap.
 
 ## Out of Scope For This Refactor Unless Explicitly Requested
 

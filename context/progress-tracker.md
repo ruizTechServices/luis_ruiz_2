@@ -25,14 +25,14 @@ The context files were created as empty placeholders and are now being populated
 - [x] Create/replace Codex instruction context files
 - [x] Define feature-spec loop
 - [x] Define implementation order
-- [ ] Codex confirms context files are present in repo
+- [x] Codex confirms context files are present in repo
 
 ### Phase 1 — Public Master Hub
 
-- [ ] `001-public-home-master-hub.md`
-- [ ] Replace generic landing composition with public master hub composition
-- [ ] Create `components/app/home/*`
-- [ ] Preserve existing working landing components until safely replaced or unused
+- [x] `001-public-home-master-hub.md`
+- [x] Replace generic landing composition with public master hub composition
+- [x] Create `components/app/home/*`
+- [x] Preserve existing working landing components until safely replaced or unused
 
 ### Phase 2 — Owner Dashboard Shell
 
@@ -84,10 +84,54 @@ The context files were created as empty placeholders and are now being populated
 - Supabase is the main backend/auth/storage provider.
 - `/gio_dash` already exists and is owner-only.
 - `/dashboard` exists and redirects owner users to `/gio_dash`.
-- `/` currently uses older landing-page components and should become the public master hub.
+- `/` now uses the public master hub composition from `components/app/home/*`.
 - Existing AI/Nucleus/round-robin/Ollama systems should be preserved and not expanded during this refactor unless explicitly requested.
 
 ## Latest Log
+
+## 2026-05-19 - 001-public-home-master-hub: Public Home Master Hub
+
+Status: Complete
+
+### Files changed
+- `app/page.tsx`
+- `components/app/home/MasterHero.tsx`
+- `components/app/home/PublicStatusPanel.tsx`
+- `components/app/home/ServiceCards.tsx`
+- `components/app/home/SystemsOverview.tsx`
+- `components/app/home/FeaturedProjects.tsx`
+- `components/app/home/CaseStudyPreview.tsx`
+- `components/app/home/HomeCTA.tsx`
+- `components/app/home/home-data.ts`
+- `Agents.md`
+- `CLAUDE.md`
+- `README.md`
+- `context/architecture-context.md`
+- `context/project-overview.md`
+- `context/ui-context.md`
+- `context/feature-specs/001-public-home-master-hub.md`
+- `context/progress-tracker.md`
+
+### What changed
+- Replaced the old homepage composition with `MasterHero`, `PublicStatusPanel`, `ServiceCards`, `SystemsOverview`, `FeaturedProjects`, `CaseStudyPreview`, and `HomeCTA`.
+- Added a static, public-safe home data layer for status areas, services, systems, featured public work, and the case-study preview.
+- Kept existing landing-page components in place but unused by `/`, preserving them for safe later cleanup.
+- Routed `View Services` to `/contact` because `/services` does not currently exist, which is allowed by the spec.
+- Updated context/docs that described `/` as the old generic portfolio or landing-page stack.
+
+### Verification
+- `npm run build`: pass
+- `npm run lint`: pass; `next lint` reported deprecation notice only and no warnings/errors
+- `npx next dev -p 3001`: pass; port `3000` was already in use, so `3001` was used
+- Local HTTP checks: `/`, `/projects`, and `/contact` returned `200`
+- Home content checks: required hero, service, systems, case-study, and contact text were present in served HTML
+
+### Known issues
+- `/services` and `/systems` are not implemented routes yet. Homepage service CTAs use `/contact` and project/system proof links use existing public routes.
+- Browser/IAB tooling was not exposed in this environment; verification used build, lint, dev server, and HTTP route/content checks.
+
+### Next recommended spec
+- `context/feature-specs/002-owner-dashboard-shell.md`
 
 ## 2026-05-19 — Context System Drafted
 

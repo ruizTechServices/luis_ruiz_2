@@ -33,22 +33,11 @@ tests/                lightweight helper/smoke tests
 context/              LLM-readable project context
 ```
 
-## Existing Public Homepage
+## Current Public Homepage
 
-The current homepage is composition-driven and imports landing-page components from `components/app/landing_page`.
+The current homepage is composition-driven and imports home components from `components/app/home`.
 
-Current conceptual shape:
-
-```txt
-Hero
-Highlights
-Quote
-LatestPushesSection
-TechSection
-CallToAction
-```
-
-Refactor direction:
+Current shape:
 
 ```txt
 MasterHero
@@ -58,6 +47,19 @@ SystemsOverview
 FeaturedProjects
 CaseStudyPreview
 HomeCTA
+```
+
+The legacy landing-page components still exist under `components/app/landing_page`, but `/` no longer renders them.
+
+Previous legacy shape:
+
+```txt
+Hero
+Highlights
+Quote
+LatestPushesSection
+TechSection
+CallToAction
 ```
 
 The new homepage should remain public and should not expose private operational data.

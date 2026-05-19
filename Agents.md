@@ -43,7 +43,9 @@ The root layout in `app/layout.tsx` defines the shared shell:
 - analytics
 - back-to-top behavior
 
-The homepage in `app/page.tsx` is composition-driven and built from landing-page components. This layer is mostly presentational, but it also surfaces live operational data like latest GitHub pushes.
+The homepage in `app/page.tsx` is now the public master hub and composes `components/app/home/*` sections:
+`MasterHero`, `PublicStatusPanel`, `ServiceCards`, `SystemsOverview`, `FeaturedProjects`, `CaseStudyPreview`, and `HomeCTA`.
+This layer is public-facing and uses static public-safe content plus links into existing public routes. Legacy landing-page components still exist under `components/app/landing_page/*`, but `/` no longer renders them.
 
 ### 2. Projects Domain
 

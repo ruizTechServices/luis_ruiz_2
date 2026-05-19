@@ -22,7 +22,7 @@ Gio builds practical web, AI, and automation systems for small businesses and op
 
 The public homepage should become a master hub landing page.
 
-Recommended sections:
+Implemented sections:
 
 ```txt
 1. MasterHero
@@ -33,6 +33,12 @@ Recommended sections:
 6. CaseStudyPreview
 7. HomeCTA
 ```
+
+Implementation status:
+
+- `/` now renders these sections from `components/app/home/*`.
+- Static public-safe data lives in `components/app/home/home-data.ts`.
+- `/services` and `/systems` are not implemented routes yet, so homepage service CTAs currently route to `/contact` or existing public proof routes.
 
 ### MasterHero
 

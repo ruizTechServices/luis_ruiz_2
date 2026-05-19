@@ -1,5 +1,13 @@
 # 001 — Public Home Master Hub
 
+Status: Implemented on 2026-05-19.
+
+Implementation notes:
+
+- `/` now renders the requested `components/app/home/*` section system.
+- `/services` does not currently exist, so "View Services" routes to `/contact` as allowed by this spec.
+- Existing legacy landing-page components were preserved and are no longer rendered by `/`.
+
 ## Goal
 
 Refactor the public homepage `/` from a generic portfolio landing page into a public master hub for Gio and ruizTechServices.
