@@ -99,6 +99,11 @@ Gio builds practical AI, web, and automation systems for small businesses, creat
 - `/api/projects` — upsert project (uses `zod` validation).
 - `/api/comments` and `/api/votes` — Blog interactions (comments/upvotes/downvotes).
 - `/api/site_settings/availability` — Get/Set availability banner values.
+- `/api/dashboard/projects` — Owner-only operational project tracker (`GET`, Zod-validated `POST`).
+- `/api/dashboard/leads` — Owner-only lead pipeline (`GET`, Zod-validated `POST`).
+- `/api/dashboard/money` — Owner-only money entries with income/expense summary (`GET`, Zod-validated `POST`).
+- `/api/dashboard/decisions` — Owner-only decision log (`GET`, Zod-validated `POST`).
+- `/api/dashboard/system-links` — Owner-only curated system/tool links (`GET`, Zod-validated `POST`).
 
 ## Photos & Legacy Hero Slideshow
 

@@ -43,10 +43,10 @@ The context files were created as empty placeholders and are now being populated
 
 ### Phase 3 — Master Dashboard Data Layer
 
-- [ ] `003-master-dashboard-data-layer.md`
-- [ ] Add Supabase migration for dashboard operational tables
-- [ ] Add typed data access helpers
-- [ ] Add owner-only API routes foundation
+- [x] `003-master-dashboard-data-layer.md`
+- [x] Add Supabase migration for dashboard operational tables
+- [x] Add typed data access helpers
+- [x] Add owner-only API routes foundation
 
 ### Phase 4 — Projects, Leads, Money
 
@@ -89,6 +89,54 @@ The context files were created as empty placeholders and are now being populated
 - Existing AI/Nucleus/round-robin/Ollama systems should be preserved and not expanded during this refactor unless explicitly requested.
 
 ## Latest Log
+
+## 2026-05-19 - 003-master-dashboard-data-layer: Master Dashboard Data Layer
+
+Status: Complete
+
+### Files changed
+- `supabase/migrations/20260519_create_master_dashboard_tables.sql`
+- `lib/functions/master-dashboard/types.ts`
+- `lib/functions/master-dashboard/getDashboardProjects.ts`
+- `lib/functions/master-dashboard/getDashboardLeads.ts`
+- `lib/functions/master-dashboard/getDashboardMoney.ts`
+- `lib/functions/master-dashboard/getDashboardDecisions.ts`
+- `lib/functions/master-dashboard/getDashboardSystemLinks.ts`
+- `lib/functions/master-dashboard/getMasterDashboardOverview.ts`
+- `app/api/dashboard/projects/route.ts`
+- `app/api/dashboard/leads/route.ts`
+- `app/api/dashboard/money/route.ts`
+- `app/api/dashboard/decisions/route.ts`
+- `app/api/dashboard/system-links/route.ts`
+- `Agents.md`
+- `CLAUDE.md`
+- `README.md`
+- `context/architecture-context.md`
+- `context/project-overview.md`
+- `context/feature-specs/003-master-dashboard-data-layer.md`
+- `context/progress-tracker.md`
+
+### What changed
+- Added a Supabase migration that creates the six owner-only operational tables: `dashboard_projects`, `dashboard_leads`, `dashboard_clients`, `dashboard_money_entries`, `dashboard_decisions`, and `dashboard_system_links`.
+- Added a shared `public.set_updated_at()` trigger helper because no equivalent existed in earlier migrations, and wired `updated_at` triggers on all dashboard tables that carry that column.
+- Added common indexes for status, priority, follow-up, and occurred-on lookups per spec.
+- Enabled row-level security with no permissive policies on all six tables. These tables are private and are only intended to be read or written by server-side contexts (owner-only API routes / server components using the existing `requireOwnerClient` helper or service-role usage where appropriate).
+- Created typed contracts in `lib/functions/master-dashboard/types.ts` for `DashboardProject`, `DashboardLead`, `DashboardClient`, `DashboardMoneyEntry`, `DashboardDecision`, `DashboardSystemLink`, and `MasterDashboardOverview`. These are independent from the UI shell types in `components/app/master_dashboard/types.ts`.
+- Created per-resource read helpers using the cookie-aware server Supabase client: `getDashboardProjects`, `getDashboardLeads`, `getDashboardMoney` (plus `summarizeMoneyEntries`), `getDashboardDecisions`, `getDashboardSystemLinks`.
+- Created `getMasterDashboardOverview` to compose the dashboard read in one call with sensible defaults.
+- Created owner-only API foundations under `app/api/dashboard/` for projects, leads, money, decisions, and system-links. Each route uses `requireOwnerClient` (which returns 401 unauthenticated / 403 non-owner) and exposes `GET` and a Zod-validated `POST` for inserts.
+
+### Verification
+- `npm run build`: pass; all five new dashboard API routes appear in the route map.
+- Migration was added but not applied here. The next environment that runs `supabase db push` (or equivalent) will create the new tables, the trigger helper, indexes, and RLS settings.
+
+### Known issues
+- The MasterDashboard UI shell still renders static seed data. Wiring `getMasterDashboardOverview` into `MasterDashboardView` is intentionally deferred to `004-dashboard-projects-leads-money.md` per spec direction ("It should not redesign UI beyond wiring minimal reads if safe").
+- `dashboard_clients` does not yet have an API route; spec lists projects/leads/money/decisions/system-links only. Clients are reachable directly through Supabase from server-side code and will get a route when the clients UI lands.
+- RLS is enabled with no policies. All access must go through the server-side service-role-capable Supabase client used by `requireOwnerClient`. Adding direct browser access would require explicit policies.
+
+### Next recommended spec
+- `context/feature-specs/004-dashboard-projects-leads-money.md`
 
 ## 2026-05-19 - 002-owner-dashboard-shell: Owner Dashboard Shell
 

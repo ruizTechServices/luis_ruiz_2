@@ -163,7 +163,8 @@ Current status:
 
 - Item 1 is implemented in `components/app/home/*`.
 - Item 2 is implemented as the `/gio_dash` command-center shell in `components/app/master_dashboard/*`.
-- Items 3-5 remain the active roadmap.
+- Item 3 is implemented at the data-layer level: `supabase/migrations/20260519_create_master_dashboard_tables.sql` adds the operational tables, and typed helpers and owner-only API foundations live under `lib/functions/master-dashboard/*` and `app/api/dashboard/*`.
+- Items 4-5 (wiring real reads/writes into the UI) remain the active roadmap.
 
 ## Out of Scope For This Refactor Unless Explicitly Requested
 

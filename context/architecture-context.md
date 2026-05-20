@@ -162,7 +162,7 @@ If a helper exists for requiring owner access, use it for API routes.
 
 ## New Master Dashboard Data Model
 
-Add or use tables for:
+The owner command center is backed by these dedicated operational tables:
 
 ```txt
 dashboard_projects
@@ -172,6 +172,22 @@ dashboard_money_entries
 dashboard_decisions
 dashboard_system_links
 ```
+
+These are created by `supabase/migrations/20260519_create_master_dashboard_tables.sql` together with a shared `public.set_updated_at()` trigger helper and per-table `updated_at` triggers for tables that carry that column.
+
+Indexes added for common dashboard reads:
+
+```txt
+dashboard_projects_status_idx
+dashboard_projects_priority_idx
+dashboard_leads_status_idx
+dashboard_leads_next_follow_up_idx
+dashboard_money_entries_occurred_on_idx
+dashboard_decisions_status_idx
+dashboard_system_links_status_idx
+```
+
+Row-level security is enabled on all six tables with no permissive policies. They are intentionally not directly readable from the browser. All access goes through server-side contexts that use the project's existing server Supabase client (which prefers `SUPABASE_SERVICE_ROLE_KEY` on the server) together with the `requireOwnerClient` helper for owner-only API routes.
 
 Keep these separate from the existing public `projects` table unless the feature-spec explicitly instructs linking them.
 
@@ -196,13 +212,19 @@ Owner command center components:
 components/app/master_dashboard/
 ```
 
-Dashboard data access:
+Dashboard data access (now present):
 
 ```txt
-lib/functions/master-dashboard/
+lib/functions/master-dashboard/types.ts
+lib/functions/master-dashboard/getDashboardProjects.ts
+lib/functions/master-dashboard/getDashboardLeads.ts
+lib/functions/master-dashboard/getDashboardMoney.ts
+lib/functions/master-dashboard/getDashboardDecisions.ts
+lib/functions/master-dashboard/getDashboardSystemLinks.ts
+lib/functions/master-dashboard/getMasterDashboardOverview.ts
 ```
 
-Dashboard API resources:
+Dashboard API resources (now present, owner-only via `requireOwnerClient`):
 
 ```txt
 app/api/dashboard/projects/route.ts

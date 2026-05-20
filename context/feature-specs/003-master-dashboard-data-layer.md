@@ -1,5 +1,16 @@
 # 003 — Master Dashboard Data Layer
 
+Status: Implemented on 2026-05-19.
+
+Implementation notes:
+
+- Migration `supabase/migrations/20260519_create_master_dashboard_tables.sql` creates `dashboard_projects`, `dashboard_leads`, `dashboard_clients`, `dashboard_money_entries`, `dashboard_decisions`, `dashboard_system_links`; adds a shared `public.set_updated_at()` trigger helper (no helper existed previously); attaches `updated_at` triggers to the five tables that carry that column; adds the indexes listed in the spec; and enables RLS with no permissive policies so these private tables are not directly readable from the browser.
+- Typed contracts and read helpers live under `lib/functions/master-dashboard/`. Helpers use the existing async cookie-aware server Supabase client and accept narrow option objects rather than ad-hoc query plumbing.
+- Owner-only API foundations exist at `app/api/dashboard/{projects,leads,money,decisions,system-links}/route.ts`. Each route uses `requireOwnerClient` for 401/403 enforcement, exposes `GET`, and exposes a Zod-validated `POST` for inserts.
+- `dashboard_clients` has no API route in this pass because the spec listed routes for projects/leads/money/decisions/system-links only. The clients table is otherwise complete and readable from server-side code.
+- The MasterDashboard UI shell still renders static seed data; wiring real reads into `MasterDashboardView` is intentionally deferred to `004-dashboard-projects-leads-money.md` per the spec direction "It should not redesign UI beyond wiring minimal reads if safe."
+- `npm run build` passes with all five new dashboard API routes appearing in the route map.
+
 ## Goal
 
 Create the Supabase-backed data layer for the owner command center.

@@ -112,6 +112,12 @@ Capabilities present in code:
 
 Systemically, `gio_dash` is acting as a lightweight internal CMS and ops console rather than a generic admin panel. Its main page now renders the command-center shell from `components/app/master_dashboard/*`, while older useful admin cards remain available lower on the page as legacy site-admin tools.
 
+The master dashboard now has a dedicated operational data layer:
+
+- migration: `supabase/migrations/20260519_create_master_dashboard_tables.sql` adds `dashboard_projects`, `dashboard_leads`, `dashboard_clients`, `dashboard_money_entries`, `dashboard_decisions`, `dashboard_system_links` and a shared `public.set_updated_at()` trigger helper. RLS is enabled with no permissive policies, so access is server-side only.
+- typed read helpers and shared types live in `lib/functions/master-dashboard/` (`getDashboardProjects`, `getDashboardLeads`, `getDashboardMoney` + `summarizeMoneyEntries`, `getDashboardDecisions`, `getDashboardSystemLinks`, `getMasterDashboardOverview`).
+- owner-only API foundations live under `app/api/dashboard/{projects,leads,money,decisions,system-links}/route.ts`. Each route uses `requireOwnerClient` for 401/403 enforcement and exposes a `GET` and a Zod-validated `POST`.
+
 ### 6. Photos / Media Domain
 
 Photos are managed via Supabase Storage:
@@ -213,6 +219,12 @@ The code indicates these main persisted domains:
 - `nucleus_credit_transactions`
 - `nucleus_usage_logs`
 - pricing and package tables for Nucleus
+- `dashboard_projects`
+- `dashboard_leads`
+- `dashboard_clients`
+- `dashboard_money_entries`
+- `dashboard_decisions`
+- `dashboard_system_links`
 
 Supabase Storage is also part of the data model through the photos bucket.
 
