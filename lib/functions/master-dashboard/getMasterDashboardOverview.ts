@@ -16,14 +16,14 @@ export type GetMasterDashboardOverviewOptions = {
 export async function getMasterDashboardOverview(
   options: GetMasterDashboardOverviewOptions = {}
 ): Promise<MasterDashboardOverview> {
-  const projectLimit = options.projectLimit ?? 12;
-  const leadLimit = options.leadLimit ?? 12;
-  const moneyLimit = options.moneyLimit ?? 25;
-  const decisionLimit = options.decisionLimit ?? 10;
-  const systemLinkLimit = options.systemLinkLimit ?? 20;
+  const projectLimit = options.projectLimit ?? 5;
+  const leadLimit = options.leadLimit ?? 5;
+  const moneyLimit = options.moneyLimit ?? 100;
+  const decisionLimit = options.decisionLimit ?? 5;
+  const systemLinkLimit = options.systemLinkLimit ?? 8;
 
   const [projects, leads, recent_money, decisions, system_links] = await Promise.all([
-    getDashboardProjects({ limit: projectLimit }),
+    getDashboardProjects({ activeOnly: true, limit: projectLimit }),
     getDashboardLeads({ openOnly: true, limit: leadLimit }),
     getDashboardMoney({ limit: moneyLimit }),
     getDashboardDecisions({ status: "active", limit: decisionLimit }),
@@ -36,7 +36,10 @@ export async function getMasterDashboardOverview(
     recent_money,
     decisions,
     system_links,
-    money_summary: summarizeMoneyEntries(recent_money),
+    money_summary: summarizeMoneyEntries(recent_money, {
+      openLeads: leads,
+      openProjects: projects,
+    }),
     generated_at: new Date().toISOString(),
   };
 }

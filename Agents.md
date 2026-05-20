@@ -6,14 +6,15 @@ This file is derived from the codebase and SQL migrations, not from existing Mar
 
 ## System Identity
 
-This repository is a Next.js 15 application that combines six product layers inside one deployable system:
+This repository is a Next.js 15 application that combines seven product layers inside one deployable system:
 
 1. A public personal/business site for Luis Ruiz and ruizTechServices.
 2. A public projects and case-study surface backed by Supabase.
 3. A public blog/build-log surface backed by Supabase.
 4. An owner-only operations dashboard under `app/gio_dash`.
-5. Several AI experiment surfaces, including Ollama chat and a multi-model round-robin discussion tool.
-6. A separately consumable API product called Nucleus with bearer-token auth, credit accounting, subscription logic, and model proxy endpoints.
+5. A client/user dashboard foundation under `app/dashboard`.
+6. Several AI experiment surfaces, including Ollama chat and a multi-model round-robin discussion tool.
+7. A separately consumable API product called Nucleus with bearer-token auth, credit accounting, subscription logic, and model proxy endpoints.
 
 The codebase is not a single-purpose app. It is a portfolio site, CMS, AI sandbox, and paid API product sharing one runtime and one Supabase backend.
 
@@ -115,10 +116,29 @@ Systemically, `gio_dash` is acting as a lightweight internal CMS and ops console
 The master dashboard now has a dedicated operational data layer:
 
 - migration: `supabase/migrations/20260519_create_master_dashboard_tables.sql` adds `dashboard_projects`, `dashboard_leads`, `dashboard_clients`, `dashboard_money_entries`, `dashboard_decisions`, `dashboard_system_links` and a shared `public.set_updated_at()` trigger helper. RLS is enabled with no permissive policies, so access is server-side only.
-- typed read helpers and shared types live in `lib/functions/master-dashboard/` (`getDashboardProjects`, `getDashboardLeads`, `getDashboardMoney` + `summarizeMoneyEntries`, `getDashboardDecisions`, `getDashboardSystemLinks`, `getMasterDashboardOverview`).
-- owner-only API foundations live under `app/api/dashboard/{projects,leads,money,decisions,system-links}/route.ts`. Each route uses `requireOwnerClient` for 401/403 enforcement and exposes a `GET` and a Zod-validated `POST`.
+- typed read helpers and shared types live in `lib/functions/master-dashboard/` (`getDashboardProjects` with `ACTIVE_PROJECT_STATUSES` + `activeOnly`, `getDashboardLeads` with `OPEN_LEAD_STATUSES` + `openOnly`, `getDashboardMoney` + `summarizeMoneyEntries` with open lead/project opportunity, `getDashboardDecisions`, `getDashboardSystemLinks`, `getMasterDashboardOverview`).
+- owner-only API foundations live under `app/api/dashboard/{projects,leads,money,decisions,system-links}/route.ts`. Each route uses `requireOwnerClient` for 401/403 enforcement and exposes a `GET` and a Zod-validated `POST`. After owner verification, private dashboard table access uses a cookie-free service-role Supabase client so RLS with no public policies does not block server-only reads.
+- The Today Focus, Revenue Snapshot, Open Leads, Active Projects, System Links, and Decisions Log cards on `/gio_dash` read live data through `getMasterDashboardOverview` and degrade to spec-aligned empty states. Read-only owner section pages at `/gio_dash/leads`, `/gio_dash/money`, `/gio_dash/systems`, and `/gio_dash/notes` surface fuller tables backed by the same helpers. `/gio_dash/projects` remains the existing public-projects portfolio editor.
 
-### 6. Photos / Media Domain
+### 6. Client Dashboard Domain
+
+The `/dashboard` route is the authenticated non-owner client portal foundation.
+
+Access model:
+
+- unauthenticated users redirect to `/login`
+- owner users redirect to `/gio_dash`
+- signed-in non-owner users render `components/app/client_dashboard/ClientDashboardView`
+
+Current behavior:
+
+- the shell is placeholder-only until client-specific records exist
+- sections include Project Status, Recent Updates, Deliverables, Invoices / Payments, Messages, and Support / Contact Gio
+- the route does not read owner-only dashboard operational tables or private owner records
+
+Systemically, this is the future customer portal surface. It is separate from Gio's private `/gio_dash` command center and from the public homepage.
+
+### 7. Photos / Media Domain
 
 Photos are managed via Supabase Storage:
 
@@ -132,7 +152,7 @@ The API generates signed URLs and falls back to public URLs where necessary.
 
 Systemically, this is the media pipeline for site-controlled assets, especially dashboard-managed imagery.
 
-### 7. Ollama Chat / Memory Domain
+### 8. Ollama Chat / Memory Domain
 
 There are two Ollama-facing chat surfaces:
 
@@ -150,7 +170,7 @@ The richer route does the following:
 
 Systemically, this is a local-model chat product with optional RAG-style memory augmentation layered on top.
 
-### 8. Round-Robin Multi-Model Discussion Domain
+### 9. Round-Robin Multi-Model Discussion Domain
 
 The round-robin feature is a stateful orchestration system:
 
@@ -172,7 +192,7 @@ Important systemic behavior:
 
 This matters: the architecture suggests planned modularity, but the live orchestration still sits inside the SSE route. Any future work on this subsystem should treat that route as the current source of truth.
 
-### 9. Nucleus API Product Domain
+### 10. Nucleus API Product Domain
 
 Nucleus is the most productized backend surface in the repo.
 
@@ -306,11 +326,12 @@ If the codebase is operating as intended, the systemic behavior should be:
 2. Projects and blog posts reinforce each other through shared relational data.
 3. Contact submissions become structured records in Supabase for owner follow-up.
 4. The owner dashboard acts as the control plane for content, media, contacts, and diagnostics.
-5. AI experiments remain available as product demonstrations and internal tooling.
-6. Ollama chat supports persistent, optionally context-aware local conversations.
-7. Round-robin sessions allow model-to-model discussion with recoverable session state.
-8. Nucleus exposes a separate authenticated API product with credit/subscription enforcement and usage tracking.
-9. GitHub and health endpoints provide operational visibility into live systems and dependencies.
+5. Signed-in non-owner users see a client dashboard foundation without owner-private data.
+6. AI experiments remain available as product demonstrations and internal tooling.
+7. Ollama chat supports persistent, optionally context-aware local conversations.
+8. Round-robin sessions allow model-to-model discussion with recoverable session state.
+9. Nucleus exposes a separate authenticated API product with credit/subscription enforcement and usage tracking.
+10. GitHub and health endpoints provide operational visibility into live systems and dependencies.
 
 That is the real systemic shape: one brand/site layer on top, one operations layer behind it, and several AI service layers attached to the same backend.
 
@@ -342,6 +363,7 @@ The best mental model for this repository is:
 - frontend shell and public brand site
 - content and proof-of-work CMS
 - owner ops console
+- client portal foundation
 - AI experimentation lab
 - monetizable API backend
 

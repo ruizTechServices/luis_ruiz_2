@@ -152,8 +152,31 @@ Blocked: <count>
 Implementation status:
 
 - `/gio_dash` now renders this shell from `components/app/master_dashboard/*`.
-- Temporary placeholder/seed data is used for revenue, leads, active projects, decisions, system links, and AI tools.
+- Live dashboard table data is used for revenue, leads, active projects, decisions, and system links. Content Queue and AI Tools still use static shell data until later specs.
 - Existing useful admin cards remain available lower on the page under `Legacy Admin Tools`.
+
+## Client Dashboard UI Direction
+
+`/dashboard` is the signed-in non-owner client portal foundation. Owner users still redirect to `/gio_dash`.
+
+Implemented first screen:
+
+```txt
+Client Dashboard
+Project Status
+Recent Updates
+Deliverables
+Invoices / Payments
+Messages
+Support / Contact Gio
+```
+
+Implementation status:
+
+- `/dashboard` now renders `components/app/client_dashboard/*`.
+- Cards are placeholder-only until client-specific project, deliverable, invoice, and message data exists.
+- The page uses public/client-safe copy and does not expose owner operational records.
+- The support card routes users to `/contact` as the current support path.
 
 ## Dashboard Card Rules
 
@@ -243,9 +266,8 @@ qualified
 proposal_sent
 deposit_paid
 in_progress
-delivered
+won
 lost
-archived
 ```
 
 Systems:
@@ -263,8 +285,7 @@ Decisions:
 ```txt
 active
 revisit
-reversed
-archived
+retired
 ```
 
 ## Navigation Direction

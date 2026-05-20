@@ -1,5 +1,18 @@
 # 005 — System Links and Decisions
 
+Status: Implemented on 2026-05-20.
+
+Implementation notes:
+
+- `SystemLinksCard` now reads `overview.system_links` and renders compact active rows with name, type, status, priority, and open-link actions.
+- `DecisionsLogCard` now reads `overview.decisions` and renders recent active decisions with title, summary, status, created date, and revisit date when present.
+- `getMasterDashboardOverview` limits overview decisions to 5 and active system links to 8.
+- `/api/dashboard/system-links` accepts spec type/status values and allows either `http(s)` URLs or internal paths beginning with `/`.
+- Dashboard private table helpers and owner-only dashboard APIs now use a cookie-free service-role client after owner verification, preserving the RLS/no-public-policy boundary without breaking owner server reads.
+- Read-only owner section pages exist at `/gio_dash/systems` and `/gio_dash/notes`.
+- Live owner-only Supabase data was initialized idempotently with 10 active system links and 5 active decisions so `/gio_dash` shows useful rows immediately.
+- `npm run build` passes with `/gio_dash/systems` and `/gio_dash/notes` in the route map.
+
 ## Goal
 
 Add operational visibility for:

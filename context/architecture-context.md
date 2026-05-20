@@ -111,9 +111,13 @@ Current command-center shell:
 - AI Tools
 ```
 
-The shell uses temporary static data until dashboard persistence exists. Useful legacy admin tools are preserved lower on the page under `Legacy Admin Tools`, including quick actions, system health, contacts inbox, GitHub snapshot, and content analytics.
+The Today Focus, Revenue Snapshot, Open Leads, Active Projects, System Links, and Decisions Log cards are wired through `getMasterDashboardOverview` to the dashboard operational tables. Content Queue and AI Tools still use static seed data until their respective specs ship. Useful legacy admin tools are preserved lower on the page under `Legacy Admin Tools`, including quick actions, system health, contacts inbox, GitHub snapshot, and content analytics.
 
-## Existing Client/User Dashboard
+Active project filtering uses `ACTIVE_PROJECT_STATUSES` (idea, validated, building, testing, shipped, selling) and excludes paused/archived. Open lead filtering uses `OPEN_LEAD_STATUSES` (new, contacted, qualified, proposal_sent, deposit_paid, in_progress). The revenue snapshot computes `open_opportunity_value` from open lead budgets plus active project `revenue_potential`.
+
+Optional read-only owner section pages live at `app/gio_dash/leads/page.tsx`, `app/gio_dash/money/page.tsx`, `app/gio_dash/systems/page.tsx`, and `app/gio_dash/notes/page.tsx`. The pre-existing `app/gio_dash/projects/page.tsx` is the public-projects (portfolio) editor and remains untouched; the operational `dashboard_projects` table is surfaced through the dashboard cards and the `/api/dashboard/projects` route.
+
+## Current Client/User Dashboard
 
 Current route:
 
@@ -121,13 +125,15 @@ Current route:
 app/dashboard/page.tsx
 ```
 
-Existing behavior:
+Current behavior:
 
 - requires signed-in user
-- redirects owner to `/gio_dash`
-- shows a basic user dashboard with blog updates
+- redirects unauthenticated users to `/login`
+- redirects owner users to `/gio_dash`
+- renders `components/app/client_dashboard/ClientDashboardView` for signed-in non-owner users
+- shows placeholder client-facing cards for Project Status, Recent Updates, Deliverables, Invoices / Payments, Messages, and Support / Contact Gio
 
-Preserve owner redirect behavior.
+The route does not read owner-only dashboard operational tables or private owner records.
 
 Future direction:
 
@@ -175,6 +181,8 @@ dashboard_system_links
 
 These are created by `supabase/migrations/20260519_create_master_dashboard_tables.sql` together with a shared `public.set_updated_at()` trigger helper and per-table `updated_at` triggers for tables that carry that column.
 
+Live project status: the migration has been applied to the `luis-ruiz` Supabase project (`huyhgdsjpdjzokjwaspb`) as `20260520064736_create_master_dashboard_tables`. On 2026-05-20 the live schema was verified to contain the six tables, RLS enabled with zero public policies, the trigger helper, and expected update triggers. A small owner-only starter dataset exists in `dashboard_system_links` and `dashboard_decisions`; projects, leads, and money entries remain empty until operational records are added.
+
 Indexes added for common dashboard reads:
 
 ```txt
@@ -187,7 +195,7 @@ dashboard_decisions_status_idx
 dashboard_system_links_status_idx
 ```
 
-Row-level security is enabled on all six tables with no permissive policies. They are intentionally not directly readable from the browser. All access goes through server-side contexts that use the project's existing server Supabase client (which prefers `SUPABASE_SERVICE_ROLE_KEY` on the server) together with the `requireOwnerClient` helper for owner-only API routes.
+Row-level security is enabled on all six tables with no permissive policies. They are intentionally not directly readable from the browser. All dashboard table access goes through server-side contexts after owner verification. Reads use `lib/functions/master-dashboard/getDashboardSupabase.ts`, which creates a cookie-free service-role client, and owner-only API routes use `requireOwnerClient`, which verifies the cookie session with the anon server client before returning the same cookie-free service-role client for private table mutation/query work.
 
 Keep these separate from the existing public `projects` table unless the feature-spec explicitly instructs linking them.
 
@@ -210,6 +218,12 @@ Owner command center components:
 
 ```txt
 components/app/master_dashboard/
+```
+
+Client dashboard components:
+
+```txt
+components/app/client_dashboard/
 ```
 
 Dashboard data access (now present):

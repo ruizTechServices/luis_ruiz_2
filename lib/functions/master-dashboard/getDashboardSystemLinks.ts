@@ -1,4 +1,4 @@
-import { createClient as createServerClient } from "@/lib/clients/supabase/server";
+import { getDashboardSupabase } from "./getDashboardSupabase";
 import type { DashboardSystemLink } from "./types";
 
 const DASHBOARD_SYSTEM_LINKS_SELECT = [
@@ -22,7 +22,7 @@ export type GetDashboardSystemLinksOptions = {
 export async function getDashboardSystemLinks(
   options: GetDashboardSystemLinksOptions = {}
 ): Promise<DashboardSystemLink[]> {
-  const supabase = await createServerClient();
+  const supabase = getDashboardSupabase();
   let query = supabase
     .from("dashboard_system_links")
     .select(DASHBOARD_SYSTEM_LINKS_SELECT)

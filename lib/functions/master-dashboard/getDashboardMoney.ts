@@ -1,5 +1,10 @@
-import { createClient as createServerClient } from "@/lib/clients/supabase/server";
-import type { DashboardMoneyEntry, MasterDashboardMoneySummary } from "./types";
+import { getDashboardSupabase } from "./getDashboardSupabase";
+import type {
+  DashboardLead,
+  DashboardMoneyEntry,
+  DashboardProject,
+  MasterDashboardMoneySummary,
+} from "./types";
 
 const DASHBOARD_MONEY_SELECT = [
   "id",
@@ -22,7 +27,7 @@ export type GetDashboardMoneyOptions = {
 export async function getDashboardMoney(
   options: GetDashboardMoneyOptions = {}
 ): Promise<DashboardMoneyEntry[]> {
-  const supabase = await createServerClient();
+  const supabase = getDashboardSupabase();
   let query = supabase
     .from("dashboard_money_entries")
     .select(DASHBOARD_MONEY_SELECT)
@@ -44,8 +49,14 @@ export async function getDashboardMoney(
   return data ?? [];
 }
 
+export type SummarizeMoneyEntriesOptions = {
+  openLeads?: DashboardLead[];
+  openProjects?: DashboardProject[];
+};
+
 export function summarizeMoneyEntries(
-  entries: DashboardMoneyEntry[]
+  entries: DashboardMoneyEntry[],
+  options: SummarizeMoneyEntriesOptions = {}
 ): MasterDashboardMoneySummary {
   let total_income = 0;
   let total_expense = 0;
@@ -59,10 +70,25 @@ export function summarizeMoneyEntries(
     }
   }
 
+  let open_opportunity_value = 0;
+  if (options.openLeads) {
+    for (const lead of options.openLeads) {
+      const budget = Number(lead.budget) || 0;
+      if (budget > 0) open_opportunity_value += budget;
+    }
+  }
+  if (options.openProjects) {
+    for (const project of options.openProjects) {
+      const potential = Number(project.revenue_potential) || 0;
+      if (potential > 0) open_opportunity_value += potential;
+    }
+  }
+
   return {
     total_income,
     total_expense,
     net: total_income - total_expense,
     entries_count: entries.length,
+    open_opportunity_value,
   };
 }

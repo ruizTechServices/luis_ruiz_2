@@ -1,4 +1,4 @@
-import { createClient as createServerClient } from "@/lib/clients/supabase/server";
+import { getDashboardSupabase } from "./getDashboardSupabase";
 import type { DashboardLead } from "./types";
 
 const DASHBOARD_LEADS_SELECT = [
@@ -23,12 +23,19 @@ export type GetDashboardLeadsOptions = {
   limit?: number;
 };
 
-const OPEN_LEAD_STATUSES = ["new", "contacted", "qualified", "proposal"];
+export const OPEN_LEAD_STATUSES = [
+  "new",
+  "contacted",
+  "qualified",
+  "proposal_sent",
+  "deposit_paid",
+  "in_progress",
+];
 
 export async function getDashboardLeads(
   options: GetDashboardLeadsOptions = {}
 ): Promise<DashboardLead[]> {
-  const supabase = await createServerClient();
+  const supabase = getDashboardSupabase();
   let query = supabase
     .from("dashboard_leads")
     .select(DASHBOARD_LEADS_SELECT)

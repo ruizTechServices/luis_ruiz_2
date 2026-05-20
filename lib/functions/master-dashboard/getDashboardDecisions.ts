@@ -1,4 +1,4 @@
-import { createClient as createServerClient } from "@/lib/clients/supabase/server";
+import { getDashboardSupabase } from "./getDashboardSupabase";
 import type { DashboardDecision } from "./types";
 
 const DASHBOARD_DECISIONS_SELECT = [
@@ -21,7 +21,7 @@ export type GetDashboardDecisionsOptions = {
 export async function getDashboardDecisions(
   options: GetDashboardDecisionsOptions = {}
 ): Promise<DashboardDecision[]> {
-  const supabase = await createServerClient();
+  const supabase = getDashboardSupabase();
   let query = supabase
     .from("dashboard_decisions")
     .select(DASHBOARD_DECISIONS_SELECT)

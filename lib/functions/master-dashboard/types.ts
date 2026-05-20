@@ -6,10 +6,12 @@
 export type DashboardProjectType = "internal" | "client" | "product" | "experiment" | string;
 export type DashboardProjectStatus =
   | "idea"
-  | "active"
+  | "validated"
   | "building"
-  | "paused"
+  | "testing"
   | "shipped"
+  | "selling"
+  | "paused"
   | "archived"
   | string;
 
@@ -34,7 +36,9 @@ export type DashboardLeadStatus =
   | "new"
   | "contacted"
   | "qualified"
-  | "proposal"
+  | "proposal_sent"
+  | "deposit_paid"
+  | "in_progress"
   | "won"
   | "lost"
   | string;
@@ -97,8 +101,23 @@ export type DashboardDecision = {
   updated_at: string;
 };
 
-export type DashboardSystemLinkType = "system" | "tool" | "service" | "doc" | string;
-export type DashboardSystemLinkStatus = "active" | "paused" | "archived" | string;
+export type DashboardSystemLinkType =
+  | "website"
+  | "repo"
+  | "deployment"
+  | "database"
+  | "ai_tool"
+  | "product"
+  | "admin"
+  | "external"
+  | string;
+export type DashboardSystemLinkStatus =
+  | "active"
+  | "paused"
+  | "needs_review"
+  | "broken"
+  | "archived"
+  | string;
 
 export type DashboardSystemLink = {
   id: string;
@@ -117,6 +136,7 @@ export type MasterDashboardMoneySummary = {
   total_expense: number;
   net: number;
   entries_count: number;
+  open_opportunity_value: number;
 };
 
 export type MasterDashboardOverview = {

@@ -1,4 +1,4 @@
-import { createClient as createServerClient } from "@/lib/clients/supabase/server";
+import { getDashboardSupabase } from "./getDashboardSupabase";
 import type { DashboardProject } from "./types";
 
 const DASHBOARD_PROJECTS_SELECT = [
@@ -18,15 +18,25 @@ const DASHBOARD_PROJECTS_SELECT = [
   "updated_at",
 ].join(", ");
 
+export const ACTIVE_PROJECT_STATUSES = [
+  "idea",
+  "validated",
+  "building",
+  "testing",
+  "shipped",
+  "selling",
+];
+
 export type GetDashboardProjectsOptions = {
   status?: string | string[];
+  activeOnly?: boolean;
   limit?: number;
 };
 
 export async function getDashboardProjects(
   options: GetDashboardProjectsOptions = {}
 ): Promise<DashboardProject[]> {
-  const supabase = await createServerClient();
+  const supabase = getDashboardSupabase();
   let query = supabase
     .from("dashboard_projects")
     .select(DASHBOARD_PROJECTS_SELECT)
@@ -34,7 +44,9 @@ export async function getDashboardProjects(
     .order("last_touched_at", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false });
 
-  if (options.status) {
+  if (options.activeOnly) {
+    query = query.in("status", ACTIVE_PROJECT_STATUSES);
+  } else if (options.status) {
     if (Array.isArray(options.status)) {
       query = query.in("status", options.status);
     } else {

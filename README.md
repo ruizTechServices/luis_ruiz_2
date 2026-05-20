@@ -11,7 +11,8 @@ Gio builds practical AI, web, and automation systems for small businesses, creat
 - **Public Master Hub**: Homepage for services, public systems, proof-of-work, and contact routing.
 - **Blog / Build Log**: Supabase-backed public writing with interaction features.
 - **Projects / Case Studies**: Public project records and proof-of-work.
-- **Owner Dashboard**: Owner-only operations area under `/gio_dash`.
+- **Owner Dashboard**: Owner-only operations area under `/gio_dash` with live operational cards for projects, leads, money, system links, and decisions.
+- **Client Dashboard**: Authenticated `/dashboard` foundation for future client project status, updates, deliverables, invoices, messages, and support.
 - **AI Experiments**: Ollama chat and round-robin model discussion surfaces.
 - **Nucleus API Product**: Separate API product with auth, credits, model routes, and Stripe flows.
 - **Contact System**: Structured lead intake with validation and Supabase persistence.
@@ -80,7 +81,12 @@ Gio builds practical AI, web, and automation systems for small businesses, creat
 - `/blog` - Personal blog and articles
 - `/projects` - Project showcase and portfolio
 - `/contact` - Professional contact information
-- `/gio_dash` - Owner-only command center shell
+- `/dashboard` - Signed-in client dashboard foundation; owner users redirect to `/gio_dash`
+- `/gio_dash` - Owner-only command center (Today Focus, Revenue Snapshot, Open Leads, Active Projects, System Links, and Decisions Log cards are wired to live dashboard tables)
+- `/gio_dash/leads` - Owner-only read-only operational leads table
+- `/gio_dash/money` - Owner-only read-only operational P&L table
+- `/gio_dash/systems` - Owner-only read-only system links table
+- `/gio_dash/notes` - Owner-only read-only decisions/notes list
 - `/gio_dash/photos` - Photo library (Supabase Storage-backed)
 - `/gio_dash/photos/upload` - Upload photos to Storage
 - `/ollama` - Local Ollama chat UI (streams via API)
@@ -122,3 +128,4 @@ Gio builds practical AI, web, and automation systems for small businesses, creat
 
 - Supabase OAuth callback is handled in `app/auth/callback/route.ts` (exchanges provider code for a session).
 - Set `NEXT_PUBLIC_SITE_URL` or `SITE_URL` for accurate redirects in dev/prod (defaults to `http://localhost:5000`).
+- `/dashboard` redirects unauthenticated users to `/login`, redirects owner users to `/gio_dash`, and renders the client portal shell for signed-in non-owner users.

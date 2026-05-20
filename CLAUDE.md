@@ -20,8 +20,8 @@ context/feature-specs/
 `luis-ruiz.com` is being refactored from a portfolio-heavy site into Gio's master hub:
 
 1. Public master hub at `/` for credibility, services, proof-of-work, and lead capture. First pass implemented in `components/app/home/*`.
-2. Owner-only command center at `/gio_dash`. First shell pass implemented in `components/app/master_dashboard/*`.
-3. Future client/user portal at `/dashboard`.
+2. Owner-only command center at `/gio_dash`. Shell implemented in `components/app/master_dashboard/*`; Today Focus, Revenue Snapshot, Open Leads, Active Projects, System Links, and Decisions Log cards now read live data through `getMasterDashboardOverview`. Read-only owner section pages live at `/gio_dash/leads`, `/gio_dash/money`, `/gio_dash/systems`, and `/gio_dash/notes`.
+3. Client/user portal foundation at `/dashboard`, implemented in `components/app/client_dashboard/*`; signed-in non-owner users see placeholder client cards and owner users still redirect to `/gio_dash`.
 4. Supabase-backed data layer for dashboard projects, leads, clients, money entries, decisions, and system links. Migration, typed helpers, and owner-only API foundations live under `supabase/migrations/`, `lib/functions/master-dashboard/`, and `app/api/dashboard/`.
 
 ## Existing Technical Foundation

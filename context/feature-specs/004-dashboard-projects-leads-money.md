@@ -1,5 +1,9 @@
 # 004 — Dashboard Projects, Leads, and Money
 
+Status: Implemented on 2026-05-20.
+
+Post-implementation note: the spec 003 live Supabase migration gap was resolved on 2026-05-20 before spec 005. The live dashboard tables now exist; projects, leads, and money entries are currently true empty datasets until operational records are added.
+
 ## Goal
 
 Wire the owner dashboard to real operational data for:

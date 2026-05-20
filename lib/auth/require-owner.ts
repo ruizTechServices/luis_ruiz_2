@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAnonServerClient } from "@/lib/clients/supabase/anon-server";
-import { createClient as createServerClient } from "@/lib/clients/supabase/server";
+import { createServiceRoleClient } from "@/lib/clients/supabase/service-role";
 import { isOwner } from "./ownership";
 
 /**
@@ -8,7 +8,7 @@ import { isOwner } from "./ownership";
  * Returns an error response if auth fails or user is not an owner.
  */
 export async function requireOwnerClient(): Promise<
-  { supabase: Awaited<ReturnType<typeof createServerClient>>; errorResponse?: never } |
+  { supabase: NonNullable<ReturnType<typeof createServiceRoleClient>>; errorResponse?: never } |
   { supabase?: never; errorResponse: NextResponse }
 > {
   try {
@@ -27,7 +27,16 @@ export async function requireOwnerClient(): Promise<
       return { errorResponse: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };
     }
 
-    const supabase = await createServerClient();
+    const supabase = createServiceRoleClient();
+    if (!supabase) {
+      return {
+        errorResponse: NextResponse.json(
+          { error: "Dashboard Supabase service-role client is not configured" },
+          { status: 500 }
+        ),
+      };
+    }
+
     return { supabase };
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);

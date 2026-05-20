@@ -1,5 +1,17 @@
 # 006 — Client Dashboard Foundation
 
+Status: Implemented on 2026-05-20.
+
+Implementation notes:
+
+- `/dashboard` still requires a Supabase-authenticated user.
+- Owner users are still redirected from `/dashboard` to `/gio_dash`.
+- Non-owner authenticated users now render `ClientDashboardView`.
+- The client dashboard shell lives in `components/app/client_dashboard/*`.
+- The shell includes placeholder client-facing sections for Project Status, Recent Updates, Deliverables, Invoices / Payments, Messages, and Support / Contact Gio.
+- No owner-only dashboard operational tables or private owner records are read by `/dashboard`.
+- `npm run build` passes, and an unauthenticated runtime check returned `307` to `/login`.
+
 ## Goal
 
 Refine `/dashboard` into a clean foundation for future clients/users while preserving the current owner redirect to `/gio_dash`.

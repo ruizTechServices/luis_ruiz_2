@@ -10,6 +10,7 @@ Implementation notes:
 - `dashboard_clients` has no API route in this pass because the spec listed routes for projects/leads/money/decisions/system-links only. The clients table is otherwise complete and readable from server-side code.
 - The MasterDashboard UI shell still renders static seed data; wiring real reads into `MasterDashboardView` is intentionally deferred to `004-dashboard-projects-leads-money.md` per the spec direction "It should not redesign UI beyond wiring minimal reads if safe."
 - `npm run build` passes with all five new dashboard API routes appearing in the route map.
+- Live application note: on 2026-05-20 this migration was applied to the live `luis-ruiz` Supabase project (`huyhgdsjpdjzokjwaspb`) as `20260520064736_create_master_dashboard_tables`. The six dashboard tables, RLS settings, `public.set_updated_at()`, and expected triggers were verified after application.
 
 ## Goal
 

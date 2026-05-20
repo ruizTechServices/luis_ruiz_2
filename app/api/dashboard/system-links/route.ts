@@ -7,10 +7,28 @@ export const dynamic = "force-dynamic";
 
 const createSystemLinkSchema = z.object({
   name: z.string().trim().min(1).max(200),
-  url: z.string().trim().url().max(500),
+  url: z
+    .string()
+    .trim()
+    .max(500)
+    .refine((value) => {
+      if (value.startsWith("/")) return true;
+      try {
+        const parsed = new URL(value);
+        return parsed.protocol === "http:" || parsed.protocol === "https:";
+      } catch {
+        return false;
+      }
+    }, "Must be an absolute http(s) URL or an internal path starting with /."),
   description: z.string().trim().max(500).optional().nullable(),
-  type: z.string().trim().max(50).optional(),
-  status: z.string().trim().max(50).optional(),
+  type: z
+    .enum(["website", "repo", "deployment", "database", "ai_tool", "product", "admin", "external"])
+    .optional()
+    .default("external"),
+  status: z
+    .enum(["active", "paused", "needs_review", "broken", "archived"])
+    .optional()
+    .default("active"),
   priority: z.number().int().min(1).max(5).optional(),
 });
 
