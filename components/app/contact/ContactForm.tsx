@@ -15,7 +15,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
@@ -209,14 +208,13 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
 
         <Collapsible open={showMoreDetails} onOpenChange={setShowMoreDetails}>
           <CollapsibleTrigger asChild>
-            <Button
+            <button
               type="button"
-              variant="ghost"
-              className="flex w-full items-center justify-center gap-2 text-muted-foreground hover:text-foreground"
+              className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-white/10 bg-transparent px-3 py-2.5 text-sm font-medium text-slate-300 transition hover:border-teal-300/30 hover:bg-white/[0.03] hover:text-teal-200"
             >
-              <span>{showMoreDetails ? "Hide" : "Add more"} scope details</span>
+              <span>{showMoreDetails ? "Hide" : "Add"} scope details</span>
               <ChevronDownIcon className={`h-4 w-4 transition-transform ${showMoreDetails ? "rotate-180" : ""}`} />
-            </Button>
+            </button>
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-6 pt-4">
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -310,10 +308,14 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
           )}
         />
 
-        <div className="pt-6">
-          <Button className="w-full" disabled={isSubmitting} type="submit">
+        <div className="pt-2">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-[10px] bg-blue-600 text-[14px] font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
             {isSubmitting ? "Sending..." : submitLabel}
-          </Button>
+          </button>
         </div>
       </form>
     </Form>

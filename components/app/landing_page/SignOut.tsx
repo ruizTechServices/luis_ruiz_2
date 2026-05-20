@@ -16,7 +16,13 @@ export default function SignOut({ redirectTo = "/", className, children }: SignO
   }
 
   return (
-    <button onClick={handle} className={cn("border px-3 py-1 rounded hover:bg-gray-50", className)}>
+    <button
+      onClick={handle}
+      className={cn(
+        "inline-flex h-9 items-center justify-center rounded-md border border-white/15 bg-white/[0.04] px-3 text-[13px] font-medium text-slate-200 transition hover:border-white/25 hover:bg-white/[0.08] hover:text-white",
+        className,
+      )}
+    >
       {children ?? "Sign out"}
     </button>
   );

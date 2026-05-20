@@ -1,11 +1,37 @@
 "use client";
 
 import { useState } from "react";
+import { GitBranch, Mail, MapPin, Phone } from "lucide-react";
 
 import { ContactForm } from "@/components/app/contact/ContactForm";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 type SubmissionStatus = "idle" | "success" | "error";
+
+const metaItems = [
+  {
+    icon: Mail,
+    label: "Email",
+    value: "ruiztechservices@gmail.com",
+    href: "mailto:ruiztechservices@gmail.com",
+  },
+  {
+    icon: Phone,
+    label: "Phone (NYC clients)",
+    value: "email for number",
+    href: "mailto:ruiztechservices@gmail.com",
+  },
+  {
+    icon: MapPin,
+    label: "Based in",
+    value: "New York, NY · remote globally",
+  },
+  {
+    icon: GitBranch,
+    label: "Open source",
+    value: "github.com/ruizTechServices",
+    href: "https://github.com/ruizTechServices",
+  },
+];
 
 export default function ContactFormClient() {
   const [status, setStatus] = useState<SubmissionStatus>("idle");
@@ -22,65 +48,106 @@ export default function ContactFormClient() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 px-4 py-12 dark:from-slate-900 dark:to-slate-800 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-3xl">
-        <div className="rounded-2xl bg-white p-8 shadow-xl dark:bg-slate-800 sm:p-12">
-          <div className="mb-8 text-center">
-            <h1 className="mb-3 text-3xl font-bold text-gray-900 dark:text-white">Start a project conversation</h1>
-            <p className="mx-auto max-w-2xl text-gray-600 dark:text-gray-300">
-              This contact flow is for founders, small businesses, and serious collaborators who want help building a real product, AI workflow, or business system. Send the essentials first, then we can narrow scope, fit, and next steps.
-            </p>
-          </div>
+    <div
+      className="relative isolate min-h-[calc(100vh-72px)] px-6 py-14 lg:px-8"
+      style={{
+        background:
+          "radial-gradient(80% 50% at 100% 0%, rgba(56,189,248,0.08), transparent 60%), radial-gradient(60% 40% at 0% 100%, rgba(94,234,212,0.06), transparent 70%), #020617",
+      }}
+    >
+      <div className="mx-auto grid max-w-6xl items-start gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+        {/* Left rail */}
+        <aside className="lg:sticky lg:top-24">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-teal-300">
+            Start a project
+          </p>
+          <h1 className="mt-3 text-[44px] font-semibold leading-[1.1] tracking-[-0.025em] text-slate-50">
+            Tell Gio what you&apos;re trying to ship.
+          </h1>
+          <p className="mt-4 max-w-xl text-base leading-7 text-slate-300">
+            One conversation, scoped honestly. No sales funnel — you&apos;ll talk to Gio
+            directly. Free to discuss; quoted once we agree on the system we&apos;re
+            building.
+          </p>
 
-          <div className="mb-8 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300">
-            <p className="font-semibold text-slate-900 dark:text-white">What happens after you submit</p>
-            <ul className="mt-3 space-y-2">
-              <li>1. Your message lands in the admin intake queue.</li>
-              <li>2. I review the project type, scope, timeline, and whether it looks like a real fit.</li>
-              <li>3. If it makes sense, I follow up with next-step questions, a recommended path, or a conversation invite.</li>
-            </ul>
-          </div>
-
-          <div className="space-y-6">
-            {status === "success" && (
-              <Alert className="border-green-200 bg-green-50 text-green-900">
-                <AlertTitle>Message sent.</AlertTitle>
-                <AlertDescription>
-                  Your note is in the intake queue. Next step is review, then a reply with either follow-up questions or a recommended path.
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {status === "error" && (
-              <Alert variant="destructive">
-                <AlertTitle>Submission failed</AlertTitle>
-                <AlertDescription>{errorMessage ?? "Something went wrong. Please try again."}</AlertDescription>
-              </Alert>
-            )}
-
-            <ContactForm onSuccess={handleSuccess} onFailure={handleFailure} />
-
-            <div className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-700">
-              <div className="text-center text-gray-600 dark:text-gray-300">
-                <p className="mb-2">Or reach out directly:</p>
-                <div className="flex flex-col items-center justify-center space-y-2 sm:flex-row sm:space-x-6 sm:space-y-0">
-                  <a href="mailto:ruiztechservices@gmail.com" className="flex items-center transition-colors hover:text-indigo-600">
-                    <svg className="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                    </svg>
-                    ruizTechServices Email
-                  </a>
-                  <a href="phone number" className="flex items-center transition-colors hover:text-indigo-600">
-                    <svg className="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                    </svg>
-                    +1 (917) 993-6701
-                  </a>
-                </div>
+          <div className="mt-7 flex items-center gap-3 rounded-xl border border-emerald-400/25 bg-emerald-500/10 px-3.5 py-3">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/70" />
+              <span className="relative h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(34,197,94,0.7)]" />
+            </span>
+            <div className="text-[13px] font-semibold text-emerald-300">
+              Taking on 2 new builds this quarter
+              <div className="mt-0.5 text-[12px] font-normal text-emerald-300/70">
+                Most replies within 1 business day · ET (NYC)
               </div>
             </div>
           </div>
+
+          <ul className="mt-8 flex flex-col gap-3.5">
+            {metaItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <li key={item.label} className="grid grid-cols-[32px_1fr] items-start gap-3.5">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-sky-300">
+                    <Icon className="h-4 w-4" />
+                  </span>
+                  <div>
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                      {item.label}
+                    </div>
+                    <div className="mt-0.5 text-[14px] font-medium text-slate-50">
+                      {item.href ? (
+                        <a
+                          href={item.href}
+                          className="text-teal-200 transition hover:text-teal-100"
+                        >
+                          {item.value}
+                        </a>
+                      ) : (
+                        item.value
+                      )}
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </aside>
+
+        {/* Form card */}
+        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-7 shadow-[0_24px_70px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.04)] sm:p-8">
+          <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-teal-300/60 to-transparent" />
+
+          <h2 className="text-[22px] font-semibold tracking-[-0.015em] text-slate-50">
+            Send a project inquiry
+          </h2>
+          <p className="mt-1.5 text-[13px] leading-relaxed text-slate-400">
+            Fill in the essentials. The optional scope section helps Gio reply with a real
+            first call instead of a back-and-forth.
+          </p>
+
+          {status === "success" ? (
+            <div className="mt-5 rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-[13px] leading-relaxed text-emerald-300">
+              <strong className="font-semibold text-emerald-200">Message sent.</strong>{" "}
+              Your note is in the intake queue. Next step is review, then a reply with
+              either follow-up questions or a recommended path.
+            </div>
+          ) : null}
+
+          {status === "error" ? (
+            <div className="mt-5 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-[13px] leading-relaxed text-red-300">
+              <strong className="font-semibold text-red-200">Submission failed.</strong>{" "}
+              {errorMessage ?? "Something went wrong. Please try again."}
+            </div>
+          ) : null}
+
+          <div className="mt-6">
+            <ContactForm onSuccess={handleSuccess} onFailure={handleFailure} />
+          </div>
+
+          <p className="mt-6 text-center text-[11px] leading-relaxed text-slate-500">
+            Submissions are validated, stored, and routed to Gio directly.
+          </p>
         </div>
       </div>
     </div>

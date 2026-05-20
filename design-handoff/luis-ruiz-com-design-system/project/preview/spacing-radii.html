@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=700"/>
+<link rel="stylesheet" href="../colors_and_type.css"/>
+<style>
+  html,body{margin:0;background:#020617;color:#F8FAFC;font-family:var(--font-sans);}
+  body{padding:24px;width:700px;box-sizing:border-box;}
+  .row{display:flex;gap:12px;align-items:stretch;flex-wrap:wrap;}
+  .grid{display:grid;gap:12px;}
+  .swatch{flex:1;min-width:0;border-radius:12px;padding:14px 14px 16px;display:flex;flex-direction:column;justify-content:space-between;border:1px solid rgba(255,255,255,0.06);min-height:96px;}
+  .swatch .name{font-size:12px;font-weight:600;letter-spacing:.02em;color:#F8FAFC;}
+  .swatch .hex{font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,.65);letter-spacing:.02em;}
+  .swatch.lt{color:#0F172A;}
+  .swatch.lt .name{color:#0F172A;}
+  .swatch.lt .hex{color:rgba(15,23,42,.6);}
+  .label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#5EEAD4;font-weight:600;margin-bottom:10px;}
+  .stack{display:flex;flex-direction:column;gap:14px;}
+</style>
+</head><body>
+<div class="label">Radii</div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+  
+  <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+    <div style="width:72px;height:72px;background:#111827;border:1px solid rgba(255,255,255,.1);border-radius:4px"></div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:#94A3B8">xs · 4px</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+    <div style="width:72px;height:72px;background:#111827;border:1px solid rgba(255,255,255,.1);border-radius:6px"></div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:#94A3B8">sm · 6px</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+    <div style="width:72px;height:72px;background:#111827;border:1px solid rgba(255,255,255,.1);border-radius:8px"></div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:#94A3B8">md · 8px</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+    <div style="width:72px;height:72px;background:#111827;border:1px solid rgba(255,255,255,.1);border-radius:12px"></div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:#94A3B8">lg · 12px</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+    <div style="width:72px;height:72px;background:#111827;border:1px solid rgba(255,255,255,.1);border-radius:16px"></div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:#94A3B8">xl · 16px</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+    <div style="width:72px;height:72px;background:#111827;border:1px solid rgba(255,255,255,.1);border-radius:20px"></div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:#94A3B8">2xl · 20px</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+    <div style="width:72px;height:72px;background:#111827;border:1px solid rgba(255,255,255,.1);border-radius:24px"></div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:#94A3B8">3xl · 24px</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+    <div style="width:72px;height:72px;background:#111827;border:1px solid rgba(255,255,255,.1);border-radius:999px"></div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:#94A3B8">pill · pill</div>
+  </div>
+</div></body></html>

@@ -37,7 +37,7 @@ export function FeaturedProjects() {
               className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-teal-300 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-teal-200/40"
             >
               <div className="mb-5 flex items-center justify-between gap-4">
-                <span className="rounded-md bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-800 dark:bg-amber-300/10 dark:text-amber-200">
+                <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-teal-700 dark:text-teal-300">
                   {project.meta}
                 </span>
                 <ArrowUpRight className="h-4 w-4 text-slate-400 transition group-hover:text-teal-700 dark:group-hover:text-teal-200" />

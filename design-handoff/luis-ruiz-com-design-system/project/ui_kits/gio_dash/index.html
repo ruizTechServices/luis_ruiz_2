@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gio Command Center — /gio_dash</title>
+  <link rel="stylesheet" href="../../colors_and_type.css" />
+  <style>
+    *,*::before,*::after { box-sizing: border-box; }
+    html,body { margin:0; padding:0; background:#020617; color:#F8FAFC; font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+    a { color: inherit; }
+    .dash-shell {
+      min-height: 100vh;
+      display: grid; grid-template-columns: 232px 1fr;
+      background:
+        radial-gradient(60% 50% at 78% 0%, rgba(56,189,248,0.06), transparent 70%),
+        linear-gradient(180deg, #020617 0%, #0F172A 100%);
+    }
+    .dash-main {
+      display: flex; flex-direction: column;
+      min-width: 0;
+    }
+    .dash-content {
+      padding: 24px 28px 64px;
+      display: flex; flex-direction: column; gap: 20px;
+      max-width: 1440px; margin-inline: auto; width: 100%;
+    }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .grid-7-5 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
+    .grid-6-6 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script src="data.js"></script>
+</head>
+<body data-screen-label="01 Gio dash">
+  <div id="root"></div>
+
+  <script type="text/babel" src="Atoms.jsx"></script>
+  <script type="text/babel" src="Sidebar.jsx"></script>
+  <script type="text/babel" src="TopBar.jsx"></script>
+  <script type="text/babel" src="DashboardHeader.jsx"></script>
+  <script type="text/babel" src="CardsTop.jsx"></script>
+  <script type="text/babel" src="CardsMid.jsx"></script>
+  <script type="text/babel" src="CardsBottom.jsx"></script>
+
+  <script type="text/babel">
+    function App() {
+      const [active, setActive] = React.useState("today");
+      React.useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, []);
+      return (
+        <div className="dash-shell">
+          <Sidebar active={active} />
+          <div className="dash-main">
+            <TopBar />
+            <div className="dash-content">
+              <DashboardHeader />
+
+              <div className="grid-3">
+                <RevenueSnapshotCard />
+                <OpenLeadsCard />
+                <ActiveProjectsCard />
+              </div>
+
+              <div className="grid-6-6">
+                <TodayFocusCard />
+                <QuickActionsPanel />
+              </div>
+
+              <div className="grid-7-5">
+                <SystemLinksCard />
+                <DecisionsLogCard />
+              </div>
+
+              <div className="grid-7-5">
+                <ContentQueueCard />
+                <AiToolsCard />
+              </div>
+
+              <SystemHealthCard />
+            </div>
+          </div>
+        </div>
+      );
+    }
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
+  </script>
+</body>
+</html>

@@ -33,9 +33,9 @@ const signals = [
 
 export function MasterHero() {
   return (
-    <section className="relative isolate overflow-hidden border-b border-slate-200/70 bg-[linear-gradient(135deg,#f8fafc_0%,#ffffff_48%,#eef8f6_100%)] text-slate-950 dark:border-white/10 dark:bg-[linear-gradient(135deg,#09090b_0%,#111827_48%,#062f2f_100%)] dark:text-white">
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-teal-300 to-transparent dark:via-teal-200/40" />
-      <div className="absolute left-1/2 top-12 -z-10 h-80 w-[40rem] -translate-x-1/2 rounded-full bg-teal-200/25 blur-3xl dark:bg-teal-500/10" />
+    <section className="relative isolate overflow-hidden border-b border-slate-200/70 bg-[linear-gradient(135deg,#f8fafc_0%,#ffffff_48%,#eef8f6_100%)] text-slate-950 dark:border-white/10 dark:bg-[linear-gradient(135deg,#020617_0%,#111827_48%,#062f2f_100%)] dark:text-white">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-teal-300 to-transparent dark:via-teal-300/55" />
+      <div className="pointer-events-none absolute left-1/2 top-12 -z-10 h-80 w-[40rem] -translate-x-1/2 rounded-full bg-teal-200/25 blur-3xl dark:bg-sky-400/15" />
 
       <div className="mx-auto grid min-h-[calc(100vh-72px)] max-w-7xl items-center gap-12 px-6 py-20 sm:py-24 lg:grid-cols-[1.08fr_0.92fr] lg:px-8">
         <div>
@@ -88,18 +88,15 @@ export function MasterHero() {
             </div>
 
             <div className="mt-5 grid gap-3">
-              {signals.map((signal, index) => (
+              {signals.map((signal) => (
                 <div
                   key={signal}
-                  className="grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-white/10 dark:bg-slate-950/35"
+                  className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-white/10 dark:bg-slate-950/35"
                 >
-                  <span className="flex h-7 w-7 items-center justify-center rounded-md bg-slate-950 text-xs font-semibold text-white dark:bg-white dark:text-slate-950">
-                    {index + 1}
-                  </span>
                   <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
                     {signal}
                   </span>
-                  <span className="h-2 w-16 rounded-full bg-gradient-to-r from-teal-400 via-sky-400 to-amber-300" />
+                  <span className="h-2 w-16 rounded-full bg-gradient-to-r from-teal-300 via-sky-400 to-amber-400" />
                 </div>
               ))}
             </div>

@@ -23,19 +23,18 @@ export function SystemsOverview() {
             {systems.map((system, index) => (
               <article
                 key={system.title}
-                className="grid gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:grid-cols-[auto_1fr] dark:border-white/10 dark:bg-white/[0.04]"
+                className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-5 transition hover:border-teal-300 dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-teal-200/30"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-slate-950 text-sm font-semibold text-white dark:bg-white dark:text-slate-950">
-                  {String(index + 1).padStart(2, "0")}
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-slate-950 dark:text-white">
-                    {system.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-7 text-slate-600 dark:text-slate-300">
-                    {system.description}
-                  </p>
-                </div>
+                <p className="font-mono text-[11px] font-semibold tracking-[0.22em] text-teal-700 dark:text-teal-300">
+                  SYS · 0{index + 1}
+                </p>
+                <h3 className="mt-2 text-lg font-semibold text-slate-950 dark:text-white">
+                  {system.title}
+                </h3>
+                <p className="mt-2 text-sm leading-7 text-slate-600 dark:text-slate-300">
+                  {system.description}
+                </p>
+                <span className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-teal-300 via-sky-400 to-amber-400 opacity-70" />
               </article>
             ))}
           </div>

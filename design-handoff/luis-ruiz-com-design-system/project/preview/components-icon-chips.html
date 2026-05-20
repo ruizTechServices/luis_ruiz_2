@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=700"/>
+<link rel="stylesheet" href="../colors_and_type.css"/>
+<style>
+  html,body{margin:0;background:#020617;color:#F8FAFC;font-family:var(--font-sans);}
+  body{padding:24px;width:700px;box-sizing:border-box;}
+  .row{display:flex;gap:12px;align-items:stretch;flex-wrap:wrap;}
+  .grid{display:grid;gap:12px;}
+  .swatch{flex:1;min-width:0;border-radius:12px;padding:14px 14px 16px;display:flex;flex-direction:column;justify-content:space-between;border:1px solid rgba(255,255,255,0.06);min-height:96px;}
+  .swatch .name{font-size:12px;font-weight:600;letter-spacing:.02em;color:#F8FAFC;}
+  .swatch .hex{font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,.65);letter-spacing:.02em;}
+  .swatch.lt{color:#0F172A;}
+  .swatch.lt .name{color:#0F172A;}
+  .swatch.lt .hex{color:rgba(15,23,42,.6);}
+  .label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#5EEAD4;font-weight:600;margin-bottom:10px;}
+  .stack{display:flex;flex-direction:column;gap:14px;}
+</style>
+</head><body>
+<div class="label">Icon chips</div>
+<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+  
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:64px">
+      <div style="height:40px;width:40px;border-radius:12px;background:#FFFFFF;color:#020617;display:grid;place-items:center"><i data-lucide="monitor-cog" style="width:18px;height:18px"></i></div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:#64748B">monitor-cog</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:64px">
+      <div style="height:40px;width:40px;border-radius:12px;background:#FFFFFF;color:#020617;display:grid;place-items:center"><i data-lucide="bot" style="width:18px;height:18px"></i></div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:#64748B">bot</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:64px">
+      <div style="height:40px;width:40px;border-radius:12px;background:#FFFFFF;color:#020617;display:grid;place-items:center"><i data-lucide="cpu" style="width:18px;height:18px"></i></div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:#64748B">cpu</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:64px">
+      <div style="height:40px;width:40px;border-radius:12px;background:#FFFFFF;color:#020617;display:grid;place-items:center"><i data-lucide="line-chart" style="width:18px;height:18px"></i></div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:#64748B">line-chart</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:64px">
+      <div style="height:40px;width:40px;border-radius:12px;background:#FFFFFF;color:#020617;display:grid;place-items:center"><i data-lucide="wrench" style="width:18px;height:18px"></i></div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:#64748B">wrench</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:64px">
+      <div style="height:40px;width:40px;border-radius:12px;background:#FFFFFF;color:#020617;display:grid;place-items:center"><i data-lucide="building" style="width:18px;height:18px"></i></div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:#64748B">building</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:64px">
+      <div style="height:40px;width:40px;border-radius:12px;background:#FFFFFF;color:#020617;display:grid;place-items:center"><i data-lucide="folder-kanban" style="width:18px;height:18px"></i></div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:#64748B">folder-kanban</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:64px">
+      <div style="height:40px;width:40px;border-radius:12px;background:#FFFFFF;color:#020617;display:grid;place-items:center"><i data-lucide="sparkles" style="width:18px;height:18px"></i></div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:#64748B">sparkles</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:64px">
+      <div style="height:40px;width:40px;border-radius:12px;background:#FFFFFF;color:#020617;display:grid;place-items:center"><i data-lucide="target" style="width:18px;height:18px"></i></div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:#64748B">target</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:64px">
+      <div style="height:40px;width:40px;border-radius:12px;background:#FFFFFF;color:#020617;display:grid;place-items:center"><i data-lucide="inbox" style="width:18px;height:18px"></i></div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:#64748B">inbox</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:64px">
+      <div style="height:40px;width:40px;border-radius:12px;background:#FFFFFF;color:#020617;display:grid;place-items:center"><i data-lucide="link-2" style="width:18px;height:18px"></i></div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:#64748B">link-2</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:64px">
+      <div style="height:40px;width:40px;border-radius:12px;background:#FFFFFF;color:#020617;display:grid;place-items:center"><i data-lucide="circle-dollar-sign" style="width:18px;height:18px"></i></div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:#64748B">circle-dollar-sign</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:64px">
+      <div style="height:40px;width:40px;border-radius:12px;background:#FFFFFF;color:#020617;display:grid;place-items:center"><i data-lucide="mail" style="width:18px;height:18px"></i></div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:#64748B">mail</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:64px">
+      <div style="height:40px;width:40px;border-radius:12px;background:#FFFFFF;color:#020617;display:grid;place-items:center"><i data-lucide="plus-circle" style="width:18px;height:18px"></i></div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:#64748B">plus-circle</div>
+    </div>
+</div>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script></body></html>
