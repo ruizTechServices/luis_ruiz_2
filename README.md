@@ -80,7 +80,7 @@ Gio builds practical AI, web, and automation systems for small businesses, creat
 - `/blog` - Personal blog and articles
 - `/projects` - Project showcase and portfolio
 - `/contact` - Professional contact information
-- `/gio_dash` - Administrative dashboard
+- `/gio_dash` - Owner-only command center shell
 - `/gio_dash/photos` - Photo library (Supabase Storage-backed)
 - `/gio_dash/photos/upload` - Upload photos to Storage
 - `/ollama` - Local Ollama chat UI (streams via API)

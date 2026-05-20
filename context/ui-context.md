@@ -135,7 +135,7 @@ Route visitors to:
 
 `/gio_dash` should feel like a private command center.
 
-Recommended first screen:
+Implemented first screen:
 
 ```txt
 Gio Command Center
@@ -148,6 +148,12 @@ Blocked: <count>
 [Today Focus]      [Quick Actions] [System Links]
 [Decisions Log]    [Content Queue] [AI Tools]
 ```
+
+Implementation status:
+
+- `/gio_dash` now renders this shell from `components/app/master_dashboard/*`.
+- Temporary placeholder/seed data is used for revenue, leads, active projects, decisions, system links, and AI tools.
+- Existing useful admin cards remain available lower on the page under `Legacy Admin Tools`.
 
 ## Dashboard Card Rules
 

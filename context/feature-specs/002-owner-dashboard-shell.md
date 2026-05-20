@@ -1,5 +1,15 @@
 # 002 — Owner Dashboard Shell
 
+Status: Implemented on 2026-05-19.
+
+Implementation notes:
+
+- `/gio_dash` now renders `MasterDashboardView` from `components/app/master_dashboard/*`.
+- `app/gio_dash/layout.tsx` remains the primary owner-auth protection point.
+- `app/gio_dash/page.tsx` also keeps a small pre-render owner check because route probing showed layout-only protection can stream child content before redirect completion in this codebase.
+- Revenue, leads, projects, decisions, and system links use temporary shell seed data until the data-layer spec.
+- Existing useful `components/app/gio_dashboard/*` tools are preserved lower on the page under `Legacy Admin Tools`.
+
 ## Goal
 
 Refactor `/gio_dash` from a general admin-card page into Gio's private command center shell.

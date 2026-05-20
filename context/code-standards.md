@@ -87,6 +87,8 @@ Do not duplicate owner-email parsing.
 
 Do not expose owner-only data through public pages or public APIs.
 
+For `/gio_dash`, keep the existing layout guard and the page-level pre-render guard unless a safer centralized route protection pattern replaces both. The page guard prevents owner-only child content from streaming before a redirect completes.
+
 ## Validation Rules
 
 Use Zod for request bodies.

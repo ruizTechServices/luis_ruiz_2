@@ -162,7 +162,8 @@ The first useful version is complete when:
 Current status:
 
 - Item 1 is implemented in `components/app/home/*`.
-- Items 2-5 remain the active roadmap.
+- Item 2 is implemented as the `/gio_dash` command-center shell in `components/app/master_dashboard/*`.
+- Items 3-5 remain the active roadmap.
 
 ## Out of Scope For This Refactor Unless Explicitly Requested
 

@@ -110,7 +110,7 @@ Capabilities present in code:
 - GitHub API testing
 - system health inspection
 
-Systemically, `gio_dash` is acting as a lightweight internal CMS and ops console rather than a generic admin panel.
+Systemically, `gio_dash` is acting as a lightweight internal CMS and ops console rather than a generic admin panel. Its main page now renders the command-center shell from `components/app/master_dashboard/*`, while older useful admin cards remain available lower on the page as legacy site-admin tools.
 
 ### 6. Photos / Media Domain
 

@@ -64,7 +64,7 @@ CallToAction
 
 The new homepage should remain public and should not expose private operational data.
 
-## Existing Owner Dashboard
+## Current Owner Dashboard
 
 Current route:
 
@@ -88,23 +88,18 @@ Existing access behavior:
 
 Preserve this behavior.
 
-Current dashboard is mostly a grid of cards:
+`app/gio_dash/page.tsx` also performs a small pre-render owner check before rendering `MasterDashboardView`. Keep that page-level guard unless a safer route-level auth pattern replaces it; terminal route probing showed layout-only protection can stream child content before redirect completion in this codebase.
 
-- blog posts
-- stats
-- content analytics
-- user management
-- quick actions
-- system health
-- recent activity
-- settings
-- GitHub API tester
-- contacts inbox
-
-Refactor direction:
+Current dashboard route shape:
 
 ```txt
-/gio_dash becomes Gio Command Center:
+app/gio_dash/page.tsx
+-> components/app/master_dashboard/MasterDashboardView
+```
+
+Current command-center shell:
+
+```txt
 - Today Focus
 - Revenue Snapshot
 - Open Leads
@@ -115,6 +110,8 @@ Refactor direction:
 - Content Queue
 - AI Tools
 ```
+
+The shell uses temporary static data until dashboard persistence exists. Useful legacy admin tools are preserved lower on the page under `Legacy Admin Tools`, including quick actions, system health, contacts inbox, GitHub snapshot, and content analytics.
 
 ## Existing Client/User Dashboard
 
