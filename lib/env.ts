@@ -38,6 +38,11 @@ const serverSchema = z.object({
   OWNER_EMAILS: z.string().optional(),
   SUPABASE_PHOTOS_BUCKET: z.string().optional(),
   NUCLEUS_CORS_ORIGINS: z.string().optional(),
+  GITHUB_TOKEN: z.string().optional(),
+  GITHUB_USER: z.string().optional(),
+  BUILD_LOG_GITHUB_REPO: z.string().optional(),
+  BUILD_LOG_GITHUB_BRANCH: z.string().optional(),
+  BUILD_LOG_NOTION_PAGE_ID: z.string().optional(),
 });
 
 export type ServerEnv = z.infer<typeof serverSchema>;

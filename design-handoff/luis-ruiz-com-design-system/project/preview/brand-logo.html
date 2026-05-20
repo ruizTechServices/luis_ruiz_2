@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=700"/>
+<link rel="stylesheet" href="../colors_and_type.css"/>
+<style>
+  html,body{margin:0;background:#020617;color:#F8FAFC;font-family:var(--font-sans);}
+  body{padding:24px;width:700px;box-sizing:border-box;}
+  .row{display:flex;gap:12px;align-items:stretch;flex-wrap:wrap;}
+  .grid{display:grid;gap:12px;}
+  .swatch{flex:1;min-width:0;border-radius:12px;padding:14px 14px 16px;display:flex;flex-direction:column;justify-content:space-between;border:1px solid rgba(255,255,255,0.06);min-height:96px;}
+  .swatch .name{font-size:12px;font-weight:600;letter-spacing:.02em;color:#F8FAFC;}
+  .swatch .hex{font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,.65);letter-spacing:.02em;}
+  .swatch.lt{color:#0F172A;}
+  .swatch.lt .name{color:#0F172A;}
+  .swatch.lt .hex{color:rgba(15,23,42,.6);}
+  .label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#5EEAD4;font-weight:600;margin-bottom:10px;}
+  .stack{display:flex;flex-direction:column;gap:14px;}
+</style>
+</head><body>
+<div class="label">Wordmark</div>
+<div style="background:#FFFFFF;border-radius:14px;padding:24px;display:flex;align-items:center;gap:20px">
+  <img src="../assets/logo-lr.png" alt="LR wordmark" style="height:120px;width:auto;object-fit:contain"/>
+  <div style="font-family:var(--font-mono);font-size:11px;color:#475569;line-height:1.6">
+    <div style="font-weight:600;color:#0F172A;font-size:13px;font-family:var(--font-sans)">LR — Luis Ruiz</div>
+    <div style="margin-top:6px">Serif wordmark · treated as artwork.<br/>Min size 24px. Do not recolor.</div>
+  </div>
+</div>
+<div style="background:#020617;border-radius:14px;padding:24px;display:flex;align-items:center;gap:20px;margin-top:10px;border:1px solid rgba(255,255,255,.08)">
+  <img src="../assets/logo-lr.png" alt="LR" style="height:80px;filter:invert(1)"/>
+  <div style="font-family:var(--font-mono);font-size:11px;color:#94A3B8">On dark — inverted via CSS filter for static use.</div>
+</div></body></html>

@@ -2,8 +2,18 @@
 "use client";
 
 import { useCallback, useMemo, useState, type FormEvent } from "react";
-import { createClient as createBrowserSupabase } from "@/lib/clients/supabase/client";
 import Link from "next/link";
+import { createClient as createBrowserSupabase } from "@/lib/clients/supabase/client";
+import { AuthShell } from "@/components/app/auth/AuthShell";
+import {
+  AuthAlert,
+  AuthDivider,
+  AuthField,
+  AuthInput,
+  GoogleButton,
+  PasswordInput,
+  SubmitButton,
+} from "@/components/app/auth/AuthFields";
 
 export default function LoginPage() {
   const supabase = useMemo(() => createBrowserSupabase(), []);
@@ -13,38 +23,32 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
- const signInWithGoogle = useCallback(async () => {
-  setGoogleLoading(true);
-  setError(null);
-  try {
-    const envBase = process.env.NEXT_PUBLIC_SITE_URL;
-    const runtimeBase =
-      typeof window !== "undefined" ? window.location.origin : "";
+  const signInWithGoogle = useCallback(async () => {
+    setGoogleLoading(true);
+    setError(null);
+    try {
+      const envBase = process.env.NEXT_PUBLIC_SITE_URL;
+      const runtimeBase =
+        typeof window !== "undefined" ? window.location.origin : "";
 
-    const fallback = (runtimeBase || "http://localhost:3000").replace(
-      "0.0.0.0",
-      "localhost",
-    );
+      const fallback = (runtimeBase || "http://localhost:3000").replace(
+        "0.0.0.0",
+        "localhost",
+      );
 
-    // Prefer canonical env domain if provided; keeps prod on https://luis-ruiz.com
-    const base = (envBase || fallback).replace("0.0.0.0", "localhost");
+      const base = (envBase || fallback).replace("0.0.0.0", "localhost");
+      const redirectTo = new URL("/auth/callback", base).toString();
 
-    const redirectTo = new URL("/auth/callback", base).toString();
-
-    console.log("GOOGLE LOGIN DEBUG", { runtimeBase, envBase, base, redirectTo });
-
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo },
-    });
-    if (error) setError(error.message);
-  } catch (e: unknown) {
-    setError(e instanceof Error ? e.message : String(e));
-    setGoogleLoading(false);
-  }
-}, [supabase]);
-
-
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo },
+      });
+      if (error) setError(error.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : String(e));
+      setGoogleLoading(false);
+    }
+  }, [supabase]);
 
   const signInWithPassword = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
@@ -63,8 +67,6 @@ export default function LoginPage() {
           return;
         }
 
-        // IMPORTANT: force a full navigation so server components (Navbar)
-        // see the updated Supabase auth cookies.
         window.location.href = "/dashboard";
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : String(e));
@@ -74,86 +76,75 @@ export default function LoginPage() {
     [email, password, supabase],
   );
 
+  const busy = googleLoading || passwordLoading;
+
   return (
-    <div className="mx-auto max-w-md p-8">
-      <h1 className="text-2xl font-semibold mb-4">Sign in</h1>
-      <p className="text-sm text-gray-600 mb-6">
-        Use your Google account to continue. After authentication, you will be
-        redirected back here.
-      </p>
-
-      <button
+    <AuthShell
+      title="Welcome back."
+      intro="Sign in to access the owner dashboard, your saved Ollama sessions, and Nucleus credits."
+    >
+      <GoogleButton
         onClick={signInWithGoogle}
-        disabled={googleLoading || passwordLoading}
-        className="w-full border px-4 py-2 rounded hover:bg-gray-50 disabled:opacity-60"
-      >
-        {googleLoading ? "Redirecting…" : "Continue with Google"}
-      </button>
+        disabled={busy}
+        loading={googleLoading}
+        label="Continue with Google"
+      />
 
-      <div className="my-6 text-center text-sm text-gray-500">
-        <span>or</span>
-      </div>
+      <AuthDivider />
 
-      <form className="space-y-4" onSubmit={signInWithPassword}>
-        <div>
-          <label
-            className="block text-sm font-medium text-gray-700 mb-1"
-            htmlFor="email"
-          >
-            Email
-          </label>
-          <input
+      {error ? <AuthAlert tone="error">{error}</AuthAlert> : null}
+
+      <form onSubmit={signInWithPassword} className="flex flex-col gap-3.5" noValidate>
+        <AuthField id="email" label="Email">
+          <AuthInput
             id="email"
             name="email"
             type="email"
             autoComplete="email"
+            placeholder="you@company.com"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-        </div>
-        <div>
-          <label
-            className="block text-sm font-medium text-gray-700 mb-1"
-            htmlFor="password"
-          >
-            Password
-          </label>
-          <input
+        </AuthField>
+
+        <AuthField id="password" label="Password">
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             autoComplete="current-password"
+            placeholder="••••••••"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+        </AuthField>
+
+        <div className="flex items-center justify-between text-[12px] text-slate-400">
+          <label className="inline-flex items-center gap-2">
+            <input
+              type="checkbox"
+              defaultChecked
+              className="h-3.5 w-3.5 rounded border-white/20 bg-slate-950/60 text-blue-600 focus:ring-blue-600/30"
+            />
+            Remember me
+          </label>
+          <Link href="/about" className="font-medium text-sky-300 hover:text-sky-200">
+            Forgot password?
+          </Link>
         </div>
-        <button
-          type="submit"
-          disabled={passwordLoading || googleLoading}
-          className="w-full border px-4 py-2 rounded hover:bg-gray-50 disabled:opacity-60"
-        >
-          {passwordLoading ? "Signing in…" : "Sign in with email"}
-        </button>
+
+        <SubmitButton loading={passwordLoading} loadingLabel="Signing in…" disabled={busy}>
+          Sign in with email
+        </SubmitButton>
       </form>
 
-      {error ? (
-        <p className="mt-3 text-sm text-red-600">{error}</p>
-      ) : null}
-
-      <p className="mt-6 text-sm text-gray-500">
-        <Link className="underline" href="/">
-          Back to home
+      <p className="mt-5 text-center text-[12px] text-slate-400">
+        New here?{" "}
+        <Link href="/signup" className="font-semibold text-teal-200 hover:text-teal-100">
+          Create an account
         </Link>
       </p>
-      <p className="mt-2 text-sm text-gray-500">
-        <Link className="underline" href="/signup">
-          Need an account? Create one
-        </Link>
-      </p>
-    </div>
+    </AuthShell>
   );
 }

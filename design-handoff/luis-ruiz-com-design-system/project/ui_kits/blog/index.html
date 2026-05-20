@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Build log · Luis Ruiz</title>
+  <link rel="stylesheet" href="../../colors_and_type.css" />
+  <style>
+    *,*::before,*::after { box-sizing: border-box; }
+    html,body { margin:0; background:#020617; color:#F8FAFC; font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+    a { color: inherit; }
+    .container { max-width: 1100px; margin-inline: auto; padding-inline: 32px; }
+    .blog-shell { min-height: 100vh; background: radial-gradient(60% 40% at 50% -10%, rgba(56,189,248,0.06), transparent 70%), #020617; }
+
+    /* Navbar */
+    nav.top { position: sticky; top:0; z-index:30; background: rgba(2,6,23,0.7); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    nav.top .row { height:64px; display:flex; align-items:center; justify-content:space-between; }
+    nav.top a.brand { display:flex; align-items:center; gap:10px; color:#F8FAFC; text-decoration:none; font-weight:600; font-size:14px; }
+    nav.top a.brand .mark { height:30px; width:30px; border-radius:8px; background:#fff; color:#020617; display:grid; place-items:center; font-family:Georgia,serif; font-weight:700; font-size:13px; }
+    nav.top ul { display:flex; gap:24px; margin:0; padding:0; list-style:none; }
+    nav.top ul a { color:#CBD5E1; font-size:13px; text-decoration:none; font-weight:500; }
+    nav.top ul a[aria-current] { color:#F8FAFC; }
+
+    /* Header */
+    header.page { padding: 56px 0 28px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .eyebrow { font-size:12px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:#5EEAD4; }
+    .page h1 { font-size:44px; line-height:1.1; letter-spacing:-0.025em; font-weight:600; margin:10px 0 12px; }
+    .page p.lead { font-size:16px; line-height:1.7; color:#CBD5E1; max-width:680px; margin:0; }
+
+    /* Filter bar */
+    .filter-bar { display:flex; gap:8px; flex-wrap:wrap; padding: 20px 0 24px; align-items:center; }
+    .chip { display:inline-flex; align-items:center; gap:8px; padding:7px 12px; border-radius:999px; border:1px solid rgba(255,255,255,0.10); background:rgba(255,255,255,0.03); color:#CBD5E1; font-size:12px; font-weight:500; cursor:pointer; transition: background .15s, border-color .15s; }
+    .chip:hover { background: rgba(255,255,255,0.06); border-color: rgba(94,234,212,0.25); }
+    .chip.active { background: rgba(94,234,212,0.10); border-color: rgba(94,234,212,0.35); color: #99F6E4; }
+    .chip .dot { width:6px; height:6px; border-radius:50%; background:#5EEAD4; }
+    .search { margin-left:auto; display:flex; align-items:center; gap:8px; height:36px; padding:0 12px; width:280px; border-radius:8px; background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.10); color:#94A3B8; font-size:13px; }
+
+    /* Layout */
+    .grid { display:grid; grid-template-columns: 1fr 320px; gap:48px; padding: 32px 0 96px; }
+    @media (max-width: 920px) { .grid { grid-template-columns: 1fr; } }
+
+    /* Cards */
+    article.post {
+      display:block; padding:24px; border-radius:20px;
+      border:1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02);
+      text-decoration:none; color:inherit; margin-bottom:14px;
+      transition: transform .2s, border-color .2s, background .2s;
+    }
+    article.post:hover { transform: translateY(-2px); border-color: rgba(94,234,212,0.25); background: rgba(255,255,255,0.04); }
+    article.post .meta { display:flex; align-items:center; gap:10px; margin-bottom:10px; font-size:11px; color:#94A3B8; }
+    article.post .meta .ey { font-size:11px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:#99F6E4; }
+    article.post .meta .dot { width:3px; height:3px; border-radius:50%; background:#475569; }
+    article.post h2 { font-size:22px; line-height:1.3; letter-spacing:-0.015em; font-weight:600; margin:0; color:#F8FAFC; }
+    article.post p { margin:10px 0 16px; font-size:14px; line-height:1.7; color:#CBD5E1; }
+    article.post .tags { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+    article.post .tag { padding:4px 10px; border-radius:999px; background:rgba(94,234,212,0.08); border:1px solid rgba(94,234,212,0.18); color:#99F6E4; font-size:11px; font-weight:500; }
+    article.post .row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding-top:14px; border-top: 1px dashed rgba(255,255,255,0.08); font-size:12px; color:#94A3B8; }
+    article.post .stats { display:flex; gap:14px; align-items:center; }
+    article.post .stats span { display:inline-flex; align-items:center; gap:5px; }
+    article.post .read { color:#7DD3FC; font-weight:600; }
+
+    article.featured { padding:28px; background: linear-gradient(135deg, rgba(56,189,248,0.06), rgba(94,234,212,0.04)); border-color: rgba(94,234,212,0.18); position:relative; overflow:hidden; }
+    article.featured::before { content:""; position:absolute; inset-inline:0; top:0; height:1px; background: linear-gradient(90deg,transparent,rgba(94,234,212,0.6),transparent); }
+    article.featured h2 { font-size:30px; }
+    article.featured .pin { position:absolute; top:18px; right:18px; padding:4px 10px; border-radius:6px; background: rgba(94,234,212,0.15); color:#99F6E4; font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; }
+
+    /* Sidebar */
+    aside.side { display:flex; flex-direction:column; gap:18px; position: sticky; top: 96px; align-self: start; }
+    .panel { border-radius:18px; border:1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); padding:18px; }
+    .panel h3 { font-size:13px; font-weight:600; margin:0 0 12px; color:#F8FAFC; letter-spacing:-0.005em; display:flex; align-items:center; justify-content:space-between; }
+    .panel h3 .count { font-size:11px; color:#64748B; font-weight:500; }
+    .tag-cloud { display:flex; flex-wrap:wrap; gap:6px; }
+    .tag-cloud a { font-size:11px; padding:4px 9px; border-radius:999px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:#CBD5E1; text-decoration:none; }
+    .recent-list { display:flex; flex-direction:column; gap:12px; }
+    .recent-list a { color:inherit; text-decoration:none; display:block; padding-bottom:12px; border-bottom:1px dashed rgba(255,255,255,0.06); }
+    .recent-list a:last-child { border-bottom:none; padding-bottom:0; }
+    .recent-list .t { font-size:13px; color:#F8FAFC; font-weight:600; line-height:1.4; }
+    .recent-list .d { font-size:11px; color:#64748B; margin-top:4px; font-family: var(--font-mono); }
+
+    /* GitHub heatmap mini */
+    .heat { display:grid; grid-template-columns: repeat(20, 1fr); gap:3px; }
+    .heat span { aspect-ratio:1; border-radius:3px; background: rgba(94,234,212,0.06); }
+    .heat span.l1 { background: rgba(94,234,212,0.18); }
+    .heat span.l2 { background: rgba(94,234,212,0.35); }
+    .heat span.l3 { background: rgba(94,234,212,0.6); }
+    .heat span.l4 { background: rgba(94,234,212,0.85); }
+
+    /* Post detail */
+    .detail { display: none; }
+    .detail.show { display: block; }
+    .list.hide { display: none; }
+    .detail article { padding:0; max-width: 720px; margin: 32px auto 0; }
+    .detail h1 { font-size:40px; line-height:1.15; letter-spacing:-0.025em; font-weight:600; margin: 0 0 14px; }
+    .detail .meta { display:flex; align-items:center; gap:12px; color:#94A3B8; font-size:13px; margin-bottom:18px; flex-wrap:wrap; }
+    .detail .body { font-size:16px; line-height:1.8; color:#E2E8F0; }
+    .detail .body p { margin: 1em 0; }
+    .detail .body h2 { font-size: 24px; font-weight:600; margin: 36px 0 12px; letter-spacing:-0.015em; }
+    .detail .body code { font-family: var(--font-mono); font-size:13px; background:rgba(56,189,248,0.10); color:#BAE6FD; padding:2px 6px; border-radius:4px; }
+    .detail .body pre { background:#0A101D; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:18px; overflow:auto; font-family: var(--font-mono); font-size:13px; line-height:1.6; color:#CBD5E1; }
+    .detail .body pre code { background: none; padding:0; color:inherit; }
+    .detail .body ul { padding-left: 1.2em; }
+    .detail .back { display:inline-flex; align-items:center; gap:6px; font-size:13px; color:#99F6E4; font-weight:600; cursor:pointer; margin-bottom: 18px; background:none; border:none; padding:0; }
+    .detail .related { margin: 24px 0; padding:20px; border-radius:16px; background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); }
+    .detail .related .ey { font-size:11px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:#99F6E4; }
+    .detail .related .chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .detail .related .chips a { padding:6px 12px; border-radius:999px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.10); font-size:12px; color:#CBD5E1; text-decoration:none; }
+    .detail hr { border:none; height:1px; background:rgba(255,255,255,0.08); margin: 36px 0; }
+
+    /* Votes */
+    .votes { display:flex; align-items:center; gap:12px; padding:14px 16px; border-radius:14px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); margin: 18px 0 28px; }
+    .votes button { display:inline-flex; align-items:center; gap:8px; height:36px; padding:0 14px; border-radius:8px; border:1px solid rgba(255,255,255,0.10); background: rgba(255,255,255,0.03); color:#F8FAFC; font-size:13px; font-weight:600; cursor:pointer; transition: background .15s, border-color .15s; }
+    .votes button:hover { background: rgba(255,255,255,0.06); }
+    .votes button.active.up { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.35); color:#22C55E; }
+    .votes button.active.down { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.35); color:#EF4444; }
+    .votes .count { font-family: var(--font-mono); font-size:13px; color:#94A3B8; margin-left:auto; }
+
+    /* Comments */
+    .comments h2 { font-size:20px; font-weight:600; margin: 0 0 14px; }
+    .comments form { display:flex; flex-direction:column; gap:10px; padding:16px; border-radius:14px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); margin-bottom:18px; }
+    .comments input, .comments textarea { width:100%; padding:10px 12px; border-radius:8px; background: rgba(2,6,23,0.6); border:1px solid rgba(255,255,255,0.10); color:#F8FAFC; font: 14px var(--font-sans); resize:vertical; }
+    .comments input:focus, .comments textarea:focus { outline:0; border-color:#2563EB; box-shadow: 0 0 0 3px rgba(37,99,235,0.20); }
+    .comments button { align-self:flex-start; height:36px; padding:0 16px; border-radius:8px; background:#2563EB; color:#fff; border:none; font-size:13px; font-weight:600; cursor:pointer; }
+    .comments ul { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; }
+    .comments li { padding:14px; border-radius:12px; background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); }
+    .comments li .head { display:flex; align-items:center; gap:10px; font-size:11px; color:#94A3B8; margin-bottom:8px; }
+    .comments li .head .av { width:24px; height:24px; border-radius:6px; background: linear-gradient(135deg,#5EEAD4,#38BDF8); color:#020617; display:grid; place-items:center; font-size:11px; font-weight:700; }
+    .comments li .body { font-size:13px; line-height:1.65; color:#E2E8F0; white-space:pre-wrap; }
+  </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body data-screen-label="01 Blog index">
+  <div class="blog-shell">
+    <nav class="top">
+      <div class="container row">
+        <a class="brand" href="#"><span class="mark">LR</span> luis-ruiz.com</a>
+        <ul>
+          <li><a href="#">Services</a></li>
+          <li><a href="#">Projects</a></li>
+          <li><a href="#" aria-current="page">Blog</a></li>
+          <li><a href="#">Round-Robin</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- LIST VIEW -->
+    <div class="list" id="list-view">
+      <header class="page">
+        <div class="container">
+          <div class="eyebrow">Build log</div>
+          <h1>Notes from the workbench.</h1>
+          <p class="lead">Working notes on AI tooling, dashboards, automation, and small-business systems. Honest about what's shipped and what's still rough.</p>
+        </div>
+      </header>
+
+      <div class="container">
+        <div class="filter-bar">
+          <div class="chip active"><span class="dot"></span>All posts <span style="color:#5EEAD4;font-family:var(--font-mono)">· 42</span></div>
+          <div class="chip">AI</div>
+          <div class="chip">Dashboards</div>
+          <div class="chip">Automation</div>
+          <div class="chip">Supabase</div>
+          <div class="chip">Next.js</div>
+          <div class="chip">Ollama</div>
+          <div class="search"><i data-lucide="search" style="width:14px;height:14px"></i> Search the build log…</div>
+        </div>
+
+        <div class="grid">
+          <main id="posts"></main>
+          <aside class="side">
+            <div class="panel">
+              <h3>Build streak <span class="count">last 4 weeks</span></h3>
+              <div class="heat" id="heat"></div>
+              <div style="display:flex;justify-content:space-between;margin-top:10px;font-family:var(--font-mono);font-size:10px;color:#64748B">
+                <span>4w ago</span><span>today</span>
+              </div>
+            </div>
+            <div class="panel">
+              <h3>Tags <span class="count">12</span></h3>
+              <div class="tag-cloud">
+                <a href="#">ai</a><a href="#">dashboards</a><a href="#">automation</a>
+                <a href="#">supabase</a><a href="#">next.js</a><a href="#">ollama</a>
+                <a href="#">round-robin</a><a href="#">nucleus</a><a href="#">stripe</a>
+                <a href="#">tailwind</a><a href="#">postgres</a><a href="#">nyc</a>
+              </div>
+            </div>
+            <div class="panel">
+              <h3>Recently shipped <span class="count">4</span></h3>
+              <div class="recent-list">
+                <a href="#"><div class="t">Master hub homepage launched</div><div class="d">Nov 14 · ship-log</div></a>
+                <a href="#"><div class="t">Contact form Zod validation</div><div class="d">Nov 09 · contact</div></a>
+                <a href="#"><div class="t">Owner-only command center</div><div class="d">Nov 03 · gio_dash</div></a>
+                <a href="#"><div class="t">Nucleus credit metering</div><div class="d">Oct 26 · nucleus</div></a>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETAIL VIEW -->
+    <div class="detail" id="detail-view">
+      <div class="container">
+        <article id="detail-article"></article>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Seed posts — illustrative content in Gio's voice.
+    const POSTS = [
+      {
+        id: 1, featured: true,
+        title: "From portfolio site to operating hub: rebuilding luis-ruiz.com",
+        summary: "The old site read like a generic portfolio. I rebuilt the front of luis-ruiz.com as a public 'master hub' that points at services, systems, projects, and a real contact path — and put a private command center behind it.",
+        tags: ["next.js","supabase","dashboards"], date: "Nov 14, 2025", reading: "8 min read", up: 14, down: 0, comments: 5,
+        related: ["luis-ruiz.com Master Hub","ruizTechServices"],
+        body: `<p>The previous version of luis-ruiz.com worked, but it didn't <em>do</em> anything beyond present me. It was a portfolio. After a year of doing actual client work through ruizTechServices, that wasn't the right surface anymore.</p>
+<p>I rebuilt the public homepage as a "master hub" — a page whose only job is to route real visitors to the next real step: <code>Services</code>, <code>Projects</code>, <code>Build log</code>, <code>Contact</code>. Then I built a second surface behind login at <code>/gio_dash</code> that is the operational opposite: an owner-only command center for projects, leads, revenue, and decisions.</p>
+<h2>What I kept</h2>
+<ul><li>Nucleus (the API product) — untouched. Different audience, different contract.</li><li>Round-robin discussion tool — untouched.</li><li>The blog / build-log surface (this page).</li><li>Existing Supabase auth + the photos pipeline.</li></ul>
+<h2>What I rebuilt</h2>
+<p>The homepage composition itself: <code>MasterHero</code>, <code>PublicStatusPanel</code>, <code>ServiceCards</code>, <code>SystemsOverview</code>, <code>FeaturedProjects</code>, <code>CaseStudyPreview</code>, <code>HomeCTA</code>. Each one is small and replaceable. The legacy <code>landing_page/*</code> components still exist in the repo but aren't rendered.</p>
+<h2>One honest thing</h2>
+<p>The dashboard cards currently render placeholder values — "$0", "No lead records connected yet" — because I haven't wired the operational tables yet. I left those visible instead of hiding the cards. The site shows its seams. That's a feature, not a bug.</p>
+<pre><code>// app/page.tsx
+export default function HomePage() {
+  return (
+    &lt;main className="min-h-screen bg-background"&gt;
+      &lt;MasterHero /&gt;
+      &lt;PublicStatusPanel /&gt;
+      &lt;ServiceCards /&gt;
+      &lt;SystemsOverview /&gt;
+      &lt;FeaturedProjects /&gt;
+      &lt;CaseStudyPreview /&gt;
+      &lt;HomeCTA /&gt;
+    &lt;/main&gt;
+  );
+}</code></pre>`
+      },
+      { id: 2, title: "Round-robin: pulling orchestration out of the SSE route", summary: "The round-robin discussion tool's real orchestration logic still sits inside the SSE route. Here's how I'm planning to extract it without breaking session resumption.", tags: ["round-robin","ai","next.js"], date: "Nov 09, 2025", reading: "6 min", up: 8, down: 0, comments: 2 },
+      { id: 3, title: "Why the contact form uses Zod twice (and that's fine)", summary: "Zod validates on the client for instant feedback and then re-validates on the server before insert. The redundancy is intentional — and it makes the data layer easier to trust.", tags: ["zod","contact","supabase"], date: "Nov 06, 2025", reading: "4 min", up: 11, down: 1, comments: 3 },
+      { id: 4, title: "Ollama as a default — a small business case for local models", summary: "Not every chatbot needs a frontier model. A walk through one client engagement where Ollama running on a single Mac mini was the right answer.", tags: ["ai","ollama","clients"], date: "Oct 30, 2025", reading: "7 min", up: 19, down: 0, comments: 7 },
+      { id: 5, title: "Dashboard cards as questions, not numbers", summary: "Every private dashboard card here answers four questions: what matters, what's blocked, what's next, what changed. That framing changes what you build.", tags: ["dashboards","design"], date: "Oct 22, 2025", reading: "5 min", up: 16, down: 0, comments: 4 },
+      { id: 6, title: "Nucleus credit metering, end to end", summary: "Bearer-token auth, atomic credit deduction, subscription-aware unlimited tier, usage logs. The full plumbing in one post.", tags: ["nucleus","stripe","supabase"], date: "Oct 18, 2025", reading: "12 min", up: 22, down: 0, comments: 9 },
+    ];
+
+    // GitHub-style heat (80 cells)
+    const heat = document.getElementById('heat');
+    for (let i = 0; i < 80; i++) {
+      const v = [0,0,0,1,1,2,2,3,4][Math.floor(Math.random()*9)];
+      const span = document.createElement('span');
+      if (v) span.className = 'l'+v;
+      heat.appendChild(span);
+    }
+
+    const listView = document.getElementById('list-view');
+    const detailView = document.getElementById('detail-view');
+    const postsRoot = document.getElementById('posts');
+    const detailArt = document.getElementById('detail-article');
+
+    function renderList() {
+      postsRoot.innerHTML = POSTS.map(p => `
+        <article class="post ${p.featured ? 'featured' : ''}" data-id="${p.id}">
+          ${p.featured ? '<div class="pin">Latest</div>' : ''}
+          <div class="meta">
+            <span class="ey">Build log</span>
+            <span class="dot"></span>
+            <span>${p.date}</span>
+            <span class="dot"></span>
+            <span>${p.reading || '5 min read'}</span>
+          </div>
+          <h2>${p.title}</h2>
+          <p>${p.summary}</p>
+          <div class="tags">${p.tags.map(t => `<span class="tag">#${t}</span>`).join('')}</div>
+          <div class="row">
+            <div class="stats">
+              <span><i data-lucide="arrow-big-up" style="width:14px;height:14px"></i> ${p.up}</span>
+              <span><i data-lucide="message-square" style="width:14px;height:14px"></i> ${p.comments}</span>
+            </div>
+            <span class="read">Read post →</span>
+          </div>
+        </article>
+      `).join('');
+      window.lucide && window.lucide.createIcons();
+      postsRoot.querySelectorAll('article.post').forEach(el => {
+        el.addEventListener('click', () => openPost(Number(el.dataset.id)));
+      });
+    }
+
+    let state = { up: 0, down: 0, vote: null, comments: [
+      { email: 'jordan@selene.studio', date: 'Nov 14, 4:21pm', body: "This matches my own experience refactoring my freelance site. The 'show the seams' part especially — clients trust placeholders that say what's coming next." },
+      { email: 'mira@bronxmed.org', date: 'Nov 15, 9:08am', body: "Curious how you handle the gio_dash data tables — separate schema or just RLS-scoped?" },
+    ] };
+
+    function openPost(id) {
+      const p = POSTS.find(x => x.id === id);
+      if (!p) return;
+      state = { up: p.up, down: p.down, vote: null, comments: state.comments };
+      detailArt.innerHTML = `
+        <button class="back" onclick="closePost()"><i data-lucide="arrow-left" style="width:14px;height:14px"></i> Back to build log</button>
+        <div class="eyebrow">Build log</div>
+        <h1>${p.title}</h1>
+        <div class="meta">
+          <span><i data-lucide="calendar" style="width:14px;height:14px"></i> ${p.date}</span>
+          <span><i data-lucide="clock" style="width:14px;height:14px"></i> ${p.reading || '5 min read'}</span>
+          <span>${p.tags.map(t => `<span class="tag" style="padding:2px 8px;border-radius:999px;background:rgba(94,234,212,0.10);border:1px solid rgba(94,234,212,0.18);color:#99F6E4;font-size:11px;font-weight:500;margin-right:4px">#${t}</span>`).join('')}</span>
+        </div>
+        ${p.related ? `
+          <div class="related">
+            <div class="ey">Related project work</div>
+            <div class="chips">${p.related.map(r => `<a href="#">${r}</a>`).join('')}</div>
+          </div>` : ''}
+        <div class="body">${p.body || `<p>${p.summary}</p><p>Full post coming. This is a UI-kit specimen.</p>`}</div>
+        <hr/>
+        <div class="votes">
+          <button id="up" onclick="vote('up')"><i data-lucide="arrow-big-up" style="width:16px;height:16px"></i> Useful</button>
+          <button id="down" onclick="vote('down')"><i data-lucide="arrow-big-down" style="width:16px;height:16px"></i> Not for me</button>
+          <span class="count" id="vcount">${state.up} useful · ${state.down} not</span>
+        </div>
+        <div class="comments">
+          <h2>Comments <span style="color:#64748B;font-weight:500;font-size:14px">· ${state.comments.length}</span></h2>
+          <form onsubmit="addComment(event)">
+            <input id="c-email" type="email" placeholder="you@example.com" required />
+            <textarea id="c-body" rows="3" placeholder="Add a comment…" required></textarea>
+            <button type="submit">Post comment</button>
+          </form>
+          <ul id="c-list"></ul>
+        </div>
+      `;
+      listView.classList.add('hide');
+      detailView.classList.add('show');
+      window.scrollTo(0, 0);
+      renderComments();
+      window.lucide && window.lucide.createIcons();
+    }
+    window.closePost = function () {
+      listView.classList.remove('hide');
+      detailView.classList.remove('show');
+    };
+    window.vote = function (kind) {
+      const upBtn = document.getElementById('up');
+      const dnBtn = document.getElementById('down');
+      if (state.vote === kind) {
+        state[kind]--;
+        state.vote = null;
+      } else {
+        if (state.vote) state[state.vote]--;
+        state[kind]++;
+        state.vote = kind;
+      }
+      upBtn.classList.toggle('active', state.vote === 'up');
+      upBtn.classList.toggle('up', true);
+      dnBtn.classList.toggle('active', state.vote === 'down');
+      dnBtn.classList.toggle('down', true);
+      document.getElementById('vcount').textContent = `${state.up} useful · ${state.down} not`;
+    };
+    window.addComment = function (e) {
+      e.preventDefault();
+      const email = document.getElementById('c-email').value.trim();
+      const body = document.getElementById('c-body').value.trim();
+      if (!email || !body) return;
+      state.comments.unshift({ email, date: 'Just now', body });
+      document.getElementById('c-body').value = '';
+      renderComments();
+    };
+    function renderComments() {
+      const list = document.getElementById('c-list');
+      if (!list) return;
+      list.innerHTML = state.comments.map(c => `
+        <li>
+          <div class="head">
+            <span class="av">${c.email.charAt(0).toUpperCase()}</span>
+            <span>${c.email}</span><span>·</span><span>${c.date}</span>
+          </div>
+          <div class="body">${c.body}</div>
+        </li>
+      `).join('');
+    }
+
+    renderList();
+  </script>
+</body>
+</html>

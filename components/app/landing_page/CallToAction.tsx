@@ -1,11 +1,11 @@
 import Link from 'next/link';
-import { ArrowRightIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 
-const stats = [
-  { value: 'Full-stack', label: 'Web applications' },
-  { value: 'AI-ready', label: 'Modern workflows' },
-  { value: 'Production', label: 'Focused delivery' },
+const audienceSignals = [
+  { value: 'Founders', label: 'People who need a builder who can turn direction into working systems' },
+  { value: 'Small businesses', label: 'Operators who need clearer digital systems, not vague web help' },
+  { value: 'Collaborators', label: 'Teams looking for practical technical execution with product judgment' },
 ];
 
 export default function CallToAction() {
@@ -24,42 +24,41 @@ export default function CallToAction() {
             <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
               <div>
                 <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-blue-100">
-                  <SparklesIcon className="h-4 w-4" />
-                  Available for select projects
+                  Founder-builder • ruizTechServices
                 </div>
 
                 <h2 className="mt-6 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-                  Let&apos;s build something fast, reliable, and maintainable.
+                  Need a builder for a real product, business system, or AI workflow?
                 </h2>
 
                 <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-200 sm:text-lg">
-                  If you need a portfolio site, a business platform, or an AI-enabled product, I can help design and ship a solution that fits the product goals and the user experience.
+                  luis-ruiz.com is aimed at founders, small businesses, and serious collaborators who need practical software execution, not branding theater. If the work needs product judgment, technical range, and honest iteration, this is the right intake point.
                 </p>
 
                 <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                   <Button asChild size="lg" variant="cta" className="rounded-full px-7 py-6">
                     <Link href="/contact">
-                      Start a conversation
+                      Start project conversation
                       <ArrowRightIcon className="h-5 w-5" />
                     </Link>
                   </Button>
 
                   <Button asChild size="lg" variant="cta-outline" className="rounded-full px-7 py-6">
-                    <Link href="/projects">
-                      View projects
+                    <Link href="/blog">
+                      Read Blog / Build Log
                     </Link>
                   </Button>
                 </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
-                {stats.map((stat) => (
+                {audienceSignals.map((signal) => (
                   <div
-                    key={stat.label}
+                    key={signal.label}
                     className="rounded-2xl border border-white/10 bg-slate-950/30 p-5 text-center shadow-[0_12px_40px_rgba(0,0,0,0.18)]"
                   >
-                    <div className="text-2xl font-bold text-white">{stat.value}</div>
-                    <div className="mt-1 text-sm text-slate-300">{stat.label}</div>
+                    <div className="text-2xl font-bold text-white">{signal.value}</div>
+                    <div className="mt-1 text-sm text-slate-300">{signal.label}</div>
                   </div>
                 ))}
               </div>

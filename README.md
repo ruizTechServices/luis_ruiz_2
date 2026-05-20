@@ -1,24 +1,21 @@
 # Luis-ruiz.com
 
-The personal portfolio website of **Gio (Luis Giovanni Ruiz)** - a Bronx-born, bilingual full-stack AI engineer and founder of ruizTechServices LLC (est. 2024). This Next.js-powered site showcases Gio's expertise in AI engineering, his flagship product 24Hour-AI, and his proficiency across multiple programming languages and frameworks.
+The public master hub for **Gio (Luis Giovanni Ruiz)** and ruizTechServices LLC. This Next.js-powered site presents practical AI, web, automation, and support work while preserving separate public project, blog, contact, owner dashboard, AI experiment, and Nucleus API product surfaces.
 
 ## About Gio
 
-Gio specializes in scalable AI infrastructure and enterprise-grade solutions that deliver measurable business value. His flagship product **24Hour-AI** is a high-performance LLM platform achieving:
-- Sub-200ms latency
-- 99.9% uptime
-- 30% cost optimization
-- Support for 100+ concurrent users
+Gio builds practical AI, web, and automation systems for small businesses, creators, and operators through ruizTechServices. The site is organized around services, proof-of-work, build notes, contact intake, owner operations, and AI product experiments.
 
-## Portfolio Features
+## Product Surfaces
 
-- **Personal Portfolio**: Professional landing page showcasing skills and experience
-- **Blog System**: Personal blog with markdown support and interactive features
-- **Project Showcase**: Display of technical projects and achievements
-- **Dashboard**: Administrative interface for content management
-- **AI Integration**: Multiple AI provider support showcasing technical expertise
-- **Contact System**: Professional contact forms and availability status
-- **Skills Display**: Interactive showcase of programming languages and frameworks
+- **Public Master Hub**: Homepage for services, public systems, proof-of-work, and contact routing.
+- **Blog / Build Log**: Supabase-backed public writing with interaction features.
+- **Projects / Case Studies**: Public project records and proof-of-work.
+- **Owner Dashboard**: Owner-only operations area under `/gio_dash` with live operational cards for projects, leads, money, system links, and decisions.
+- **Client Dashboard**: Authenticated `/dashboard` foundation for future client project status, updates, deliverables, invoices, messages, and support.
+- **AI Experiments**: Ollama chat and round-robin model discussion surfaces.
+- **Nucleus API Product**: Separate API product with auth, credits, model routes, and Stripe flows.
+- **Contact System**: Structured lead intake with validation and Supabase persistence.
 
 ## Tech Stack
 
@@ -55,7 +52,7 @@ Gio specializes in scalable AI infrastructure and enterprise-grade solutions tha
    Notes:
    - Prisma is not used in this project. You can ignore `DATABASE_URL` and `DIRECT_URL` found in `.env.example`.
    - `SUPABASE_API_KEY` is supported as a server fallback, but prefer `SUPABASE_SERVICE_ROLE_KEY`. Never expose the service role key to the browser.
-   - Dev server runs on http://localhost:5000 (`npm run dev`).
+   - Dev server defaults to http://localhost:3000 (`npm run dev`). Use `npx next dev -p 3001` or another open port when 3000 is occupied.
    - If you use a different Supabase project, update `next.config.ts` `images.remotePatterns` host to match your project (currently `huyhgdsjpdjzokjwaspb.supabase.co`).
 
 4. Run the development server:
@@ -80,11 +77,16 @@ Gio specializes in scalable AI infrastructure and enterprise-grade solutions tha
 
 ## Available Routes
 
-- `/` - Personal portfolio landing page
+- `/` - Public master hub
 - `/blog` - Personal blog and articles
 - `/projects` - Project showcase and portfolio
 - `/contact` - Professional contact information
-- `/gio_dash` - Administrative dashboard
+- `/dashboard` - Signed-in client dashboard foundation; owner users redirect to `/gio_dash`
+- `/gio_dash` - Owner-only command center (Today Focus, Revenue Snapshot, Open Leads, Active Projects, System Links, and Decisions Log cards are wired to live dashboard tables)
+- `/gio_dash/leads` - Owner-only read-only operational leads table
+- `/gio_dash/money` - Owner-only read-only operational P&L table
+- `/gio_dash/systems` - Owner-only read-only system links table
+- `/gio_dash/notes` - Owner-only read-only decisions/notes list
 - `/gio_dash/photos` - Photo library (Supabase Storage-backed)
 - `/gio_dash/photos/upload` - Upload photos to Storage
 - `/ollama` - Local Ollama chat UI (streams via API)
@@ -103,10 +105,16 @@ Gio specializes in scalable AI infrastructure and enterprise-grade solutions tha
 - `/api/projects` — upsert project (uses `zod` validation).
 - `/api/comments` and `/api/votes` — Blog interactions (comments/upvotes/downvotes).
 - `/api/site_settings/availability` — Get/Set availability banner values.
+- `/api/dashboard/projects` — Owner-only operational project tracker (`GET`, Zod-validated `POST`).
+- `/api/dashboard/leads` — Owner-only lead pipeline (`GET`, Zod-validated `POST`).
+- `/api/dashboard/money` — Owner-only money entries with income/expense summary (`GET`, Zod-validated `POST`).
+- `/api/dashboard/decisions` — Owner-only decision log (`GET`, Zod-validated `POST`).
+- `/api/dashboard/system-links` — Owner-only curated system/tool links (`GET`, Zod-validated `POST`).
 
-## Photos & Hero Slideshow
+## Photos & Legacy Hero Slideshow
 
-- `components/app/landing_page/Hero.tsx` loads slideshow images via `/api/photos?prefix=hero` with a fallback to static `public/edited/*` images.
+- The current `/` homepage uses `components/app/home/*`.
+- The legacy `components/app/landing_page/Hero.tsx` component still loads slideshow images via `/api/photos?prefix=hero` with a fallback to static `public/edited/*` images, but it is no longer rendered by `/`.
 - Requires a Supabase Storage bucket (default: `photos`, configurable via `SUPABASE_PHOTOS_BUCKET`).
 - To seed images from your repo, place files under `public/edited/` and call `POST /api/photos/seed-hero`.
 
@@ -120,3 +128,4 @@ Gio specializes in scalable AI infrastructure and enterprise-grade solutions tha
 
 - Supabase OAuth callback is handled in `app/auth/callback/route.ts` (exchanges provider code for a session).
 - Set `NEXT_PUBLIC_SITE_URL` or `SITE_URL` for accurate redirects in dev/prod (defaults to `http://localhost:5000`).
+- `/dashboard` redirects unauthenticated users to `/login`, redirects owner users to `/gio_dash`, and renders the client portal shell for signed-in non-owner users.

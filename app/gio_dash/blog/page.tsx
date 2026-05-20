@@ -7,7 +7,11 @@ import { isOwner } from "@/lib/auth/ownership";
 import { getBlogPostsForAdmin, type BlogPostWithStats } from "@/lib/db/blog";
 import BlogPostsClient from "./BlogPostsClient";
 
-export default async function BlogAdminPage() {
+interface BlogAdminPageProps {
+  searchParams: Promise<{ created?: string; updated?: string }>;
+}
+
+export default async function BlogAdminPage({ searchParams }: BlogAdminPageProps) {
   const supabase = await createServerClient();
 
   // Auth check: admin only
@@ -19,6 +23,10 @@ export default async function BlogAdminPage() {
   if (!isOwner(email)) {
     redirect("/dashboard");
   }
+
+  const params = await searchParams;
+  const created = params.created === "1";
+  const updated = params.updated === "1";
 
   // Fetch posts with stats
   let posts: BlogPostWithStats[] = [];
@@ -53,6 +61,24 @@ export default async function BlogAdminPage() {
             New Post
           </Link>
         </div>
+
+        {created && (
+          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4 mb-6">
+            <p className="text-green-700 dark:text-green-300 font-medium">Blog post published successfully.</p>
+            <p className="text-green-600 dark:text-green-400 text-sm mt-1">
+              The post was saved to Supabase and should now appear on the public blog page.
+            </p>
+          </div>
+        )}
+
+        {updated && (
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-6">
+            <p className="text-blue-700 dark:text-blue-300 font-medium">Blog post updated successfully.</p>
+            <p className="text-blue-600 dark:text-blue-400 text-sm mt-1">
+              The latest changes were saved to Supabase and the public blog was revalidated.
+            </p>
+          </div>
+        )}
 
         {error && (
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6">

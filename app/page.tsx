@@ -1,18 +1,21 @@
-//C:\Users\giost\CascadeProjects\websites\luis-ruiz\luis_ruiz_2\app\page.tsx
-import Hero from "../components/app/landing_page/Hero";
-import { Highlights } from "../components/app/landing_page/Highlights";
-import TechSection from "../components/app/landing_page/techSection";
-import Quote from "../components/app/landing_page/quotes";  
-import CallToAction from "../components/app/landing_page/CallToAction";
+import { MasterHero } from "@/components/app/home/MasterHero";
+import { PublicStatusPanel } from "@/components/app/home/PublicStatusPanel";
+import { ServiceCards } from "@/components/app/home/ServiceCards";
+import { SystemsOverview } from "@/components/app/home/SystemsOverview";
+import { FeaturedProjects } from "@/components/app/home/FeaturedProjects";
+import { CaseStudyPreview } from "@/components/app/home/CaseStudyPreview";
+import { HomeCTA } from "@/components/app/home/HomeCTA";
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="w-full h-full overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900">
-      <Hero />
-      <Highlights />
-      <Quote />
-      <TechSection />
-      <CallToAction />
-    </div>
-  )
+    <main className="min-h-screen bg-background">
+      <MasterHero />
+      <PublicStatusPanel />
+      <ServiceCards />
+      <SystemsOverview />
+      <FeaturedProjects />
+      <CaseStudyPreview />
+      <HomeCTA />
+    </main>
+  );
 }

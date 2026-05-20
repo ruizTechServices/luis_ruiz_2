@@ -28,9 +28,10 @@ interface BlogPost {
   created_at: string;
   title: string;
   summary: string;
-  tags: string; // or string[] if you update the schema
+  tags: string;
   references: string;
   body: string;
+  relatedProjects?: { id: number; title: string | null; url: string }[];
 }
 
 interface BlogCardProps {
@@ -39,16 +40,20 @@ interface BlogCardProps {
 
 export function BlogPostCard({ blogPost }: BlogCardProps) {
   return (
-    <article className="bg-white rounded-lg shadow-md p-6 mb-4">
+    <article className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-sm backdrop-blur-sm transition-all hover:border-violet-400/20 hover:bg-white/[0.07]">
+      <div className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-violet-200/70">
+        Blog / Build Log
+      </div>
+
       <Link href={`/blog/${blogPost.id}`}>
-        <h2 className="text-xl font-bold mb-2 hover:underline">
+        <h2 className="mb-3 text-xl font-bold text-white hover:text-violet-200 transition-colors">
           {blogPost.title}
         </h2>
       </Link>
-      <p className="text-gray-600 mb-3">{blogPost.summary}</p>
 
-      {/* Tags - clickable filter links */}
-      <div className="flex flex-wrap gap-2 mb-3">
+      <p className="mb-4 leading-7 text-slate-300">{blogPost.summary}</p>
+
+      <div className="flex flex-wrap gap-2 mb-4">
         {blogPost.tags &&
           blogPost.tags.split(",").map((tag, index) => {
             const trimmedTag = tag.trim();
@@ -57,9 +62,9 @@ export function BlogPostCard({ blogPost }: BlogCardProps) {
                 key={index}
                 href={`/blog?tag=${encodeURIComponent(trimmedTag)}`}
                 className={cn(
-                  "px-3 py-1 rounded-full text-sm font-medium transition-all",
-                  "bg-blue-100 text-blue-800 hover:bg-blue-200",
-                  "dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50",
+                  "rounded-full px-3 py-1 text-sm font-medium transition-all",
+                  "bg-violet-500/15 text-violet-200 hover:bg-violet-500/25",
+                  "border border-violet-400/20",
                   "hover:scale-105 active:scale-95 cursor-pointer"
                 )}
               >
@@ -69,11 +74,31 @@ export function BlogPostCard({ blogPost }: BlogCardProps) {
           })}
       </div>
 
-      {/* Date */}
-      <div className="text-sm text-gray-500">
-        {blogPost.created_at
-          ? new Date(blogPost.created_at).toLocaleDateString()
-          : "No date"}
+      <div className="flex flex-col gap-3 text-sm text-slate-400">
+        {blogPost.relatedProjects && blogPost.relatedProjects.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {blogPost.relatedProjects.slice(0, 3).map((project) => (
+              <Link
+                key={project.id}
+                href="/projects"
+                className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-300 hover:border-violet-400/20 hover:text-violet-200"
+              >
+                Related: {project.title || project.url}
+              </Link>
+            ))}
+          </div>
+        ) : null}
+
+        <div className="flex items-center justify-between gap-4">
+          <span>
+            {blogPost.created_at
+              ? new Date(blogPost.created_at).toLocaleDateString()
+              : "No date"}
+          </span>
+          <Link href="/projects" className="font-medium text-violet-300 hover:text-violet-200">
+            See project work →
+          </Link>
+        </div>
       </div>
     </article>
   );
@@ -97,10 +122,32 @@ export async function BlogCard() {
     return <div className="text-sm text-gray-500">No posts yet.</div>;
   }
 
+  const postIds = posts.map((post) => post.id);
+  const relationMap = new Map<number, { id: number; title: string | null; url: string }[]>();
+
+  if (postIds.length > 0) {
+    const relationRes = await supabase
+      .from("project_blog_links")
+      .select("blog_post_id, projects(id, title, url)")
+      .in("blog_post_id", postIds);
+
+    if (!relationRes.error && relationRes.data) {
+      for (const row of relationRes.data as Array<{ blog_post_id: number; projects: { id: number; title: string | null; url: string } | { id: number; title: string | null; url: string }[] | null }>) {
+        const entries = row.projects ? (Array.isArray(row.projects) ? row.projects : [row.projects]) : [];
+        relationMap.set(row.blog_post_id, [...(relationMap.get(row.blog_post_id) ?? []), ...entries]);
+      }
+    }
+  }
+
+  const normalizedPosts = posts.map((post) => ({
+    ...post,
+    relatedProjects: relationMap.get(post.id) ?? [],
+  }));
+
   return (
     <Carousel opts={{ align: "start", loop: true }} className="w-full">
       <CarouselContent>
-        {posts.map((p) => (
+        {normalizedPosts.map((p) => (
           <CarouselItem key={p.id}>
             <BlogPostCard blogPost={p} />
           </CarouselItem>

@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { ChevronRightIcon, SparklesIcon } from '@heroicons/react/20/solid';
+import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import { ArrowDownIcon } from '@heroicons/react/24/outline';
 import NextImage from 'next/image';
 import Link from 'next/link';
@@ -14,13 +14,19 @@ export default function Hero() {
   const { isAvailable, availabilityText } = useAvailability();
   const { slides, currentSlide } = useHeroSlides();
 
+  const carouselNotes = [
+    'A rotating visual layer showing the person behind the work, not just the code.',
+    'Built to make the hero feel active and human without turning the homepage into fluff.',
+    'Kept intentionally as a proof-of-presence element, now cleaner and less intrusive.',
+  ];
+
   const [isVisible, setIsVisible] = useState(false);
   const [particles, setParticles] = useState<{ left: number; top: number; delay: number; duration: number }[]>([]);
+  const [noteIndex, setNoteIndex] = useState(0);
 
   useEffect(() => {
     setIsVisible(true);
 
-    // Generate floating particles client-side after mount to avoid SSR/client mismatch
     const count = 30;
     const generated = Array.from({ length: count }, () => ({
       left: Math.random() * 100,
@@ -31,12 +37,18 @@ export default function Hero() {
     setParticles(generated);
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNoteIndex((prev) => (prev + 1) % carouselNotes.length);
+    }, 3200);
+
+    return () => clearInterval(interval);
+  }, [carouselNotes.length]);
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
-      {/* Animated gradient background */}
       <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20 animate-pulse" />
 
-      {/* Dynamic mesh gradient */}
       <div
         className="absolute inset-0 opacity-30"
         style={{
@@ -44,7 +56,6 @@ export default function Hero() {
         }}
       />
 
-      {/* Floating particles (client-only after mount to prevent hydration mismatch) */}
       <div className="absolute inset-0">
         {particles.map((p, i) => (
           <div
@@ -62,14 +73,11 @@ export default function Hero() {
         ))}
       </div>
 
-      {/* Grid pattern overlay */}
       <div className={`absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20`} />
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
         <div className="lg:grid lg:grid-cols-2 lg:gap-x-12 lg:items-center">
-          {/* Left Content */}
           <div className={`transition-all duration-1000 ${isVisible ? 'translate-x-0 opacity-100' : '-translate-x-20 opacity-0'}`}>
-            {/* Status Badge (links to Contact when available; hidden when text says "not available") */}
             {isAvailable && !availabilityText.toLowerCase().includes('not available') ? (
               <Link href="/contact" className="inline-block">
                 <div className={`inline-flex items-center gap-x-2 rounded-full px-4 py-2 backdrop-blur-md mb-8 group hover:scale-105 transition-transform cursor-pointer border
@@ -84,40 +92,27 @@ export default function Hero() {
               </Link>
             ) : null}
 
-            {/* Main Heading */}
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-blue-100 mb-6">
+              Founder-Builder • ruizTechServices
+            </div>
+
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-5">
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 animate-gradient">
-                Luis Giovanni Ruiz
+                Luis Ruiz
               </span>
-              <span className="block text-white mt-2">
-                Full-Stack
-                <span className="relative inline-block ml-3">
-                  <span className="absolute inset-0 bg-gradient-to-r from-violet-600 to-indigo-600 blur-lg opacity-75 animate-pulse"></span>
-                  <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400">
-                    Developer
-                  </span>
-                </span>
+              <span className="block text-white mt-3 leading-tight">
+                Building real software, in public.
               </span>
             </h1>
 
-            {/* Tagline */}
-            <p className="text-xl sm:text-2xl text-violet-300 font-medium mb-6">
-              Building fast, scalable web experiences
+            <p className="text-lg sm:text-xl text-violet-300 font-medium mb-8 max-w-xl">
+              Projects, Blog / Build Log, and practical systems through ruizTechServices.
             </p>
 
-            {/* Description */}
-            <p className="text-lg text-gray-300 mb-10 leading-relaxed max-w-xl">
-              Crafting next-generation digital experiences with cutting-edge technologies.
-              Specialized in building scalable, performant applications that push the boundaries
-              of what&#39;s possible on the web.
-            </p>
-
-            {/* CTA Buttons */}
             <div className="flex flex-wrap gap-4">
               <Button variant="cta" size="lg" className="px-8 py-6 text-base" asChild>
                 <Link href="/contact">
-                  <SparklesIcon className="h-5 w-5" />
-                  Let&#39;s Connect
+                  Work With Me
                 </Link>
               </Button>
 
@@ -127,22 +122,23 @@ export default function Hero() {
                   <ChevronRightIcon className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
+
+              <Button variant="cta-outline" size="lg" className="px-8 py-6 text-base group" asChild>
+                <Link href="/blog">
+                  Read Blog / Build Log
+                </Link>
+              </Button>
             </div>
           </div>
 
-          {/* Right Content - Image */}
           <div className={`relative mt-16 lg:mt-0 transition-all duration-1000 delay-300 ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-20 opacity-0'}`}>
             <div className="relative mx-auto w-full max-w-lg">
-              {/* Glow effect behind image */}
               <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-3xl blur-3xl opacity-50 animate-pulse"></div>
 
-              {/* Glass morphism card */}
               <div className="hidden md:block relative bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl">
-                {/* Decorative elements */}
                 <div className="absolute -top-4 -right-4 h-20 w-20 bg-gradient-to-br from-pink-500 to-violet-500 rounded-full blur-2xl opacity-60"></div>
                 <div className="absolute -bottom-4 -left-4 h-24 w-24 bg-gradient-to-tr from-blue-500 to-cyan-500 rounded-full blur-2xl opacity-60"></div>
 
-                {/* Profile image placeholder (slideshow) */}
                 <div className="relative aspect-square rounded-2xl bg-transparent overflow-hidden group">
                   <div className="absolute inset-0">
                     {slides.map((src, idx) => (
@@ -155,21 +151,28 @@ export default function Hero() {
                         className="object-cover transition-opacity duration-700 ease-in-out mix-blend-multiply"
                         style={{ opacity: idx === currentSlide ? 1 : 0 }}
                         priority={idx === 0}
+                        unoptimized={src.startsWith('http')}
                       />
                     ))}
-                    {/* Gradient overlay on top */}
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                   </div>
-                  {/* Hover effect */}
                   <div className="absolute inset-0 bg-gradient-to-r from-violet-600/0 to-indigo-600/0 group-hover:from-violet-600/20 group-hover:to-indigo-600/20 transition-all duration-300"></div>
                 </div>
 
+                <div className="mt-5 min-h-[64px] border-t border-white/10 pt-4">
+                  <p className="text-xs uppercase tracking-[0.22em] text-violet-200/60 mb-2">Carousel notes</p>
+                  <p
+                    key={noteIndex}
+                    className="text-sm text-slate-300 leading-relaxed animate-fadeNote"
+                  >
+                    {carouselNotes[noteIndex]}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
           <ArrowDownIcon className="h-6 w-6 text-white/40" />
         </div>
@@ -187,15 +190,11 @@ export default function Hero() {
           50% { background-position: 100% 50%; }
         }
 
-        @keyframes fadeInUp {
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
+        @keyframes fadeNote {
+          0% { opacity: 0; transform: translateY(6px); }
+          15% { opacity: 1; transform: translateY(0); }
+          85% { opacity: 1; transform: translateY(0); }
+          100% { opacity: 0; transform: translateY(-4px); }
         }
 
         .animate-gradient {
@@ -203,8 +202,8 @@ export default function Hero() {
           animation: gradient 3s ease infinite;
         }
 
-        .animate-fadeInUp {
-          animation: fadeInUp 0.6s ease-out;
+        .animate-fadeNote {
+          animation: fadeNote 3.2s ease-in-out;
         }
       `}</style>
     </div>

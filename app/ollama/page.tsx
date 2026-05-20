@@ -1,561 +1,142 @@
-'use client'
+import type { Metadata } from "next";
+import Link from "next/link";
+import { BeakerIcon, CpuChipIcon, MusicalNoteIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import Soundboard from "@/components/app/landing_page/soundboard";
+import OllamaChatPage from "./OllamaChatClient";
 
-import React, { useEffect, useRef, useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select'
-import { Label } from '@/components/ui/label'
-import { Slider } from '@/components/ui/slider'
-import { Switch } from '@/components/ui/switch'
-import { Input as NumberInput } from '@/components/ui/input'
-import EmbedInput from '@/components/app/chatbot_basic/EmbedInput'
-import { Toaster, toast } from 'sonner'
-import { checkOllamaOnline } from '@/lib/functions/isOllama'
+export const metadata: Metadata = {
+  title: "Experiments | Luis Ruiz",
+  description:
+    "Public experiments, interface tests, local AI work, and playful software builds from Luis Ruiz.",
+};
 
-async function formatFetchError(res: Response, origin: string) {
-  try {
-    const contentType = res.headers.get('content-type')?.toLowerCase() ?? ''
-    if (contentType.includes('application/json')) {
-      const data = await res.json().catch(() => null)
-      if (data && typeof data === 'object') {
-        const message = typeof (data as { error?: unknown }).error === 'string'
-          ? (data as { error?: string }).error
-          : JSON.stringify(data)
-        return `${origin} responded ${res.status}${message ? ` – ${message}` : ''}`
-      }
-    } else {
-      const text = (await res.text().catch(() => '')).trim()
-      if (text) {
-        return `${origin} responded ${res.status} – ${text.slice(0, 400)}`
-      }
-    }
-  } catch {}
-  return `${origin} responded ${res.status}`
-}
+const experimentNotes = [
+  {
+    title: "Public experiments, not filler",
+    description:
+      "This page is for real exploratory work, interaction ideas, local AI testing, and builds that show range even when they are not client-facing products.",
+    icon: BeakerIcon,
+  },
+  {
+    title: "Technical play still counts",
+    description:
+      "Some experiments sharpen product instincts, some stress-test interfaces, and some are just worth shipping because they prove speed, curiosity, and taste.",
+    icon: SparklesIcon,
+  },
+  {
+    title: "Local-first AI belongs here",
+    description:
+      "The Ollama surface stays in experiments because it reflects active system exploration, not polished portfolio positioning.",
+    icon: CpuChipIcon,
+  },
+];
 
-// Minimal chat UI for local Ollama via Next.js API routes
-export default function OllamaChatPage() {
-  const [models, setModels] = useState<string[]>([])
-  const [model, setModel] = useState<string>('')
-  const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([])
-  const [streaming, setStreaming] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const controllerRef = useRef<AbortController | null>(null)
-  const assistantBufferRef = useRef('')
-  const [temperature, setTemperature] = useState<number>(0.6)
-  const [topP, setTopP] = useState<number>(0.9)
-  const [chatId, setChatId] = useState<number | null>(null)
-  const [useContext, setUseContext] = useState<boolean>(false)
-  const [topK, setTopK] = useState<number>(5)
-  const [minSim, setMinSim] = useState<number>(0.75)
-  const [dbPersist, setDbPersist] = useState<string | null>(null)
-  const [isOnline, setIsOnline] = useState<boolean>(true)
-  const [checkingOnline, setCheckingOnline] = useState<boolean>(false)
-  const [baseUrl, setBaseUrl] = useState<string | null>(null)
-  const [siteOrigin, setSiteOrigin] = useState<string>('')
-
-  useEffect(() => {
-    let active = true
-    ;(async () => {
-      try {
-        let list: string[] = []
-        let latestError: string | null = null
-        if (baseUrl) {
-          const res = await fetch(`${baseUrl}/api/tags`, { cache: 'no-store' })
-          if (res.ok) {
-            const json = (await res.json()) as { models?: Array<{ name?: string }> }
-            list = (json.models ?? []).map(m => m?.name).filter((n): n is string => Boolean(n))
-            latestError = null
-          }
-        } else {
-          const res = await fetch('/api/ollama/models', { cache: 'no-store' })
-          const json = (await res.json()) as { models?: string[]; error?: string }
-          list = Array.isArray(json.models) ? json.models : []
-          latestError = typeof json.error === 'string' ? json.error : null
-        }
-        if (!active) return
-        setModels(list)
-        setError(latestError)
-        let preferred = list.find(m => /llama3\.2:1b|phi3:mini|gemma3:1b/i.test(m)) || list[0] || ''
-
-        try {
-          const raw = localStorage.getItem('ollama_settings')
-          if (raw) {
-            const s = JSON.parse(raw)
-            if (s && typeof s.model === 'string' && list.includes(s.model)) preferred = s.model
-            if (typeof s.temperature === 'number') setTemperature(s.temperature)
-            if (typeof s.topP === 'number') setTopP(s.topP)
-          }
-        } catch {}
-        setModel(preferred)
-      } catch (e: unknown) {
-        if (!active) return
-        setModels([])
-        setModel('')
-        const message = e instanceof Error ? e.message : 'Failed to load local models'
-        setError(message)
-      }
-    })()
-
-    return () => {
-      active = false
-    }
-  }, [baseUrl])
-
-  useEffect(() => {
-    let active = true
-    ;(async () => {
-      try {
-        const h = await checkOllamaOnline(1500)
-        if (!active) return
-        setIsOnline(Boolean(h.online))
-        setBaseUrl(h.baseUrl ?? null)
-        if (!h.online) setError('Ollama server is not running.')
-      } catch {}
-    })()
-    return () => {
-      active = false
-    }
-  }, [])
-
-  useEffect(() => {
-    try {
-      setSiteOrigin(window.location.origin)
-    } catch {}
-  }, [])
-
-  // Persist settings (model, temperature, topP)
-  useEffect(() => {
-    try {
-      localStorage.setItem('ollama_settings', JSON.stringify({ model, temperature, topP }))
-    } catch {}
-  }, [model, temperature, topP])
-
-  // Load messages for the current model on change
-  useEffect(() => {
-    if (!model) return
-    try {
-      const raw = localStorage.getItem(`ollama_chat_${model}`)
-      setMessages(raw ? (JSON.parse(raw) as Array<{ role: 'user' | 'assistant'; content: string }>) : [])
-    } catch {
-      setMessages([])
-    }
-  }, [model])
-
-  // Load chatId for the current model on change
-  useEffect(() => {
-    if (!model) return
-    try {
-      const raw = localStorage.getItem(`ollama_chatId_${model}`)
-      const parsed = raw ? Number(raw) : null
-      setChatId(Number.isFinite(parsed as number) ? parsed : null)
-    } catch {
-      setChatId(null)
-    }
-  }, [model])
-
-  // Load context settings for the current model
-  useEffect(() => {
-    if (!model) return
-    try {
-      const raw = localStorage.getItem(`ollama_ctx_${model}`)
-      if (raw) {
-        const s = JSON.parse(raw)
-        if (typeof s.useContext === 'boolean') setUseContext(s.useContext)
-        if (typeof s.topK === 'number') setTopK(s.topK)
-        if (typeof s.minSim === 'number') setMinSim(s.minSim)
-      }
-    } catch {}
-  }, [model])
-
-  // Persist messages per model
-  useEffect(() => {
-    if (!model) return
-    try {
-      localStorage.setItem(`ollama_chat_${model}`, JSON.stringify(messages))
-    } catch {}
-  }, [messages, model])
-
-  // Persist context settings per model
-  useEffect(() => {
-    if (!model) return
-    try {
-      localStorage.setItem(`ollama_ctx_${model}`, JSON.stringify({ useContext, topK, minSim }))
-    } catch {}
-  }, [useContext, topK, minSim, model])
-
-  async function sendPrompt(prompt: string) {
-    setError(null)
-    if (!isOnline) {
-      setError('Ollama server is not running.')
-      return
-    }
-    const p = prompt.trim()
-    if (!p) return
-    if (!model) {
-      setError('No model selected.')
-      return
-    }
-
-    // Append the user message
-    const nextMessages = [...messages, { role: 'user' as const, content: p }]
-    setMessages(nextMessages)
-
-    // Prepare to stream assistant reply
-    setStreaming(true)
-    assistantBufferRef.current = ''
-    controllerRef.current = new AbortController()
-
-    try {
-      if (baseUrl) {
-        setDbPersist('off')
-        const res = await fetch(`${baseUrl}/api/chat`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model,
-            messages: nextMessages.map(m => ({ role: m.role, content: m.content })),
-            stream: true,
-            options: { temperature, top_p: topP },
-          }),
-          signal: controllerRef.current.signal,
-        })
-
-        if (!res.ok) {
-          throw new Error(await formatFetchError(res, `Ollama at ${baseUrl}`))
-        }
-        if (!res.body) {
-          throw new Error(`Ollama at ${baseUrl} returned an empty response body`)
-        }
-
-        const reader = res.body.getReader()
-        const decoder = new TextDecoder()
-        let done = false
-        let buffer = ''
-
-        while (!done) {
-          const { value, done: d } = await reader.read()
-          done = d
-          if (value) {
-            buffer += decoder.decode(value, { stream: true })
-            const lines = buffer.split('\n')
-            buffer = lines.pop() ?? ''
-            for (const line of lines) {
-              const t = line.trim()
-              if (!t) continue
-              try {
-                const evt = JSON.parse(t) as { message?: { content?: string }; done?: boolean }
-                const piece = evt?.message?.content ?? ''
-                if (piece) {
-                  assistantBufferRef.current += piece
-                  setMessages(curr => {
-                    const last = curr[curr.length - 1]
-                    if (last && last.role === 'assistant') {
-                      return [...curr.slice(0, -1), { ...last, content: assistantBufferRef.current }]
-                    } else {
-                      return [...curr, { role: 'assistant' as const, content: assistantBufferRef.current }]
-                    }
-                  })
-                }
-                if (evt?.done) {
-                  done = true
-                  break
-                }
-              } catch {}
-            }
-          }
-        }
-      } else {
-        const res = await fetch('/api/ollama', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model,
-            temperature,
-            top_p: topP,
-            chat_id: chatId,
-            with_context: useContext,
-            top_k: topK,
-            min_similarity: minSim,
-            messages: nextMessages.map(m => ({ role: m.role, content: m.content })),
-          }),
-          signal: controllerRef.current.signal,
-        })
-
-        if (!res.ok) {
-          throw new Error(await formatFetchError(res, '/api/ollama'))
-        }
-        if (!res.body) {
-          throw new Error('Server response did not include a readable body')
-        }
-
-        const hdr = res.headers.get('x-chat-id')
-        if (hdr) {
-          const id = Number(hdr)
-          if (!Number.isNaN(id)) {
-            setChatId(id)
-            try { localStorage.setItem(`ollama_chatId_${model}`, String(id)) } catch {}
-          }
-        }
-
-        const persistHdr = res.headers.get('x-db-persist')
-        if (persistHdr) setDbPersist(persistHdr)
-        if (persistHdr === 'on') {
-          if (hdr) {
-            toast.success(`Saved to Supabase • Session ${hdr}`)
-          } else {
-            toast.success('Saved to Supabase')
-          }
-        }
-
-        const reader = res.body.getReader()
-        const decoder = new TextDecoder()
-        let done = false
-
-        while (!done) {
-          const { value, done: d } = await reader.read()
-          done = d
-          if (value) {
-            const chunk = decoder.decode(value)
-            assistantBufferRef.current += chunk
-            setMessages(curr => {
-              const last = curr[curr.length - 1]
-              if (last && last.role === 'assistant') {
-                return [...curr.slice(0, -1), { ...last, content: assistantBufferRef.current }]
-              } else {
-                return [...curr, { role: 'assistant' as const, content: assistantBufferRef.current }]
-              }
-            })
-          }
-        }
-      }
-    } catch (e: unknown) {
-      const isAbort = (
-        typeof e === 'object' &&
-        e !== null &&
-        'name' in e &&
-        (e as { name?: unknown }).name === 'AbortError'
-      );
-      if (!isAbort) {
-        const msg = e instanceof Error ? e.message : 'Stream failed'
-        setError(msg)
-      }
-    } finally {
-      setStreaming(false)
-      controllerRef.current = null
-    }
-  }
-
-  function handleStop() {
-    controllerRef.current?.abort()
-  }
-
-  function handleClear() {
-    if (streaming) controllerRef.current?.abort()
-    setMessages([])
-    try { if (model) localStorage.removeItem(`ollama_chat_${model}`) } catch {}
-    try { if (model) localStorage.removeItem(`ollama_chatId_${model}`) } catch {}
-    setChatId(null)
-  }
-
-  function handleCopy(text: string) {
-    try {
-      void navigator.clipboard.writeText(text)
-      toast.success('Copied to clipboard')
-    } catch {
-      toast.error('Copy failed')
-    }
-  }
-
-  async function handleRetry() {
-    setCheckingOnline(true)
-    try {
-      const h = await checkOllamaOnline(1500)
-      setIsOnline(Boolean(h.online))
-      setBaseUrl(h.baseUrl ?? null)
-      if (h.online) {
-        try {
-          let list: string[] = []
-          let latestError: string | null = null
-          if (h.baseUrl) {
-            const res = await fetch(`${h.baseUrl}/api/tags`, { cache: 'no-store' })
-            if (res.ok) {
-              const json = (await res.json()) as { models?: Array<{ name?: string }> }
-              list = (json.models ?? []).map(m => m?.name).filter((n): n is string => Boolean(n))
-              latestError = null
-            }
-          } else {
-            const res = await fetch('/api/ollama/models', { cache: 'no-store' })
-            const json = (await res.json()) as { models?: string[]; error?: string }
-            list = Array.isArray(json.models) ? json.models : []
-            latestError = typeof json.error === 'string' ? json.error : null
-          }
-          setModels(list)
-          let preferred = list.find(m => /llama3\.2:1b|phi3:mini|gemma3:1b/i.test(m)) || list[0] || ''
-          try {
-            const raw = localStorage.getItem('ollama_settings')
-            if (raw) {
-              const s = JSON.parse(raw)
-              if (s && typeof s.model === 'string' && list.includes(s.model)) preferred = s.model
-              if (typeof s.temperature === 'number') setTemperature(s.temperature)
-              if (typeof s.topP === 'number') setTopP(s.topP)
-            }
-          } catch {}
-          setModel(preferred)
-          setError(latestError)
-        } catch {}
-      } else {
-        setError('Ollama server is not running.')
-      }
-    } finally {
-      setCheckingOnline(false)
-    }
-  }
-
+export default function ExperimentsPage() {
   return (
-    <>
-    <Toaster richColors position="top-right" />
-    <div className="mx-auto max-w-3xl p-4 space-y-4">
-      <h1 className="text-2xl font-semibold">Local Ollama Chat</h1>
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(125,211,252,0.12),_transparent_24%),linear-gradient(135deg,_#020617_0%,_#0f172a_42%,_#111827_100%)] text-white">
+      <section className="border-b border-white/10 bg-white/[0.03] backdrop-blur-xl">
+        <div className="mx-auto max-w-7xl px-6 py-20 sm:py-24 lg:px-8">
+          <div className="max-w-4xl">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-sky-200/20 bg-white/10 px-4 py-2 text-sm font-medium text-sky-100 shadow-[0_12px_35px_rgba(15,23,42,0.2)] backdrop-blur-xl">
+              <BeakerIcon className="h-4 w-4" />
+              Experiments / Lab
+            </div>
 
-      {!isOnline && (
-        <div className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700 flex items-start justify-between gap-3">
-          <div className="space-y-2">
-            <div>
-              Ollama is not running. Please install and start Ollama to use this chatbot.{' '}
-              <a href="https://ollama.com/download" className="underline" target="_blank" rel="noreferrer">Download Ollama</a>
+            <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Interfaces, local AI, and side experiments worth keeping public.
+            </h1>
+
+            <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">
+              Not everything belongs in the main proof-of-work flow. This page is for the more exploratory side of the site, experiments that still show how I think, build, and test ideas in public.
+            </p>
+
+            <div className="mt-10 flex flex-wrap gap-4">
+              <Link
+                href="/projects"
+                className="inline-flex items-center gap-2 rounded-full border border-sky-100/20 bg-white/90 px-6 py-3 text-sm font-semibold text-slate-900 shadow-[0_14px_32px_rgba(148,163,184,0.18)] transition hover:bg-white"
+              >
+                See Projects
+              </Link>
+              <Link
+                href="/blog"
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-6 py-3 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-white/[0.12]"
+              >
+                Read Blog / Build Log
+              </Link>
             </div>
-            <div className="text-xs text-red-800">
-              Allow this site in your local Ollama by setting OLLAMA_ORIGINS to:
-              <div className="mt-1 font-mono text-[11px] bg-white/70 text-red-900 rounded px-1 py-0.5 inline-block">
-                {siteOrigin || 'https://your-domain.com'}
-              </div>
-            </div>
-            <div className="grid gap-2 text-xs">
-              <div className="flex items-start gap-2">
-                <div className="flex-1 rounded bg-white/70 p-2 font-mono whitespace-pre-wrap text-red-900">
-{`export OLLAMA_ORIGINS="${siteOrigin || 'https://your-domain.com'}"\nollama serve`}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
+        <div className="grid gap-6 md:grid-cols-3">
+          {experimentNotes.map((item) => {
+            const Icon = item.icon;
+            return (
+              <div key={item.title} className="rounded-2xl border border-white/10 bg-white/[0.08] p-6 shadow-[0_18px_45px_rgba(15,23,42,0.18)] backdrop-blur-xl">
+                <div className="mb-4 inline-flex rounded-xl border border-sky-200/20 bg-white/10 p-3 text-sky-100 backdrop-blur-lg">
+                  <Icon className="h-6 w-6" />
                 </div>
-                <Button size="sm" variant="secondary" onClick={() => handleCopy(`export OLLAMA_ORIGINS=\"${siteOrigin || 'https://your-domain.com'}\"\nollama serve`)}>Copy macOS/Linux</Button>
+                <h2 className="text-lg font-semibold text-white">{item.title}</h2>
+                <p className="mt-3 text-sm leading-7 text-slate-300">{item.description}</p>
               </div>
-              <div className="flex items-start gap-2">
-                <div className="flex-1 rounded bg-white/70 p-2 font-mono whitespace-pre-wrap text-red-900">
-{`$env:OLLAMA_ORIGINS="${siteOrigin || 'https://your-domain.com'}"\nollama serve`}
-                </div>
-                <Button size="sm" variant="secondary" onClick={() => handleCopy(`$env:OLLAMA_ORIGINS=\"${siteOrigin || 'https://your-domain.com'}\"\nollama serve`)}>Copy Windows</Button>
-              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
+        <div className="mb-8 max-w-4xl">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-sky-200/15 bg-sky-200/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-100 backdrop-blur-md">
+            <CpuChipIcon className="h-4 w-4" />
+            Local AI experiment
+          </div>
+          <h2 className="text-3xl font-bold text-white sm:text-4xl">Ollama Lab</h2>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300 sm:text-base">
+            The goal here is simple, make local AI testing feel clean, capable, and product-like. The chat should be the focus, with supporting context that helps without crowding it.
+          </p>
+        </div>
+
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_290px] xl:items-start">
+          <div className="rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.88),rgba(15,23,42,0.72))] p-2 shadow-[0_30px_90px_rgba(2,6,23,0.45)] ring-1 ring-white/5 backdrop-blur-2xl sm:p-4">
+            <OllamaChatPage />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+            <div className="rounded-[1.6rem] border border-white/10 bg-white/[0.06] p-5 shadow-[0_18px_45px_rgba(15,23,42,0.18)] backdrop-blur-xl">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-100/75">What this is</p>
+              <h3 className="mt-2 text-lg font-semibold text-white">A focused local model workspace.</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-300">
+                This is for real local prompting, streaming checks, and retrieval experiments. It should feel reliable and calm, not like a stack of random demo boxes.
+              </p>
+            </div>
+
+            <div className="rounded-[1.6rem] border border-white/10 bg-white/[0.06] p-5 shadow-[0_18px_45px_rgba(15,23,42,0.18)] backdrop-blur-xl">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-100/75">Quick guidance</p>
+              <ul className="mt-3 space-y-3 text-sm leading-7 text-slate-300">
+                <li>Start with a simple prompt to confirm streaming.</li>
+                <li>Adjust temperature and top-p only when behavior actually needs tuning.</li>
+                <li>Use retrieval only when you want context involved.</li>
+              </ul>
             </div>
           </div>
-          <Button size="sm" variant="secondary" onClick={handleRetry} disabled={checkingOnline}>
-            {checkingOnline ? 'Checking…' : 'Retry'}
-          </Button>
         </div>
-      )}
+      </section>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2">
-          <Label className="text-sm text-muted-foreground">Model</Label>
-          <Select value={model} onValueChange={setModel}>
-            <SelectTrigger size="sm" className="min-w-[14rem]">
-              <SelectValue placeholder="Select a model" />
-            </SelectTrigger>
-            <SelectContent>
-              {models.length === 0 ? (
-                <div className="px-2 py-1.5 text-xs text-muted-foreground">No local models found</div>
-              ) : (
-                models.map(m => (
-                  <SelectItem key={m} value={m}>{m}</SelectItem>
-                ))
-              )}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <Label htmlFor="temp" className="text-sm text-muted-foreground">Temperature</Label>
-            <div className="w-40">
-              <Slider id="temp" value={[temperature]} onValueChange={(v) => setTemperature(v[0] ?? 0.6)} min={0} max={1} step={0.01} />
-            </div>
-            <span className="text-xs text-muted-foreground w-10 text-right">{temperature.toFixed(2)}</span>
+      <section className="mx-auto max-w-7xl px-6 pb-20 lg:px-8">
+        <div className="mb-6 max-w-3xl">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-sky-100 backdrop-blur-md">
+            <MusicalNoteIcon className="h-4 w-4" />
+            Public experiment
           </div>
-          <div className="flex items-center gap-2">
-            <Label htmlFor="topp" className="text-sm text-muted-foreground">top_p</Label>
-            <div className="w-40">
-              <Slider id="topp" value={[topP]} onValueChange={(v) => setTopP(v[0] ?? 0.9)} min={0} max={1} step={0.01} />
-            </div>
-            <span className="text-xs text-muted-foreground w-10 text-right">{topP.toFixed(2)}</span>
-          </div>
+          <h2 className="text-3xl font-bold text-white">Soundboard</h2>
+          <p className="mt-3 text-sm leading-7 text-slate-300">
+            This stays exactly what it is, a playful interactive experiment. It just no longer competes with the Ollama chat surface for top billing on the page.
+          </p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <Label className="text-sm text-muted-foreground">Use context</Label>
-            <Switch checked={useContext} onCheckedChange={setUseContext} />
-          </div>
-          {useContext && (
-            <>
-              <div className="flex items-center gap-2">
-                <Label htmlFor="minsim" className="text-sm text-muted-foreground">Min sim</Label>
-                <div className="w-40">
-                  <Slider id="minsim" value={[minSim]} onValueChange={(v) => setMinSim(v[0] ?? 0.75)} min={0.5} max={0.95} step={0.01} />
-                </div>
-                <span className="text-xs text-muted-foreground w-12 text-right">{minSim.toFixed(2)}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Label htmlFor="topk" className="text-sm text-muted-foreground">Top K</Label>
-                <NumberInput
-                  id="topk"
-                  type="number"
-                  value={topK}
-                  min={1}
-                  max={20}
-                  onChange={(e) => {
-                    const n = Number(e.target.value)
-                    setTopK(Number.isFinite(n) ? Math.max(1, Math.min(20, n)) : 5)
-                  }}
-                  className="w-20 h-8 text-sm"
-                />
-              </div>
-            </>
-          )}
-        </div>
-        <div className="ml-auto flex items-center gap-2">
-          {streaming && (
-            <Button variant="destructive" size="sm" onClick={handleStop}>Stop</Button>
-          )}
-          <Button variant="secondary" size="sm" onClick={handleClear}>Clear chat</Button>
-        </div>
-      </div>
 
-      <div className="border rounded p-3 h-80 overflow-y-auto bg-white/40">
-        {messages.length === 0 ? (
-          <p className="text-sm text-gray-500">Ask anything to your local model.</p>
-        ) : (
-          <ul className="space-y-3">
-            {messages.map((m, i) => (
-              <li key={i} className="whitespace-pre-wrap">
-                <span className={m.role === 'user' ? 'font-medium text-blue-700' : 'font-medium text-green-700'}>
-                  {m.role === 'user' ? 'You' : 'Assistant'}:
-                </span>{' '}
-                <span>{m.content}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      {error && (
-        <div className="text-sm text-red-600">{error}</div>
-      )}
-
-      {dbPersist && (
-        <div className="text-xs text-muted-foreground">DB persist: {dbPersist} • Chat ID: {chatId ?? '—'}</div>
-      )}
-
-      {/* Primary input: triggers server-side save + embeddings + stream */}
-      <div className="flex gap-2">
-        <EmbedInput onSubmitText={(text) => { sendPrompt(text) }} disabled={streaming || !isOnline} loading={streaming} />
-      </div>
-
-    </div>
-    </>
-  )
+        <Soundboard />
+      </section>
+    </main>
+  );
 }

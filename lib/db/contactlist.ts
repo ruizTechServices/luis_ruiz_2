@@ -1,7 +1,7 @@
-// c:\Users\giost\CascadeProjects\websites\luis-ruiz\luis_ruiz_2\lib\db\contactlist.ts
 import { createClient as createServerClient } from "@/lib/clients/supabase/server";
+import type { ContactAdminFilters, ContactListResult, ContactRecord } from "@/lib/types/contact";
 
-export interface Contact {
+interface ContactRow {
   id: number;
   created_at: string;
   full_name: string | null;
@@ -15,49 +15,53 @@ export interface Contact {
   budget: string | null;
   timeline: string | null;
   preferred_contact: string | null;
-  newsletter: boolean;
+  newsletter: boolean | null;
 }
 
-export interface PaginatedContacts {
-  data: Contact[];
-  count: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
-}
+const CONTACT_SELECT = [
+  "id",
+  "created_at",
+  "full_name",
+  "first_name",
+  "last_name",
+  "email",
+  "phone",
+  "company",
+  "subject",
+  "message",
+  "budget",
+  "timeline",
+  "preferred_contact",
+  "newsletter",
+].join(", ");
 
-/**
- * Get contacts for admin view with pagination.
- * Requires admin role via RLS.
- */
 export async function getContactsForAdmin(options?: {
   page?: number;
   pageSize?: number;
-}): Promise<PaginatedContacts> {
+}): Promise<ContactListResult> {
   const supabase = await createServerClient();
   const page = options?.page ?? 1;
   const pageSize = options?.pageSize ?? 20;
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  // Get total count
   const { count, error: countErr } = await supabase
     .from("contactlist")
-    .select("*", { count: "exact", head: true });
+    .select("id", { count: "exact", head: true });
 
   if (countErr) throw countErr;
 
-  // Get paginated data
   const { data, error } = await supabase
     .from("contactlist")
-    .select("*")
+    .select(CONTACT_SELECT)
+    .returns<ContactRow[]>()
     .order("created_at", { ascending: false })
     .range(from, to);
 
   if (error) throw error;
 
   return {
-    data: (data ?? []) as Contact[],
+    data: (data ?? []).map(mapContactRow),
     count: count ?? 0,
     page,
     pageSize,
@@ -65,47 +69,61 @@ export async function getContactsForAdmin(options?: {
   };
 }
 
-/**
- * Get a single contact by ID.
- */
-export async function getContactById(id: number): Promise<Contact | null> {
+export async function getContactById(id: number): Promise<ContactRecord | null> {
   const supabase = await createServerClient();
   const { data, error } = await supabase
     .from("contactlist")
-    .select("*")
+    .select(CONTACT_SELECT)
     .eq("id", id)
-    .maybeSingle();
+    .maybeSingle()
+    .overrideTypes<ContactRow, { merge: false }>();
 
   if (error) throw error;
-  return data as Contact | null;
+  return data ? mapContactRow(data) : null;
 }
 
-/**
- * Delete a contact by ID.
- * Requires admin role via RLS.
- */
+function mapContactRow(row: ContactRow): ContactRecord {
+  return {
+    ...row,
+    subject: row.subject,
+    preferred_contact: row.preferred_contact,
+    newsletter: Boolean(row.newsletter),
+  };
+}
+
 export async function deleteContact(id: number): Promise<void> {
   const supabase = await createServerClient();
   const { error } = await supabase.from("contactlist").delete().eq("id", id);
   if (error) throw error;
 }
 
-/**
- * Update a contact by ID.
- * Requires admin role via RLS.
- */
-export async function updateContact(
-  id: number,
-  updates: Partial<Omit<Contact, "id" | "created_at">>
-): Promise<Contact | null> {
-  const supabase = await createServerClient();
-  const { data, error } = await supabase
-    .from("contactlist")
-    .update(updates)
-    .eq("id", id)
-    .select()
-    .maybeSingle();
+export function filterContacts(records: ContactRecord[], filters: ContactAdminFilters): ContactRecord[] {
+  const query = filters.query?.trim().toLowerCase() ?? "";
+  const subject = filters.subject?.trim().toLowerCase() ?? "all";
+  const newsletter = filters.newsletter ?? "all";
 
-  if (error) throw error;
-  return data as Contact | null;
+  return records.filter((record) => {
+    const matchesQuery =
+      query.length === 0 ||
+      [
+        record.full_name,
+        record.first_name,
+        record.last_name,
+        record.email,
+        record.company,
+        record.subject,
+        record.message,
+      ]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(query));
+
+    const matchesSubject = subject === "all" || String(record.subject ?? "").toLowerCase() === subject;
+
+    const matchesNewsletter =
+      newsletter === "all" ||
+      (newsletter === "subscribed" && record.newsletter) ||
+      (newsletter === "unsubscribed" && !record.newsletter);
+
+    return matchesQuery && matchesSubject && matchesNewsletter;
+  });
 }

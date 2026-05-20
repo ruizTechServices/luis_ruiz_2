@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=700"/>
+<link rel="stylesheet" href="../colors_and_type.css"/>
+<style>
+  html,body{margin:0;background:#020617;color:#F8FAFC;font-family:var(--font-sans);}
+  body{padding:24px;width:700px;box-sizing:border-box;}
+  .row{display:flex;gap:12px;align-items:stretch;flex-wrap:wrap;}
+  .grid{display:grid;gap:12px;}
+  .swatch{flex:1;min-width:0;border-radius:12px;padding:14px 14px 16px;display:flex;flex-direction:column;justify-content:space-between;border:1px solid rgba(255,255,255,0.06);min-height:96px;}
+  .swatch .name{font-size:12px;font-weight:600;letter-spacing:.02em;color:#F8FAFC;}
+  .swatch .hex{font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,.65);letter-spacing:.02em;}
+  .swatch.lt{color:#0F172A;}
+  .swatch.lt .name{color:#0F172A;}
+  .swatch.lt .hex{color:rgba(15,23,42,.6);}
+  .label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#5EEAD4;font-weight:600;margin-bottom:10px;}
+  .stack{display:flex;flex-direction:column;gap:14px;}
+</style>
+</head><body>
+<div class="label">12-column grid · public page</div>
+<div style="background:#0F172A;border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,.06)">
+  <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:8px;height:90px">
+    <div style="background:rgba(56,189,248,.10);border:1px dashed rgba(56,189,248,.35);border-radius:4px"></div><div style="background:rgba(56,189,248,.10);border:1px dashed rgba(56,189,248,.35);border-radius:4px"></div><div style="background:rgba(56,189,248,.10);border:1px dashed rgba(56,189,248,.35);border-radius:4px"></div><div style="background:rgba(56,189,248,.10);border:1px dashed rgba(56,189,248,.35);border-radius:4px"></div><div style="background:rgba(56,189,248,.10);border:1px dashed rgba(56,189,248,.35);border-radius:4px"></div><div style="background:rgba(56,189,248,.10);border:1px dashed rgba(56,189,248,.35);border-radius:4px"></div><div style="background:rgba(56,189,248,.10);border:1px dashed rgba(56,189,248,.35);border-radius:4px"></div><div style="background:rgba(56,189,248,.10);border:1px dashed rgba(56,189,248,.35);border-radius:4px"></div><div style="background:rgba(56,189,248,.10);border:1px dashed rgba(56,189,248,.35);border-radius:4px"></div><div style="background:rgba(56,189,248,.10);border:1px dashed rgba(56,189,248,.35);border-radius:4px"></div><div style="background:rgba(56,189,248,.10);border:1px dashed rgba(56,189,248,.35);border-radius:4px"></div><div style="background:rgba(56,189,248,.10);border:1px dashed rgba(56,189,248,.35);border-radius:4px"></div>
+  </div>
+  <div style="margin-top:10px;display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:11px;color:#64748B">
+    <span>gap 24px</span><span>max 1280px</span><span>pad 32–48px</span>
+  </div>
+</div>
+<div style="margin-top:12px;background:#0F172A;border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,.06)">
+  <div style="font-size:11px;color:#94A3B8;margin-bottom:8px">Dashboard overview — 3 across</div>
+  <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:8px;height:74px">
+    <div style="grid-column:span 4;background:rgba(94,234,212,.10);border:1px solid rgba(94,234,212,.25);border-radius:8px"></div>
+    <div style="grid-column:span 4;background:rgba(94,234,212,.10);border:1px solid rgba(94,234,212,.25);border-radius:8px"></div>
+    <div style="grid-column:span 4;background:rgba(94,234,212,.10);border:1px solid rgba(94,234,212,.25);border-radius:8px"></div>
+  </div>
+</div></body></html>

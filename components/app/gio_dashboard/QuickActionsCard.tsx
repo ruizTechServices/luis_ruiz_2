@@ -56,6 +56,7 @@ export default function QuickActionsCard() {
   const quickLinks = useMemo(
     () => [
       { href: "/gio_dash/blog/new", label: "New Post", ariaLabel: "Create a new blog post" },
+      { href: "/gio_dash/projects", label: "Projects", ariaLabel: "Open project admin" },
       { href: "/gio_dash/photos", label: "Photos", ariaLabel: "List photos" },
       { href: "/gio_dash/photos/upload", label: "Upload Photos", ariaLabel: "Upload photos" },
     ],

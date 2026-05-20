@@ -15,7 +15,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
@@ -27,7 +26,7 @@ export type ContactFormProps = {
 
 export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitLabel, setSubmitLabel] = useState("Send Message");
+  const [submitLabel, setSubmitLabel] = useState("Send Project Inquiry");
   const [showMoreDetails, setShowMoreDetails] = useState(false);
 
   const form = useForm<ContactFormInput>({
@@ -69,10 +68,10 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
           throw new Error(text || "Failed to submit contact form");
         }
 
-        setSubmitLabel("Message Sent!");
+        setSubmitLabel("Inquiry Sent!");
         onSuccess?.();
         setTimeout(() => {
-          setSubmitLabel("Send Message");
+          setSubmitLabel("Send Project Inquiry");
         }, 2000);
         form.reset();
       } catch (error) {
@@ -80,7 +79,7 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
         const err = error instanceof Error ? error : new Error("Unknown error");
         onFailure?.(err);
         setTimeout(() => {
-          setSubmitLabel("Send Message");
+          setSubmitLabel("Send Project Inquiry");
         }, 2000);
       } finally {
         setIsSubmitting(false);
@@ -100,7 +99,7 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
               <FormItem>
                 <FormLabel>First Name *</FormLabel>
                 <FormControl>
-                  <Input placeholder="John" {...field} />
+                  <Input placeholder="first name" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -113,7 +112,7 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
               <FormItem>
                 <FormLabel>Last Name *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Doe" {...field} />
+                  <Input placeholder="last name" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -129,7 +128,7 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
               <FormItem>
                 <FormLabel>Email Address *</FormLabel>
                 <FormControl>
-                  <Input placeholder="john.doe@example.com" type="email" {...field} />
+                  <Input placeholder="you@company.com" type="email" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -142,7 +141,7 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
               <FormItem>
                 <FormLabel>Phone Number</FormLabel>
                 <FormControl>
-                  <Input placeholder="+1 (347) 901-3772" type="tel" {...field} />
+                  <Input placeholder="+1 (phone number)" type="tel" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -155,9 +154,9 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
           name="company"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Company/Organization</FormLabel>
+              <FormLabel>Company / Brand</FormLabel>
               <FormControl>
-                <Input placeholder="ruizTechServices" {...field} />
+                <Input placeholder="Your company, startup, or brand" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -173,7 +172,7 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a subject" />
+                    <SelectValue placeholder="What do you need help with?" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -197,7 +196,7 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
               <FormLabel>Message *</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Tell us about your project, requirements, or any questions you have..."
+                  placeholder="What are you trying to build, improve, or launch? What matters most right now?"
                   rows={5}
                   {...field}
                 />
@@ -207,17 +206,15 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
           )}
         />
 
-        {/* Progressive disclosure for optional fields */}
         <Collapsible open={showMoreDetails} onOpenChange={setShowMoreDetails}>
           <CollapsibleTrigger asChild>
-            <Button
+            <button
               type="button"
-              variant="ghost"
-              className="w-full flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground"
+              className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-white/10 bg-transparent px-3 py-2.5 text-sm font-medium text-slate-300 transition hover:border-teal-300/30 hover:bg-white/[0.03] hover:text-teal-200"
             >
-              <span>{showMoreDetails ? "Hide" : "Add more"} project details</span>
+              <span>{showMoreDetails ? "Hide" : "Add"} scope details</span>
               <ChevronDownIcon className={`h-4 w-4 transition-transform ${showMoreDetails ? "rotate-180" : ""}`} />
-            </Button>
+            </button>
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-6 pt-4">
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -226,7 +223,7 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
                 name="budget"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Project Budget</FormLabel>
+                    <FormLabel>Budget range</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -250,7 +247,7 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
                 name="timeline"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Project Timeline</FormLabel>
+                    <FormLabel>Timeline</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -280,9 +277,12 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
                   <FormControl>
                     <RadioGroup className="flex flex-wrap gap-4" onValueChange={field.onChange} value={field.value}>
                       {preferredContactOptions.map((option) => (
-                        <RadioGroupItem key={option} value={option} id={`contact-${option}`}>
-                          <span className="capitalize">{option}</span>
-                        </RadioGroupItem>
+                        <div key={option} className="flex items-center gap-2">
+                          <RadioGroupItem value={option} id={`contact-${option}`} />
+                          <label htmlFor={`contact-${option}`} className="capitalize text-sm">
+                            {option}
+                          </label>
+                        </div>
                       ))}
                     </RadioGroup>
                   </FormControl>
@@ -302,16 +302,20 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
                 <Checkbox checked={field.value} onCheckedChange={field.onChange} id="newsletter" />
               </FormControl>
               <FormLabel htmlFor="newsletter" className="leading-none">
-                Subscribe to our newsletter for updates and special offers
+                Send occasional updates from Blog / Build Log and future releases
               </FormLabel>
             </FormItem>
           )}
         />
 
-        <div className="pt-6">
-          <Button className="w-full" disabled={isSubmitting} type="submit">
+        <div className="pt-2">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-[10px] bg-blue-600 text-[14px] font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
             {isSubmitting ? "Sending..." : submitLabel}
-          </Button>
+          </button>
         </div>
       </form>
     </Form>

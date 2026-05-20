@@ -1,5 +1,6 @@
 import { createClient as createServerClient } from "@/lib/clients/supabase/server";
 import type { BlogPost, Comment as BlogComment, Vote } from "@/lib/types/blog";
+import type { ProjectRow } from "@/lib/types/project";
 
 export async function supa() {
   return createServerClient();
@@ -15,6 +16,26 @@ export interface BlogPostWithStats extends BlogPost {
   down_votes: number;
 }
 
+type ProjectLinkRow = {
+  projects: Pick<ProjectRow, "id" | "title" | "url" | "description" | "created_at" | "updated_at"> | Pick<ProjectRow, "id" | "title" | "url" | "description" | "created_at" | "updated_at">[] | null;
+};
+
+type RawBlogPostRow = Omit<BlogPost, "relatedProjects"> & {
+  project_blog_links?: ProjectLinkRow[] | null;
+};
+
+function normalizeRelatedProjects(links: ProjectLinkRow[] | null | undefined): ProjectRow[] {
+  if (!links?.length) return [];
+
+  return links
+    .flatMap((link) => {
+      const entry = link.projects;
+      if (!entry) return [];
+      return Array.isArray(entry) ? entry : [entry];
+    })
+    .filter((project): project is ProjectRow => Boolean(project?.id));
+}
+
 /**
  * Get all blog posts with comment/vote counts for admin view.
  * Uses a single PostgreSQL function instead of 3 separate queries.
@@ -28,14 +49,45 @@ export async function getBlogPostsForAdmin(): Promise<BlogPostWithStats[]> {
   return (data ?? []) as BlogPostWithStats[];
 }
 
+export async function getRelatedProjectIdsForPost(postId: number): Promise<number[]> {
+  const supabase = await supa();
+  const { data, error } = await supabase
+    .from("project_blog_links")
+    .select("project_id")
+    .eq("blog_post_id", postId);
+
+  if (error) throw error;
+  return (data ?? []).map((row) => Number(row.project_id)).filter((id) => !Number.isNaN(id));
+}
+
+export async function replaceRelatedProjectsForPost(postId: number, projectIds: number[]): Promise<void> {
+  const supabase = await supa();
+
+  const { error: deleteError } = await supabase
+    .from("project_blog_links")
+    .delete()
+    .eq("blog_post_id", postId);
+
+  if (deleteError) throw deleteError;
+
+  const uniqueProjectIds = [...new Set(projectIds.filter((id) => Number.isInteger(id) && id > 0))];
+  if (uniqueProjectIds.length === 0) return;
+
+  const { error: insertError } = await supabase
+    .from("project_blog_links")
+    .insert(uniqueProjectIds.map((projectId) => ({ project_id: projectId, blog_post_id: postId })));
+
+  if (insertError) throw insertError;
+}
+
 /**
  * Delete a blog post (and cascading comments/votes via FK).
  */
 export async function deletePost(id: number): Promise<void> {
   const supabase = await supa();
-  // Delete comments and votes first (if no ON DELETE CASCADE)
   await supabase.from("comments").delete().eq("post_id", id);
   await supabase.from("votes").delete().eq("post_id", id);
+  await supabase.from("project_blog_links").delete().eq("blog_post_id", id);
   const { error } = await supabase.from("blog_posts").delete().eq("id", id);
   if (error) throw error;
 }
@@ -45,7 +97,7 @@ export async function deletePost(id: number): Promise<void> {
  */
 export async function updatePost(
   id: number,
-  updates: Partial<Omit<BlogPost, "id" | "created_at">>
+  updates: Partial<Omit<BlogPost, "id" | "created_at" | "relatedProjects">>
 ): Promise<BlogPost | null> {
   const supabase = await supa();
   const { data, error } = await supabase
@@ -106,7 +158,42 @@ export async function getPostById(id: number): Promise<BlogPost | null> {
     .eq("id", id)
     .maybeSingle();
   if (error) throw error;
-  return data as BlogPost | null;
+  if (!data) return null;
+
+  let relatedProjects: ProjectRow[] = [];
+  const relationQuery = await supabase
+    .from("blog_posts")
+    .select(`
+      id,
+      project_blog_links(
+        projects(
+          id,
+          title,
+          url,
+          description,
+          created_at,
+          updated_at
+        )
+      )
+    `)
+    .eq("id", id)
+    .maybeSingle();
+
+  if (!relationQuery.error && relationQuery.data) {
+    const relationRow = relationQuery.data as RawBlogPostRow;
+    relatedProjects = normalizeRelatedProjects(relationRow.project_blog_links);
+  }
+
+  return {
+    id: data.id,
+    created_at: data.created_at,
+    title: data.title,
+    summary: data.summary,
+    tags: data.tags,
+    references: data.references,
+    body: data.body,
+    relatedProjects,
+  };
 }
 
 export async function getVoteCounts(postId: number): Promise<{ up: number; down: number }> {

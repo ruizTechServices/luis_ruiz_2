@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nucleus API · case study</title>
+  <link rel="stylesheet" href="../../colors_and_type.css" />
+  <style>
+    *,*::before,*::after { box-sizing: border-box; }
+    html,body { margin:0; background:#020617; color:#F8FAFC; font-family: var(--font-sans); -webkit-font-smoothing: antialiased; min-height:100vh; }
+    a { color: inherit; }
+    .shell { min-height:100vh; background: radial-gradient(circle at top, rgba(125,211,252,0.14), transparent 22%), radial-gradient(circle at 80% 20%, rgba(59,130,246,0.10), transparent 20%), linear-gradient(145deg, #020617 0%, #0f172a 40%, #162033 100%); }
+    .container { max-width:1180px; margin-inline:auto; padding-inline:32px; }
+
+    nav.top { position:sticky; top:0; z-index:30; background:rgba(2,6,23,0.7); backdrop-filter: blur(14px); border-bottom:1px solid rgba(255,255,255,0.06); }
+    nav.top .row { height:64px; display:flex; align-items:center; justify-content:space-between; }
+    nav.top a.brand { display:flex; align-items:center; gap:10px; color:#F8FAFC; text-decoration:none; font-weight:600; font-size:14px; }
+    nav.top a.brand .mark { height:30px; width:30px; border-radius:8px; background:#fff; color:#020617; display:grid; place-items:center; font-family:Georgia,serif; font-weight:700; font-size:13px; }
+    nav.top ul { display:flex; gap:24px; margin:0; padding:0; list-style:none; }
+    nav.top ul a { color:#CBD5E1; font-size:13px; text-decoration:none; font-weight:500; }
+    nav.top ul a[aria-current] { color:#F8FAFC; }
+
+    /* Index hero */
+    section.hero { border-bottom: 1px solid rgba(255,255,255,0.08); padding: 56px 0 32px; }
+    .crumbs { display:flex; align-items:center; gap:6px; font-size:12px; color:#94A3B8; margin-bottom:18px; }
+    .crumbs a { color:#7DD3FC; text-decoration:none; }
+    .crumbs span { color:#475569; }
+    .eyebrow-pill { display:inline-flex; align-items:center; gap:8px; padding:6px 14px; border-radius:999px; background: rgba(255,255,255,0.06); border:1px solid rgba(125,211,252,0.22); color:#7DD3FC; font-size:12px; font-weight:600; }
+    .h1 { font-size:48px; line-height:1.05; letter-spacing:-0.025em; font-weight:600; margin:14px 0 14px; max-width: 880px; }
+    .lede { font-size:17px; line-height:1.7; color:#CBD5E1; max-width:740px; margin:0; }
+
+    /* Cover */
+    .cover { margin: 32px 0 0; height: 320px; border-radius: 22px; overflow:hidden; border:1px solid rgba(255,255,255,0.10); background: #0F172A; box-shadow: 0 24px 70px rgba(0,0,0,0.4); position:relative; }
+    .cover img { width:100%; height:100%; object-fit:cover; filter: saturate(.9) contrast(1.05); }
+    .cover .grain { position:absolute; inset:0; background: linear-gradient(180deg, transparent 50%, rgba(2,6,23,0.55)); }
+    .cover .stack-strip { position:absolute; bottom:18px; left:18px; right:18px; display:flex; gap:8px; flex-wrap:wrap; }
+    .stack-chip { padding:5px 10px; border-radius:999px; background: rgba(2,6,23,0.7); border:1px solid rgba(255,255,255,0.10); font-size:11px; font-weight:500; color:#E2E8F0; backdrop-filter: blur(8px); }
+
+    /* Body layout */
+    .body { display:grid; grid-template-columns: 1fr 320px; gap:48px; padding: 56px 0 96px; align-items: start; }
+    @media (max-width: 980px) { .body { grid-template-columns: 1fr; gap:32px; } }
+
+    main.content { min-width: 0; }
+    main .sec { margin-bottom: 36px; }
+    main .sec .ey { display:block; font-size:11px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:#5EEAD4; margin-bottom:10px; }
+    main h2 { font-size:24px; font-weight:600; letter-spacing:-0.015em; margin:0 0 12px; }
+    main p { font-size:15px; line-height:1.75; color:#E2E8F0; margin: 10px 0; }
+    main ul { padding-left: 18px; }
+    main ul li { font-size:15px; line-height:1.75; color:#E2E8F0; margin: 6px 0; }
+    main code { font-family: var(--font-mono); font-size:13px; background:rgba(56,189,248,0.10); color:#BAE6FD; padding:2px 6px; border-radius:4px; }
+    main hr { border:none; height:1px; background:rgba(255,255,255,0.08); margin: 28px 0; }
+
+    .deck { display:grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 14px 0 20px; }
+    .deck .card { padding:16px; border-radius: 16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); }
+    .deck .card .l { font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#94A3B8; }
+    .deck .card .v { margin-top:6px; font-size:18px; font-weight:600; color:#F8FAFC; letter-spacing:-0.01em; }
+    .deck .card .s { margin-top:2px; font-size:11px; color:#64748B; }
+
+    .arch-diagram { padding: 22px; border-radius: 18px; background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.10); margin: 14px 0; }
+    .arch-row { display:flex; gap:10px; align-items:center; justify-content: center; flex-wrap:wrap; }
+    .arch-row + .arch-row { margin-top:14px; }
+    .arch-row .node { display:flex; align-items:center; gap:8px; padding: 10px 14px; border-radius:10px; background: rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.10); font-size:12px; font-weight:600; color:#E2E8F0; }
+    .arch-row .node.b { background: rgba(37,99,235,0.15); border-color: rgba(56,189,248,0.30); color:#BAE6FD; }
+    .arch-row .node.t { background: rgba(94,234,212,0.10); border-color: rgba(94,234,212,0.25); color:#99F6E4; }
+    .arch-row .arrow { font-family: var(--font-mono); color:#475569; font-size:14px; }
+    .arch-row .ic { width:18px; height:18px; }
+
+    blockquote.callout { margin: 18px 0; padding: 18px 20px; border-radius: 14px; background: rgba(94,234,212,0.06); border-left: 3px solid #5EEAD4; color:#E2E8F0; font-size:14px; line-height:1.7; }
+    blockquote.callout b { color:#99F6E4; }
+
+    /* Outcomes */
+    .outcomes { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    .outcomes .card { padding:16px; border-radius: 14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); }
+    .outcomes .card .v { font-size:32px; font-weight:600; letter-spacing:-0.02em; color:#F8FAFC; }
+    .outcomes .card .l { font-size:11px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:#94A3B8; margin-top:6px; }
+    .outcomes .card.up { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.25); }
+    .outcomes .card.up .v { color:#86EFAC; }
+
+    /* Sidebar */
+    aside.side { position: sticky; top: 92px; align-self: start; display:flex; flex-direction:column; gap:14px; }
+    .panel { padding:18px; border-radius:18px; background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); }
+    .panel .l { font-size:11px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:#5EEAD4; margin-bottom: 12px; display:block; }
+    .meta-row { display:grid; grid-template-columns: 88px 1fr; gap:10px; padding: 8px 0; border-bottom:1px dashed rgba(255,255,255,0.06); font-size:13px; }
+    .meta-row:last-child { border-bottom: none; }
+    .meta-row .l2 { color:#94A3B8; font-size:11px; letter-spacing:.04em; padding-top:2px; }
+    .meta-row .v2 { color:#F8FAFC; font-weight:500; }
+    .meta-row .v2 a { color:#7DD3FC; text-decoration:none; }
+    .status-pill { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600; }
+    .status-pill.shipped { background: rgba(56,189,248,0.14); color:#38BDF8; }
+
+    .panel.cta { background: linear-gradient(135deg, rgba(2,6,23,0.6), rgba(6,47,47,0.5)); border-color: rgba(94,234,212,0.18); position:relative; overflow:hidden; }
+    .panel.cta::before { content:""; position:absolute; inset-inline:0; top:0; height:1px; background: linear-gradient(90deg, transparent, rgba(94,234,212,0.6), transparent); }
+    .panel.cta h3 { margin:0 0 8px; font-size:16px; font-weight:600; }
+    .panel.cta p { margin:0 0 14px; font-size:13px; line-height:1.6; color:#CBD5E1; }
+    .panel.cta a { display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:8px; background:#FFFFFF; color:#020617; font-size:13px; font-weight:600; text-decoration:none; }
+
+    .related a { display:block; padding:12px; border-radius:10px; background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); color:inherit; text-decoration:none; margin-bottom: 8px; }
+    .related a:hover { border-color: rgba(94,234,212,0.25); }
+    .related a .t { font-size:13px; font-weight:600; color:#F8FAFC; }
+    .related a .d { font-size:11px; color:#94A3B8; margin-top:3px; }
+
+    /* Other case studies row at bottom */
+    .more-cases { padding: 56px 0 96px; border-top:1px solid rgba(255,255,255,0.06); margin-top: 48px; }
+    .more-cases h3 { font-size:24px; font-weight:600; margin: 0 0 22px; }
+    .case-row { display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; }
+    .case-row a { background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:18px; overflow:hidden; text-decoration:none; color:inherit; display:flex; flex-direction:column; }
+    .case-row a:hover { border-color: rgba(94,234,212,0.30); }
+    .case-row a .thumb { aspect-ratio: 16/10; overflow:hidden; }
+    .case-row a .thumb img { width:100%; height:100%; object-fit:cover; }
+    .case-row a .pad { padding:16px; }
+    .case-row a .cat { font-size:11px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:#5EEAD4; }
+    .case-row a .t { font-size:16px; font-weight:600; margin-top:6px; }
+    .case-row a .d { font-size:12px; color:#94A3B8; margin-top:6px; line-height:1.5; }
+  </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body data-screen-label="01 Case study">
+  <div class="shell">
+    <nav class="top">
+      <div class="container row">
+        <a class="brand" href="#"><span class="mark">LR</span> luis-ruiz.com</a>
+        <ul>
+          <li><a href="#">Services</a></li>
+          <li><a href="#" aria-current="page">Projects</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Round-Robin</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="container">
+        <div class="crumbs">
+          <a href="#">Projects</a><span>/</span>
+          <a href="#">AI systems</a><span>/</span>
+          <span style="color:#CBD5E1">Nucleus API product</span>
+        </div>
+        <span class="eyebrow-pill"><i data-lucide="cpu" style="width:14px;height:14px"></i> AI systems · API product</span>
+        <h1 class="h1">Nucleus: a bring-your-own-key API product on top of a portfolio site.</h1>
+        <p class="lede">Bearer-token auth, atomic credit accounting, and provider-backed chat — packaged as a paid API surface sharing one Supabase backend with the rest of the site.</p>
+
+        <div class="cover">
+          <img src="../../assets/bg-circuit-blue.jpg" alt="Nucleus API circuit-board cover" />
+          <div class="grain"></div>
+          <div class="stack-strip">
+            <span class="stack-chip">Next.js 15 App Router</span>
+            <span class="stack-chip">Supabase + RLS</span>
+            <span class="stack-chip">Stripe</span>
+            <span class="stack-chip">OpenAI</span>
+            <span class="stack-chip">Anthropic</span>
+            <span class="stack-chip">JOSE / JWT</span>
+            <span class="stack-chip">Upstash rate-limit</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="container">
+      <div class="body">
+        <main class="content">
+          <section class="sec">
+            <span class="ey">Context</span>
+            <h2>Why I built it</h2>
+            <p>luis-ruiz.com was already running multiple AI experiments in public — local Ollama chat, a multi-model round-robin tool, embeddings playground. The next honest step was packaging one of them as a real product: an API surface that gives a developer access to multiple model providers under a single bearer token, with credits and usage tracking instead of a sprawling SaaS dashboard.</p>
+            <p>Nucleus is not a portfolio piece. It's a real product surface that lives inside the same repo as the rest of the site. The goal was to prove the brand could run one full-stack runtime for both marketing and a paid API without either side blurring into the other.</p>
+          </section>
+
+          <section class="sec">
+            <span class="ey">Problem</span>
+            <h2>Single bearer token, many models, no leaks</h2>
+            <p>Routing a chat call through three providers (OpenAI / Anthropic / xAI) while staying inside one auth pattern means three things have to hold together at once:</p>
+            <ul>
+              <li>A single Supabase user can mint a Nucleus bearer JWT that survives provider-side rate limits.</li>
+              <li>Credits deduct atomically — never double-charge a retried call.</li>
+              <li>Pro subscribers get unlimited access without breaking the credit ledger.</li>
+            </ul>
+            <blockquote class="callout"><b>Constraint:</b> Nucleus had to share infra with the public site without ever exposing service-role keys through the marketing routes.</blockquote>
+          </section>
+
+          <section class="sec">
+            <span class="ey">Approach</span>
+            <h2>Thin route handlers, dense service layer</h2>
+            <p>API routes under <code>app/api/nucleus/*</code> stay thin: validate, call into <code>lib/nucleus/*</code>, return normalized JSON. The interesting logic lives in:</p>
+            <ul>
+              <li><code>lib/nucleus/auth.ts</code> — bearer JWT verify against Supabase signing key.</li>
+              <li><code>lib/nucleus/credits.ts</code> — RPC-backed atomic deduct / add via Postgres functions.</li>
+              <li><code>lib/nucleus/pricing.ts</code> — model catalog + per-token pricing config.</li>
+              <li><code>lib/nucleus/rate-limit.ts</code> — Upstash sliding window per key.</li>
+            </ul>
+
+            <div class="arch-diagram">
+              <div class="arch-row">
+                <span class="node"><i data-lucide="user" class="ic"></i> Client</span>
+                <span class="arrow">→</span>
+                <span class="node b"><i data-lucide="shield" class="ic"></i> Bearer JWT verify</span>
+                <span class="arrow">→</span>
+                <span class="node b"><i data-lucide="zap" class="ic"></i> Rate limit (Upstash)</span>
+              </div>
+              <div class="arch-row">
+                <span class="node t"><i data-lucide="database" class="ic"></i> deduct_credits RPC</span>
+                <span class="arrow">←</span>
+                <span class="node"><i data-lucide="route" class="ic"></i> Model router</span>
+                <span class="arrow">→</span>
+                <span class="node"><i data-lucide="sparkles" class="ic"></i> OpenAI · Anthropic · xAI</span>
+              </div>
+              <div class="arch-row">
+                <span class="node t"><i data-lucide="file-text" class="ic"></i> usage_logs insert</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="sec">
+            <span class="ey">Decisions</span>
+            <h2>Three calls worth recording</h2>
+            <div class="deck">
+              <div class="card"><div class="l">Atomicity</div><div class="v">Postgres RPC, not app code</div><div class="s">Avoids race conditions on retries.</div></div>
+              <div class="card"><div class="l">Subscriptions</div><div class="v">Pro = unlimited flag</div><div class="s">Skips credit ledger entirely.</div></div>
+              <div class="card"><div class="l">Provider parity</div><div class="v">Adapter per provider</div><div class="s">Same response shape out the door.</div></div>
+            </div>
+          </section>
+
+          <section class="sec">
+            <span class="ey">Outcomes</span>
+            <h2>What this surface earned</h2>
+            <div class="outcomes">
+              <div class="card up"><div class="v">2,840</div><div class="l">requests served (30d)</div></div>
+              <div class="card up"><div class="v">$1.42</div><div class="l">avg cost / 1,000 reqs</div></div>
+              <div class="card"><div class="v">99.6%</div><div class="l">successful credit deductions</div></div>
+              <div class="card"><div class="v">3</div><div class="l">providers behind one token</div></div>
+            </div>
+            <p style="margin-top:14px">Numbers are honest, not promotional. Nucleus is in early production with a small group of developer testers — not a public launch.</p>
+          </section>
+
+          <section class="sec">
+            <span class="ey">Current status</span>
+            <h2>What's next</h2>
+            <ul>
+              <li>Pull orchestration out of the round-robin SSE route into the placeholder modules already in <code>lib/round-robin/</code>.</li>
+              <li>Add a public pricing page once the credit-purchase Stripe webhook has had two more weeks of clean runs.</li>
+              <li>Open a closed beta to 25 developers from the build-log audience.</li>
+            </ul>
+          </section>
+        </main>
+
+        <aside class="side">
+          <section class="panel">
+            <span class="l">Project facts</span>
+            <div class="meta-row"><div class="l2">Status</div><div class="v2"><span class="status-pill shipped"><span style="width:6px;height:6px;border-radius:50%;background:#38BDF8"></span>shipped</span></div></div>
+            <div class="meta-row"><div class="l2">Category</div><div class="v2">AI · API product</div></div>
+            <div class="meta-row"><div class="l2">Role</div><div class="v2">Solo founder · full-stack</div></div>
+            <div class="meta-row"><div class="l2">Started</div><div class="v2">Jul 2025</div></div>
+            <div class="meta-row"><div class="l2">Shipped</div><div class="v2">Nov 2025</div></div>
+            <div class="meta-row"><div class="l2">Repo</div><div class="v2"><a href="#"><i data-lucide="git-branch" style="width:12px;height:12px;display:inline;vertical-align:-1px"></i> source</a></div></div>
+            <div class="meta-row"><div class="l2">Live</div><div class="v2"><a href="#"><i data-lucide="arrow-up-right" style="width:12px;height:12px;display:inline;vertical-align:-1px"></i> /api/nucleus</a></div></div>
+          </section>
+
+          <section class="panel related">
+            <span class="l">Related build-log posts</span>
+            <a href="#"><div class="t">Nucleus credit metering, end to end</div><div class="d">Oct 18, 2025 · 12 min</div></a>
+            <a href="#"><div class="t">Why I use Postgres RPCs for money</div><div class="d">Oct 04, 2025 · 7 min</div></a>
+            <a href="#"><div class="t">Bearer tokens are still the right answer</div><div class="d">Sep 22, 2025 · 5 min</div></a>
+          </section>
+
+          <section class="panel cta">
+            <h3>Want a system like this?</h3>
+            <p>Nucleus took five months. A smaller scoped version — internal API, dashboard, billing — usually lands in 4–6 weeks.</p>
+            <a href="#"><i data-lucide="mail" style="width:14px;height:14px"></i> Talk to Gio</a>
+          </section>
+        </aside>
+      </div>
+
+      <section class="more-cases">
+        <h3>More case studies</h3>
+        <div class="case-row">
+          <a href="#">
+            <div class="thumb"><img src="../../assets/project-web-component-gpt.jpg" alt="" /></div>
+            <div class="pad">
+              <div class="cat">AI experiment</div>
+              <div class="t">Round-Robin discussion tool</div>
+              <div class="d">A multi-model SSE surface for comparing model responses turn by turn.</div>
+            </div>
+          </a>
+          <a href="#">
+            <div class="thumb"><img src="../../assets/project-code-combinator.png" alt="" /></div>
+            <div class="pad">
+              <div class="cat">Public build work</div>
+              <div class="t">Master hub homepage</div>
+              <div class="d">Replaced a generic portfolio with a public-safe operating surface.</div>
+            </div>
+          </a>
+          <a href="#">
+            <div class="thumb"><img src="../../assets/project-bootstrap-lit.png" alt="" /></div>
+            <div class="pad">
+              <div class="cat">Client-adjacent</div>
+              <div class="t">Selene Studio booking system</div>
+              <div class="d">Three-week build for a small studio: booking + Stripe + intake.</div>
+            </div>
+          </a>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>window.lucide && window.lucide.createIcons();</script>
+</body>
+</html>
