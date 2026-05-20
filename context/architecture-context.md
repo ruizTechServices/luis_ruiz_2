@@ -64,6 +64,24 @@ CallToAction
 
 The new homepage should remain public and should not expose private operational data.
 
+## GitHub Build Log and Latest Pushes
+
+Two GitHub-backed build-log paths still exist:
+
+```txt
+scripts/sync-github-build-logs.py
+```
+
+This is the Notion write path. It reads commits from `BUILD_LOG_GITHUB_REPO` / `BUILD_LOG_GITHUB_BRANCH`, tracks state in `memory/github-build-log-state.json`, and appends new commits to the configured Notion page when `NOTION_API_KEY` is present.
+
+```txt
+lib/github/latest-pushes.ts
+app/api/github/latest-pushes/route.ts
+components/app/landing_page/LatestPushesSection.tsx
+```
+
+This is the website read path. It fetches latest GitHub commits server-side and has no Notion dependency. The legacy `LatestPushesSection` component still exists, but the current `/` homepage does not render it; any future public build-log/latest-pushes surface should wire it deliberately into the current `components/app/home/*` direction.
+
 ## Current Owner Dashboard
 
 Current route:
@@ -142,6 +160,20 @@ Future direction:
 - invoices/payment status
 - messages/updates
 
+## Round-Robin Current Truth
+
+The current round-robin implementation is more advanced than the oldest planning docs described:
+
+- UI lives at `app/round-robin/page.tsx`.
+- API routes live under `app/api/round-robin/`.
+- Sessions persist to `round_robin_sessions`.
+- Messages persist to `round_robin_messages`.
+- Provider adapters exist under `lib/round-robin/providers/` for OpenAI, Anthropic, Gemini, Mistral, Hugging Face, and xAI.
+- `awaiting_user` is a real paused-between-rounds state.
+- The live orchestration is still inline in `app/api/round-robin/stream/route.ts`; `lib/round-robin/orchestrator.ts` remains a placeholder for future extraction.
+
+Do not use removed legacy round-robin docs as implementation truth. Inspect the current route and provider files before changing this subsystem.
+
 ## Existing Supabase Pattern
 
 Use existing Supabase clients under:
@@ -153,6 +185,26 @@ lib/clients/supabase/
 The server client is async because Next.js 15 requires awaiting `cookies()`.
 
 Do not invent a new Supabase client. Use the existing project pattern.
+
+## Nucleus Database Contract Notes
+
+Nucleus runtime code depends on Supabase tables including:
+
+```txt
+nucleus_profiles
+nucleus_credit_transactions
+nucleus_usage_logs
+nucleus_model_pricing
+nucleus_credit_packages
+nucleus_subscription_plans
+```
+
+Local migrations currently cover Nucleus RLS policies and atomic credit helper functions, but they do not fully create every Nucleus runtime table. Treat the full Nucleus table schema as partly external/live until explicit create-table migrations are added.
+
+There are two separate OAuth callback patterns:
+
+- `app/auth/callback/route.ts` exchanges a Supabase auth code into a site session and routes owners to `/gio_dash` and non-owners to `/dashboard`.
+- `app/nucleus/auth/callback/route.ts` handles the Nucleus/Electron PKCE handoff by forwarding the authorization code to the Nucleus success page rather than creating the normal site cookie session.
 
 ## Existing Owner Auth Pattern
 
@@ -205,6 +257,12 @@ Reason:
 - `dashboard_projects` = Gio's operational project tracker
 
 They may later be linked, but they are not the same concept.
+
+## Legacy Supabase Table Notes
+
+A removed legacy table-inventory doc listed older or auxiliary Supabase tables such as `journal`, `journal-chatbot`, `documents`, `catalog`, `responses`, `todos`, `userInfo`, `site_settings`, and several chat/vector tables. Treat that inventory as historical, not authoritative.
+
+Before reusing any legacy table, inspect the live schema, RLS state, row counts, relationships, and current code references. In particular, do not expose legacy contact, todo, document, chat, or vector tables through public routes without an explicit access-control review.
 
 ## Recommended New Folders
 

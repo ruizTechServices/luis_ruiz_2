@@ -27,3 +27,7 @@ Replace the filename with the next feature-spec.
 ## Rule
 
 Do not batch all specs together. One spec at a time.
+
+## Completed Specs
+
+Completed specs may still contain their original "current state" or "files to inspect" language from before implementation. Use each spec's implementation notes and `context/progress-tracker.md` for the current truth.

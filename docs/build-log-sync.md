@@ -9,7 +9,7 @@ This project now has two separate GitHub build-log paths:
 2. **Website read path**
    - server reader: `lib/github/latest-pushes.ts`
    - API route: `app/api/github/latest-pushes/route.ts`
-   - UI section: `components/app/landing_page/LatestPushesSection.tsx`
+   - legacy UI section: `components/app/landing_page/LatestPushesSection.tsx`
    - purpose: render a live latest-pushes section on the website from GitHub API data
 
 ## Why split them
@@ -62,4 +62,5 @@ Make sure the cron environment has:
 - latest pushes are fetched server-side
 - revalidated every 10 minutes
 - no Notion dependency
-- suitable for homepage credibility/proof-of-work display
+- suitable for public credibility/proof-of-work display
+- the current `/` homepage no longer renders `LatestPushesSection`; wire it into a current public surface deliberately if it is reused

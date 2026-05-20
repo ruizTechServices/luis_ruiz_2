@@ -172,7 +172,7 @@ Current status:
 - Item 3 is implemented and applied to the live `luis-ruiz` Supabase project: `supabase/migrations/20260519_create_master_dashboard_tables.sql` adds the operational tables, and typed helpers and owner-only API foundations live under `lib/functions/master-dashboard/*` and `app/api/dashboard/*`.
 - Item 4 is implemented: Active Projects, Open Leads, Revenue Snapshot, Today Focus, System Links, and Decisions Log cards read from the operational tables via `getMasterDashboardOverview`. Read-only owner section pages exist at `/gio_dash/leads`, `/gio_dash/money`, `/gio_dash/systems`, and `/gio_dash/notes`, and the live owner-only dashboard has starter system-link and decision records.
 - Item 5 is implemented: `/dashboard` renders the client dashboard shell from `components/app/client_dashboard/*` for signed-in non-owner users and keeps owners redirected to `/gio_dash`.
-- Item 6 is implemented: the progress tracker reflects implemented specs 001-006. The next roadmap item is legacy docs/context cleanup.
+- Item 6 is implemented: the progress tracker reflects implemented specs 001-007, and stale/conflicting legacy docs were removed or rewritten after useful facts were preserved in canonical context.
 
 ## Out of Scope For This Refactor Unless Explicitly Requested
 
@@ -200,3 +200,5 @@ Follow feature-specs in this order:
 006-client-dashboard-foundation.md
 007-cleanup-legacy-docs-context.md
 ```
+
+The initial master-hub feature-spec loop is complete. Future work should be scoped as new specs based on the next operational priority rather than continuing to rely on removed legacy TODO files.

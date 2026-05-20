@@ -1,5 +1,16 @@
 # 007 — Cleanup Legacy Docs and Context
 
+Status: Implemented on 2026-05-20.
+
+Implementation notes:
+
+- Canonical agent instructions are now tracked as `AGENTS.md`; `CLAUDE.md` is a compatibility pointer to the canonical context set.
+- `/docs` now contains a short index plus the still-useful build-log sync runbook.
+- Stale legacy planning docs, round-robin drafts, table inventories, and a one-off exported conversation transcript were deleted after review.
+- Useful facts were preserved in `context/architecture-context.md`, `context/ui-context.md`, `context/project-overview.md`, `supabase/README.md`, and `context/progress-tracker.md`.
+- `context/feature-specs/README.md` now clarifies that completed specs may retain original before-state language.
+- `npm run build` passes after the cleanup.
+
 ## Goal
 
 Review old documentation/context files and remove or rewrite irrelevant/conflicting material after useful facts have been preserved.

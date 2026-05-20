@@ -71,10 +71,10 @@ The context files were created as empty placeholders and are now being populated
 
 ### Phase 7 — Legacy Docs/Context Cleanup
 
-- [ ] `007-cleanup-legacy-docs-context.md`
-- [ ] Inspect `/docs` and legacy agent docs
-- [ ] Preserve useful facts
-- [ ] Delete or archive irrelevant/conflicting docs only after review
+- [x] `007-cleanup-legacy-docs-context.md`
+- [x] Inspect `/docs` and legacy agent docs
+- [x] Preserve useful facts
+- [x] Delete or archive irrelevant/conflicting docs only after review
 
 ## Current Known Repo Facts
 
@@ -90,9 +90,54 @@ The context files were created as empty placeholders and are now being populated
 - `/gio_dash` cards (Today Focus, Revenue Snapshot, Open Leads, Active Projects, System Links, Decisions Log) now read from `dashboard_*` tables via `getMasterDashboardOverview`. Content Queue and AI Tools remain on static seed data pending later specs.
 - Optional read-only owner section pages exist at `/gio_dash/leads`, `/gio_dash/money`, `/gio_dash/systems`, and `/gio_dash/notes`. The existing `/gio_dash/projects` route is preserved for the public-projects portfolio editor and is intentionally not replaced.
 - The spec 003 dashboard migration has been applied to the live `luis-ruiz` Supabase project (`huyhgdsjpdjzokjwaspb`) as migration `20260520064736_create_master_dashboard_tables`; the six dashboard tables, RLS settings, function, and triggers were verified on 2026-05-20.
-- The next roadmap item is legacy docs/context cleanup in `007-cleanup-legacy-docs-context.md`.
+- Legacy docs/context cleanup is complete. Canonical agent/context instructions now live in `AGENTS.md` plus `context/*`; `/docs` is no longer an agent-instruction source.
+- The initial master-hub feature-spec loop (`001` through `007`) is complete. The next recommended implementation focus is Nucleus database-contract hardening: add explicit create-table migrations or a generated schema contract for the Nucleus runtime tables before expanding the API product further.
 
 ## Latest Log
+
+## 2026-05-20 - 007-cleanup-legacy-docs-context: Legacy Docs and Context Cleanup
+
+Status: Complete
+
+### Files changed
+- `Agents.md` -> `AGENTS.md`
+- `CLAUDE.md`
+- `docs/README.md`
+- `docs/build-log-sync.md`
+- `docs/ARCHITECTURE.md`
+- `docs/GIOCLAW_EDIT_TODO.md`
+- `docs/round_robin.md`
+- `docs/session-18-conversation.md`
+- `docs/table-inventory-checklist.md`
+- `docs/todo-1-30-2026.md`
+- `docs/todo-ux-ui-improvements.md`
+- `context/architecture-context.md`
+- `context/project-overview.md`
+- `context/ui-context.md`
+- `context/progress-tracker.md`
+- `context/feature-specs/007-cleanup-legacy-docs-context.md`
+- `context/feature-specs/README.md`
+- `supabase/README.md`
+
+### What changed
+- Listed and reviewed all Markdown docs plus agent-specific files. No `gemini.md`, `GEMINI.md`, `.cursor/rules`, or `.windsurfrules` files were present.
+- Renamed the tracked agent instruction file from `Agents.md` to canonical `AGENTS.md` and updated `CLAUDE.md` to point at `AGENTS.md` plus the canonical context folder.
+- Removed stale/conflicting legacy docs after preserving useful facts: the old round-robin architecture doc, old Windsurf implementation prompt, exported round-robin conversation transcript, old Supabase table inventory, January TODO review, UX/UI TODO, and superseded GioClaw planning checklist.
+- Kept and corrected the useful build-log sync runbook, and added `docs/README.md` to mark `/docs` as focused runbooks only rather than an agent/context source.
+- Preserved useful legacy facts in canonical context: GitHub build-log write/read split, current round-robin source of truth, Nucleus migration/schema cautions, legacy Supabase table cautions, and remaining UI/accessibility follow-ups.
+- Clarified that completed feature specs can retain original before-state language and that implementation notes plus the progress tracker are the source for current status.
+- Updated `supabase/README.md` to describe both the Nucleus migration limitations and the owner-dashboard private table/RLS model.
+
+### Verification
+- `npm run build`: pass.
+- `git diff --check` and `git diff --cached --check`: pass; only existing line-ending normalization warnings were printed.
+
+### Known issues
+- The Nucleus runtime still depends on tables whose full create-table migrations are not present locally. The cleanup preserved that as a current architecture caution rather than solving it in this docs-only spec.
+- `/docs/build-log-sync.md` remains because it is a useful focused runbook, not a conflicting context file.
+
+### Next recommended focus
+- Create a new spec for Nucleus database-contract hardening: explicit migrations or generated schema documentation for `nucleus_profiles`, `nucleus_credit_transactions`, `nucleus_usage_logs`, `nucleus_model_pricing`, `nucleus_credit_packages`, and `nucleus_subscription_plans`.
 
 ## 2026-05-20 - 006-client-dashboard-foundation: Client Dashboard Foundation
 
@@ -116,20 +161,23 @@ Status: Complete
 - `Agents.md`
 - `CLAUDE.md`
 - `README.md`
+- `docs/GIOCLAW_EDIT_TODO.md`
 
 ### What changed
 - Replaced the old generic `/dashboard` content and blog/count reads with a clean client dashboard shell.
 - Preserved the existing Supabase auth requirement and owner redirect from `/dashboard` to `/gio_dash`.
 - Added client-facing placeholder cards for Project Status, Recent Updates, Deliverables, Invoices / Payments, Messages, and Support / Contact Gio.
 - Kept `/dashboard` free of owner-only operational table reads and private owner data.
+- Annotated the legacy GioClaw planning TODO so it no longer says there is no customer dashboard concept; it now records that a foundation exists while a mature portal remains future work.
 
 ### Verification
-- `npm run build`: pass.
+- `npm run build`: pass; rerun after the documentation annotation on 2026-05-20.
 - Runtime unauthenticated `/dashboard` check through `npx next start -p 3004`: pass, returned `307` redirect to `/login`.
 - `git diff --check`: pass; only existing line-ending normalization warnings were printed.
 
 ### Known issues
 - Client project data, deliverables, invoices, and messages are placeholders by design until a later client-data spec exists.
+- Broader legacy docs/context cleanup was deferred from this pass and completed later in `007-cleanup-legacy-docs-context.md`.
 - Authenticated non-owner and owner browser-session checks were not performed because no signed-in test sessions were available in this environment; the redirect branches are preserved in `app/dashboard/page.tsx` and were type-checked by the build.
 
 ### Next recommended spec

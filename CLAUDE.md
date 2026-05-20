@@ -5,7 +5,7 @@ This file is retained for compatibility with Claude-style coding tools.
 The canonical project instructions now live in:
 
 ```txt
-Agents.md
+AGENTS.md
 context/project-overview.md
 context/architecture-context.md
 context/code-standards.md
@@ -41,4 +41,4 @@ Do not restart the repository. Refactor the existing codebase deliberately.
 
 Preserve Nucleus, round-robin, Ollama, blog, project, contact, and photo behavior unless a feature-spec explicitly requests changes.
 
-For implementation tasks, follow `Agents.md` and the active feature-spec.
+For implementation tasks, follow `AGENTS.md` and the active feature-spec.

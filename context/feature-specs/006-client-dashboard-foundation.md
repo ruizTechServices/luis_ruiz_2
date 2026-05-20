@@ -10,6 +10,7 @@ Implementation notes:
 - The client dashboard shell lives in `components/app/client_dashboard/*`.
 - The shell includes placeholder client-facing sections for Project Status, Recent Updates, Deliverables, Invoices / Payments, Messages, and Support / Contact Gio.
 - No owner-only dashboard operational tables or private owner records are read by `/dashboard`.
+- The legacy planning note formerly in `docs/GIOCLAW_EDIT_TODO.md` was corrected to reflect that a client dashboard foundation exists; that legacy doc was later removed during `007-cleanup-legacy-docs-context.md` after useful facts were preserved.
 - `npm run build` passes, and an unauthenticated runtime check returned `307` to `/login`.
 
 ## Goal

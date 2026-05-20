@@ -343,6 +343,16 @@ Unlocking the infinite possibilities of tomorrow's intelligent digital transform
 - do not rely only on color for status
 - keep tap targets usable on mobile
 
+## Preserved UI Follow-Ups
+
+Legacy UI TODO docs were removed after review. The useful remaining follow-ups are:
+
+- run an accessibility pass with contrast checks on public pages and dashboards
+- keep CTA button hierarchy consistent across public routes
+- make long public pages easier to scan, especially Projects and Blog / Build Log
+- keep contact intake progressively disclosed instead of asking for too much upfront
+- treat old `components/app/landing_page/*` homepage sections as legacy unless a current route still imports them
+
 ## Mobile Direction
 
 Public site must be mobile-friendly.
