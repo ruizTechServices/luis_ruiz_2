@@ -1,4 +1,4 @@
-# 004 — Dashboard Projects, Leads, and Money
+﻿# 004 â€” Dashboard Projects, Leads, and Money
 
 Status: Implemented on 2026-05-20.
 
@@ -190,7 +190,6 @@ advanced filtering
 ## Do Not Touch
 
 - public homepage
-- Nucleus
 - round-robin
 - Ollama
 - payments

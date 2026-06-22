@@ -1,4 +1,4 @@
-# 006 — Client Dashboard Foundation
+﻿# 006 â€” Client Dashboard Foundation
 
 Status: Implemented on 2026-05-20.
 
@@ -94,7 +94,6 @@ Welcome. This area will track your project status, deliverables, updates, and co
 
 - `/gio_dash`
 - dashboard operational tables unless needed only for future-safe typing
-- Nucleus
 - round-robin
 - Ollama
 - billing

@@ -13,7 +13,6 @@ The repository is a Next.js App Router application using:
 - Zod validation
 - Vercel Analytics
 - multiple AI provider SDKs
-- Stripe for Nucleus billing
 
 ## Current Top-Level Shape
 
@@ -186,25 +185,9 @@ The server client is async because Next.js 15 requires awaiting `cookies()`.
 
 Do not invent a new Supabase client. Use the existing project pattern.
 
-## Nucleus Database Contract Notes
-
-Nucleus runtime code depends on Supabase tables including:
-
-```txt
-nucleus_profiles
-nucleus_credit_transactions
-nucleus_usage_logs
-nucleus_model_pricing
-nucleus_credit_packages
-nucleus_subscription_plans
-```
-
-Local migrations currently cover Nucleus RLS policies and atomic credit helper functions, but they do not fully create every Nucleus runtime table. Treat the full Nucleus table schema as partly external/live until explicit create-table migrations are added.
-
 There are two separate OAuth callback patterns:
 
 - `app/auth/callback/route.ts` exchanges a Supabase auth code into a site session and routes owners to `/gio_dash` and non-owners to `/dashboard`.
-- `app/nucleus/auth/callback/route.ts` handles the Nucleus/Electron PKCE handoff by forwarding the authorization code to the Nucleus success page rather than creating the normal site cookie session.
 
 ## Existing Owner Auth Pattern
 

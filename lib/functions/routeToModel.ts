@@ -1,6 +1,6 @@
 // TODO: Replace this hardcoded stub with a proper model routing strategy.
 // Options to consider:
-// - Use the existing provider routing in lib/nucleus/pricing.ts
+// - Use the provider adapters already present in the AI surfaces
 // - Implement classifier-based routing (e.g., analyze query intent)
 // - Use user preferences or session context to select models
 //

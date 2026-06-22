@@ -1,4 +1,4 @@
-# UI Context — Luis-Ruiz Master Hub
+﻿# UI Context â€” Luis-Ruiz Master Hub
 
 ## Design Goal
 
@@ -74,7 +74,6 @@ Example cards:
 
 ```txt
 ruizTechServices
-Nucleus
 AI tooling
 Client dashboards
 Build log

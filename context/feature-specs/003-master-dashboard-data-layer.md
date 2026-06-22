@@ -1,4 +1,4 @@
-# 003 — Master Dashboard Data Layer
+﻿# 003 â€” Master Dashboard Data Layer
 
 Status: Implemented on 2026-05-19.
 
@@ -217,7 +217,6 @@ If temporary UI data is needed, keep it in component-local static data until rea
 
 ## Do Not Touch
 
-- Nucleus tables
 - existing public `projects` table
 - blog tables
 - contactlist table

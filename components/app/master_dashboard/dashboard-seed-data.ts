@@ -54,12 +54,6 @@ export const aiTools: AiToolItem[] = [
     description: "Multi-model discussion tool for comparing model responses.",
   },
   {
-    name: "Nucleus API",
-    href: "/api/nucleus/models",
-    status: "protected",
-    description: "Bearer-token API product with model catalog endpoints.",
-  },
-  {
     name: "GitHub Snapshot",
     href: "https://github.com/ruizTechServices/luis_ruiz_2/tree/GioClaw-Edit",
     status: "owner tool",

@@ -9,7 +9,7 @@ export function AiToolsCard() {
         <div>
           <h2 className="text-lg font-semibold text-slate-950 dark:text-white">AI Tools</h2>
           <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-            Routes into the local model lab, multi-model discussion tool, and API product.
+            Routes into the local model lab and multi-model discussion tool.
           </p>
         </div>
         <span className="rounded-md bg-violet-50 p-2 text-violet-800 dark:bg-violet-400/10 dark:text-violet-200">

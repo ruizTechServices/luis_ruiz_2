@@ -1,18 +1,6 @@
-# Supabase RLS Policies (Nucleus Bot)
+# Supabase Migrations
 
 This folder contains SQL migrations for the project.
-
-## Nucleus
-
-Applied Nucleus policies:
-- `nucleus_profiles`: only the owner (`auth.uid() = id`) can read their profile.
-- `nucleus_credit_transactions`: only the owner (`auth.uid() = user_id`) can read their transactions.
-- `nucleus_usage_logs`: only the owner (`auth.uid() = user_id`) can read their usage logs.
-
-Notes:
-- Inserts/updates are performed by server-side API routes using the service role key,
-  which bypasses RLS. Client-side access remains read-only for user-owned data.
-- The local Nucleus migrations currently include RLS policies and atomic credit helper functions. They do not fully create every Nucleus runtime table, so add explicit create-table migrations before treating local migrations as a complete Nucleus schema source.
 
 ## Owner Dashboard
 

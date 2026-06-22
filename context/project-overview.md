@@ -1,4 +1,4 @@
-# Project Overview — Luis-Ruiz Master Hub
+﻿# Project Overview â€” Luis-Ruiz Master Hub
 
 ## Project Identity
 
@@ -36,17 +36,17 @@ This does **not** mean the public homepage becomes a private dashboard.
 It means the domain becomes a layered command system:
 
 ```txt
-Public site       → credibility, services, portfolio, contact, proof-of-work
-Owner dashboard   → Gio's private operating system
-Client dashboard  → future customer portal foundation
-Supabase          → system of record
-GitHub/Vercel     → code and deployment pipeline
-External apps     → branches from the hub
+Public site       â†’ credibility, services, portfolio, contact, proof-of-work
+Owner dashboard   â†’ Gio's private operating system
+Client dashboard  â†’ future customer portal foundation
+Supabase          â†’ system of record
+GitHub/Vercel     â†’ code and deployment pipeline
+External apps     â†’ branches from the hub
 ```
 
 ## Product Layers
 
-### Layer 1 — Public Website
+### Layer 1 â€” Public Website
 
 Purpose:
 
@@ -74,7 +74,7 @@ Planned public routes:
 /systems
 ```
 
-### Layer 2 — Owner-Only Master Dashboard
+### Layer 2 â€” Owner-Only Master Dashboard
 
 Purpose:
 
@@ -95,7 +95,7 @@ Main route:
 
 The existing `/gio_dash` already protects access with Supabase auth and owner-email authorization. Preserve this pattern.
 
-### Layer 3 — Client/User Dashboard
+### Layer 3 â€” Client/User Dashboard
 
 Purpose:
 
@@ -129,10 +129,8 @@ The codebase is not just a simple portfolio. It already includes:
 - photo/media management through Supabase Storage
 - Ollama local chat
 - multi-model round-robin discussion surface
-- Nucleus API product with credit/subscription logic
 - Supabase auth/database/storage
 - AI provider integrations
-- Stripe integration
 
 The master-dashboard refactor should improve organization and usefulness without breaking these systems.
 
@@ -176,8 +174,6 @@ Current status:
 
 ## Out of Scope For This Refactor Unless Explicitly Requested
 
-- Nucleus product redesign
-- Nucleus billing rewrite
 - round-robin orchestration rewrite
 - Ollama/RAG/memory rewrite
 - full CRM implementation

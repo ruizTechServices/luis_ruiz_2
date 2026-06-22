@@ -1,4 +1,4 @@
-# 001 — Public Home Master Hub
+﻿# 001 â€” Public Home Master Hub
 
 Status: Implemented on 2026-05-19.
 
@@ -123,9 +123,9 @@ Through ruizTechServices, Gio turns messy workflows into clean digital systems: 
 Primary CTAs:
 
 ```txt
-View Services → /services
-See Projects → /projects
-Contact Gio → /contact
+View Services â†’ /services
+See Projects â†’ /projects
+Contact Gio â†’ /contact
 ```
 
 If `/services` or `/systems` do not exist yet, link to `/contact` and `/projects` for now or create simple placeholder pages only if necessary.
@@ -138,7 +138,6 @@ Show public-safe focus areas:
 ruizTechServices
 Client dashboards
 AI tooling
-Nucleus
 Build log
 ```
 
@@ -205,7 +204,6 @@ Keep claims honest. Do not make up metrics.
 
 - `/gio_dash`
 - `/dashboard`
-- Nucleus routes
 - round-robin routes
 - Ollama routes
 - Supabase migrations

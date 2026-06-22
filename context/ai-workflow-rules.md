@@ -1,4 +1,4 @@
-# AI Workflow Rules — Codex Feature-Spec Loop
+﻿# AI Workflow Rules â€” Codex Feature-Spec Loop
 
 ## Purpose
 
@@ -28,7 +28,6 @@ Do not decide to improve unrelated systems while implementing a feature-spec.
 
 Examples of drift:
 
-- rewriting Nucleus while working on the homepage
 - refactoring round-robin while working on dashboard cards
 - rebuilding auth while adding a lead table
 - changing the entire design system because one card was requested
@@ -48,10 +47,10 @@ Update context files when reality changes.
 
 Examples:
 
-- New route added → update `architecture-context.md` and `progress-tracker.md`.
-- New dashboard card pattern created → update `ui-context.md` if the pattern becomes canonical.
-- New API pattern established → update `code-standards.md` if needed.
-- Feature completed → update `progress-tracker.md`.
+- New route added â†’ update `architecture-context.md` and `progress-tracker.md`.
+- New dashboard card pattern created â†’ update `ui-context.md` if the pattern becomes canonical.
+- New API pattern established â†’ update `code-standards.md` if needed.
+- Feature completed â†’ update `progress-tracker.md`.
 
 Do not bloat context files with implementation logs. Put detailed logs in `progress-tracker.md`.
 
@@ -60,7 +59,7 @@ Do not bloat context files with implementation logs. Put detailed logs in `progr
 After every task, append an entry like:
 
 ```md
-## YYYY-MM-DD — SPEC-ID: Title
+## YYYY-MM-DD â€” SPEC-ID: Title
 
 Status: Complete | Partial | Blocked
 

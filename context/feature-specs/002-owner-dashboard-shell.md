@@ -1,4 +1,4 @@
-# 002 — Owner Dashboard Shell
+﻿# 002 â€” Owner Dashboard Shell
 
 Status: Implemented on 2026-05-19.
 
@@ -166,7 +166,6 @@ Seed examples:
 ```txt
 luis-ruiz.com Master Hub
 ruizTechServices
-Nucleus
 24HourGPT
 ```
 
@@ -177,7 +176,6 @@ Seed links:
 ```txt
 luis-ruiz.com
 ruizTechServices
-Nucleus
 GitHub repo
 Supabase
 Vercel
@@ -200,7 +198,6 @@ Suggested preserved tools:
 
 - database schema
 - API routes
-- Nucleus
 - round-robin
 - Ollama
 - public homepage

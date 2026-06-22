@@ -1,4 +1,4 @@
-# Code Standards — Luis-Ruiz Master Hub
+﻿# Code Standards â€” Luis-Ruiz Master Hub
 
 ## Primary Principle
 
@@ -60,9 +60,9 @@ Preferred:
 
 ```txt
 app/gio_dash/page.tsx
-→ lib/functions/master-dashboard/getMasterDashboardOverview.ts
-→ typed return object
-→ MasterDashboardView
+â†’ lib/functions/master-dashboard/getMasterDashboardOverview.ts
+â†’ typed return object
+â†’ MasterDashboardView
 ```
 
 For mutations, use API routes or server actions only if the repo already clearly uses that pattern. Current project heavily uses API routes, so prefer API routes for dashboard CRUD.
@@ -219,6 +219,5 @@ Do not:
 - introduce a second UI library
 - replace Supabase
 - move unrelated AI code during dashboard work
-- change Nucleus behavior during master-dashboard implementation
 - change route names casually
 - make public pages depend on private dashboard tables unless sanitized

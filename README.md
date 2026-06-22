@@ -1,6 +1,6 @@
 # Luis-ruiz.com
 
-The public master hub for **Gio (Luis Giovanni Ruiz)** and ruizTechServices LLC. This Next.js-powered site presents practical AI, web, automation, and support work while preserving separate public project, blog, contact, owner dashboard, AI experiment, and Nucleus API product surfaces.
+The public master hub for **Gio (Luis Giovanni Ruiz)** and ruizTechServices LLC. This Next.js-powered site presents practical AI, web, automation, and support work while preserving separate public project, blog, contact, owner dashboard, client dashboard, and AI experiment surfaces.
 
 ## About Gio
 
@@ -14,7 +14,6 @@ Gio builds practical AI, web, and automation systems for small businesses, creat
 - **Owner Dashboard**: Owner-only operations area under `/gio_dash` with live operational cards for projects, leads, money, system links, and decisions.
 - **Client Dashboard**: Authenticated `/dashboard` foundation for future client project status, updates, deliverables, invoices, messages, and support.
 - **AI Experiments**: Ollama chat and round-robin model discussion surfaces.
-- **Nucleus API Product**: Separate API product with auth, credits, model routes, and Stripe flows.
 - **Contact System**: Structured lead intake with validation and Supabase persistence.
 
 ## Tech Stack

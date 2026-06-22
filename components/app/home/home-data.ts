@@ -18,12 +18,6 @@ export const publicStatusItems = [
     status: "Active",
   },
   {
-    title: "Nucleus",
-    description:
-      "A separately scoped API product with model access, credits, and usage tracking.",
-    status: "Product track",
-  },
-  {
     title: "Build log",
     description:
       "Public writing and project notes that show how systems are being shaped over time.",
@@ -93,13 +87,6 @@ export const systems = [
 ];
 
 export const featuredProjects = [
-  {
-    title: "Nucleus API product",
-    description:
-      "A model-access API surface with bearer-token auth, credit accounting, and provider-backed chat routes.",
-    href: "/projects",
-    meta: "API product",
-  },
   {
     title: "Round-robin discussion tool",
     description:

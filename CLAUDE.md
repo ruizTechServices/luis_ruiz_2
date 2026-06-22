@@ -33,12 +33,12 @@ context/feature-specs/
 - shadcn/Radix UI
 - Supabase auth/database/storage helpers
 - Zod validation
-- Existing blog, project, contact, photo, Ollama, round-robin, and Nucleus systems
+- Existing blog, project, contact, photo, Ollama, and round-robin systems
 
 ## Working Rule
 
 Do not restart the repository. Refactor the existing codebase deliberately.
 
-Preserve Nucleus, round-robin, Ollama, blog, project, contact, and photo behavior unless a feature-spec explicitly requests changes.
+Preserve round-robin, Ollama, blog, project, contact, and photo behavior unless a feature-spec explicitly requests changes.
 
 For implementation tasks, follow `AGENTS.md` and the active feature-spec.

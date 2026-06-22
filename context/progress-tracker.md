@@ -1,4 +1,4 @@
-# Progress Tracker — Luis-Ruiz Master Hub
+﻿# Progress Tracker â€” Luis-Ruiz Master Hub
 
 ## Current Objective
 
@@ -20,35 +20,35 @@ The context files were created as empty placeholders and are now being populated
 
 ## Implementation Roadmap
 
-### Phase 0 — Context System
+### Phase 0 â€” Context System
 
 - [x] Create/replace Codex instruction context files
 - [x] Define feature-spec loop
 - [x] Define implementation order
 - [x] Codex confirms context files are present in repo
 
-### Phase 1 — Public Master Hub
+### Phase 1 â€” Public Master Hub
 
 - [x] `001-public-home-master-hub.md`
 - [x] Replace generic landing composition with public master hub composition
 - [x] Create `components/app/home/*`
 - [x] Preserve existing working landing components until safely replaced or unused
 
-### Phase 2 — Owner Dashboard Shell
+### Phase 2 â€” Owner Dashboard Shell
 
 - [x] `002-owner-dashboard-shell.md`
 - [x] Refactor `/gio_dash` into owner command center shell
 - [x] Create `components/app/master_dashboard/*`
 - [x] Preserve owner auth guard
 
-### Phase 3 — Master Dashboard Data Layer
+### Phase 3 â€” Master Dashboard Data Layer
 
 - [x] `003-master-dashboard-data-layer.md`
 - [x] Add Supabase migration for dashboard operational tables
 - [x] Add typed data access helpers
 - [x] Add owner-only API routes foundation
 
-### Phase 4 — Projects, Leads, Money
+### Phase 4 â€” Projects, Leads, Money
 
 - [x] `004-dashboard-projects-leads-money.md`
 - [x] Display active projects
@@ -56,20 +56,20 @@ The context files were created as empty placeholders and are now being populated
 - [x] Display revenue/P&L snapshot
 - [x] Add basic create/update flows where specified
 
-### Phase 5 — System Links and Decisions
+### Phase 5 â€” System Links and Decisions
 
 - [x] `005-system-links-and-decisions.md`
 - [x] Add system links dashboard card/table
 - [x] Add decisions log card/table
 - [x] Add quick route links to active products/tools
 
-### Phase 6 — Client Dashboard Foundation
+### Phase 6 â€” Client Dashboard Foundation
 
 - [x] `006-client-dashboard-foundation.md`
 - [x] Refine `/dashboard` into future client portal foundation
 - [x] Preserve owner redirect to `/gio_dash`
 
-### Phase 7 — Legacy Docs/Context Cleanup
+### Phase 7 â€” Legacy Docs/Context Cleanup
 
 - [x] `007-cleanup-legacy-docs-context.md`
 - [x] Inspect `/docs` and legacy agent docs
@@ -86,12 +86,10 @@ The context files were created as empty placeholders and are now being populated
 - `/gio_dash` now renders the owner command-center shell from `components/app/master_dashboard/*`.
 - `/dashboard` now renders the client dashboard foundation for signed-in non-owner users and redirects owner users to `/gio_dash`.
 - `/` now uses the public master hub composition from `components/app/home/*`.
-- Existing AI/Nucleus/round-robin/Ollama systems should be preserved and not expanded during this refactor unless explicitly requested.
 - `/gio_dash` cards (Today Focus, Revenue Snapshot, Open Leads, Active Projects, System Links, Decisions Log) now read from `dashboard_*` tables via `getMasterDashboardOverview`. Content Queue and AI Tools remain on static seed data pending later specs.
 - Optional read-only owner section pages exist at `/gio_dash/leads`, `/gio_dash/money`, `/gio_dash/systems`, and `/gio_dash/notes`. The existing `/gio_dash/projects` route is preserved for the public-projects portfolio editor and is intentionally not replaced.
 - The spec 003 dashboard migration has been applied to the live `luis-ruiz` Supabase project (`huyhgdsjpdjzokjwaspb`) as migration `20260520064736_create_master_dashboard_tables`; the six dashboard tables, RLS settings, function, and triggers were verified on 2026-05-20.
 - Legacy docs/context cleanup is complete. Canonical agent/context instructions now live in `AGENTS.md` plus `context/*`; `/docs` is no longer an agent-instruction source.
-- The initial master-hub feature-spec loop (`001` through `007`) is complete. The next recommended implementation focus is Nucleus database-contract hardening: add explicit create-table migrations or a generated schema contract for the Nucleus runtime tables before expanding the API product further.
 
 ## Latest Log
 
@@ -124,20 +122,16 @@ Status: Complete
 - Renamed the tracked agent instruction file from `Agents.md` to canonical `AGENTS.md` and updated `CLAUDE.md` to point at `AGENTS.md` plus the canonical context folder.
 - Removed stale/conflicting legacy docs after preserving useful facts: the old round-robin architecture doc, old Windsurf implementation prompt, exported round-robin conversation transcript, old Supabase table inventory, January TODO review, UX/UI TODO, and superseded GioClaw planning checklist.
 - Kept and corrected the useful build-log sync runbook, and added `docs/README.md` to mark `/docs` as focused runbooks only rather than an agent/context source.
-- Preserved useful legacy facts in canonical context: GitHub build-log write/read split, current round-robin source of truth, Nucleus migration/schema cautions, legacy Supabase table cautions, and remaining UI/accessibility follow-ups.
 - Clarified that completed feature specs can retain original before-state language and that implementation notes plus the progress tracker are the source for current status.
-- Updated `supabase/README.md` to describe both the Nucleus migration limitations and the owner-dashboard private table/RLS model.
 
 ### Verification
 - `npm run build`: pass.
 - `git diff --check` and `git diff --cached --check`: pass; only existing line-ending normalization warnings were printed.
 
 ### Known issues
-- The Nucleus runtime still depends on tables whose full create-table migrations are not present locally. The cleanup preserved that as a current architecture caution rather than solving it in this docs-only spec.
 - `/docs/build-log-sync.md` remains because it is a useful focused runbook, not a conflicting context file.
 
 ### Next recommended focus
-- Create a new spec for Nucleus database-contract hardening: explicit migrations or generated schema documentation for `nucleus_profiles`, `nucleus_credit_transactions`, `nucleus_usage_logs`, `nucleus_model_pricing`, `nucleus_credit_packages`, and `nucleus_subscription_plans`.
 
 ## 2026-05-20 - 006-client-dashboard-foundation: Client Dashboard Foundation
 
@@ -427,7 +421,7 @@ Status: Complete
 ### Next recommended spec
 - `context/feature-specs/002-owner-dashboard-shell.md`
 
-## 2026-05-19 — Context System Drafted
+## 2026-05-19 â€” Context System Drafted
 
 Status: Prepared outside repo for insertion
 

@@ -13,7 +13,7 @@ const serverSchema = z.object({
   // Service role (required for server operations)
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
 
-  // Nucleus JWT
+  // Supabase Auth JWT metadata
   SUPABASE_JWT_ISSUER: z.string().optional(),
   SUPABASE_JWT_AUDIENCE: z.string().optional(),
   SUPABASE_JWKS_URL: z.string().url().optional(),
@@ -30,14 +30,9 @@ const serverSchema = z.object({
   PINECONE_API_KEY: z.string().optional(),
   PINECONE_INDEX: z.string().optional(),
 
-  // Stripe (optional unless using Nucleus payments)
-  STRIPE_SECRET_KEY: z.string().optional(),
-  STRIPE_WEBHOOK_SECRET: z.string().optional(),
-
   // Other
   OWNER_EMAILS: z.string().optional(),
   SUPABASE_PHOTOS_BUCKET: z.string().optional(),
-  NUCLEUS_CORS_ORIGINS: z.string().optional(),
   GITHUB_TOKEN: z.string().optional(),
   GITHUB_USER: z.string().optional(),
   BUILD_LOG_GITHUB_REPO: z.string().optional(),

@@ -1,4 +1,4 @@
-# 005 — System Links and Decisions
+﻿# 005 â€” System Links and Decisions
 
 Status: Implemented on 2026-05-20.
 
@@ -47,7 +47,6 @@ ruizTechServices
 GitHub repo
 Supabase project
 Vercel project
-Nucleus
 24HourGPT
 Razzy
 Chuef
@@ -112,7 +111,6 @@ Use luis-ruiz.com as master hub
 Keep /gio_dash as owner command center
 Keep /dashboard for future client portal
 Use Supabase as source of truth
-Do not refactor Nucleus during master-dashboard work
 ```
 
 ## UI Requirements
@@ -166,7 +164,6 @@ Not required:
 
 ## Do Not Touch
 
-- Nucleus
 - round-robin
 - Ollama
 - homepage

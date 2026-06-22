@@ -81,7 +81,7 @@ export default function LoginPage() {
   return (
     <AuthShell
       title="Welcome back."
-      intro="Sign in to access the owner dashboard, your saved Ollama sessions, and Nucleus credits."
+      intro="Sign in to access the owner dashboard, your saved Ollama sessions, and build-log comments."
     >
       <GoogleButton
         onClick={signInWithGoogle}

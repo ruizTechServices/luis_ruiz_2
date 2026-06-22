@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Atom, Bot, LayoutDashboard, Newspaper } from "lucide-react";
+import { Bot, LayoutDashboard, Newspaper } from "lucide-react";
 
 export interface AuthShellProps {
   title: string;
@@ -17,11 +17,6 @@ const features = [
     icon: Bot,
     title: "Ollama lab",
     description: "Saved chats, retrieval settings, model preferences.",
-  },
-  {
-    icon: Atom,
-    title: "Nucleus credits",
-    description: "Bearer token, model catalog, usage logs.",
   },
   {
     icon: Newspaper,
@@ -85,7 +80,7 @@ export function AuthShell({ title, intro, children }: AuthShellProps) {
               <p className="mt-3 text-[13px] leading-relaxed text-slate-300">
                 The same login unlocks the client portal, owner command center
                 (<code className="rounded bg-slate-950/60 px-1.5 py-0.5 font-mono text-[12px] text-sky-200">/gio_dash</code>{" "}
-                — owner-only), the Ollama lab, and Nucleus credits.
+                — owner-only), the Ollama lab, and build-log comments.
               </p>
 
               <ul className="mt-6 flex flex-col gap-3">
