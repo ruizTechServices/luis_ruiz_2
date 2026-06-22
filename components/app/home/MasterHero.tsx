@@ -45,7 +45,7 @@ export function MasterHero() {
           </h1>
 
           <p className="mt-6 max-w-3xl text-base leading-8 text-slate-700 sm:text-lg dark:text-slate-300">
-            Through ruizTechServices, Gio turns messy workflows into clean
+            Through ruizTechServices, Luis turns messy workflows into clean
             digital systems: dashboards, automations, AI assistants, websites,
             and internal tools.
           </p>
