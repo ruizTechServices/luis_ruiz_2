@@ -21,6 +21,16 @@ const files = fs
   .filter((f) => f.endsWith('.ts'))
   .sort();
 
+const integrationTests = new Set([
+  'testAssistantForGio.ts',
+  'testBraveWebSearch.ts',
+  'testClaudeMessage.ts',
+  'testPhotosApi.ts',
+  'testQuery.ts',
+  'testUpsert.ts',
+]);
+const runIntegrationTests = process.env.RUN_INTEGRATION_TESTS === '1';
+
 if (!files.length) {
   console.log('ℹ️ No .ts files found in tests/. Nothing to run.');
   process.exit(0);
@@ -37,6 +47,12 @@ const useLocalTsx = fs.existsSync(tsxLocal);
 
 let failures = 0;
 for (const file of files) {
+  if (integrationTests.has(file) && !runIntegrationTests) {
+    console.log(`\n=== Skipping ${file} ===`);
+    console.log('Integration test skipped. Set RUN_INTEGRATION_TESTS=1 to run live-provider checks.');
+    continue;
+  }
+
   const filePath = path.join(testsDir, file);
   console.log(`\n=== Running ${file} ===`);
 

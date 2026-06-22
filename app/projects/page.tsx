@@ -1,14 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  ArrowTopRightOnSquareIcon,
-  BriefcaseIcon,
-  ClockIcon,
-  CpuChipIcon,
-  PencilSquareIcon,
-  RocketLaunchIcon,
-} from "@heroicons/react/24/outline";
+import { ArrowUpRight, BookOpen, BriefcaseBusiness, Clock, Cpu } from "lucide-react";
 import Project from "@/components/app/projects/project";
+import { SignalBadge } from "@/components/design-system/SignalBadge";
+import { StatusIndicator } from "@/components/design-system/StatusIndicator";
 import { getProjects } from "@/lib/db/projects";
 
 export const metadata: Metadata = {
@@ -19,154 +14,115 @@ export const metadata: Metadata = {
 
 const proofPoints = [
   {
-    title: "Built systems, not mock portfolio pieces",
+    title: "Built systems, not portfolio theater",
     description:
-      "This page is meant to show real technical work, public experiments, and live software directions, not decorative filler.",
-    icon: RocketLaunchIcon,
+      "Real project records, experiments, and live software directions are more useful than decorative mock pieces.",
+    icon: BriefcaseBusiness,
+    tone: "orange" as const,
   },
   {
-    title: "Connected to business direction",
+    title: "Architecture stays inspectable",
     description:
-      "The strongest projects here support ruizTechServices, future products, or the broader founder-builder path behind the site.",
-    icon: BriefcaseIcon,
+      "Strong entries explain the problem, role, stack, tradeoffs, current state, and evidence.",
+    icon: Cpu,
+    tone: "mint" as const,
   },
   {
-    title: "Still in motion",
+    title: "Some work is still in motion",
     description:
-      "Some work is polished, some is still evolving. That is intentional. The value is in visible execution, iteration, and proof.",
-    icon: ClockIcon,
+      "Active projects are labeled as active instead of being falsely presented as finished production systems.",
+    icon: Clock,
+    tone: "violet" as const,
   },
 ];
-
-const projectFilters = ["AI systems", "Web products", "Public build work", "Client-adjacent execution"];
 
 export default async function ProjectsPage() {
   const projects = await getProjects();
   const featuredProjects = projects.filter((project) => project.featured);
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(125,211,252,0.14),_transparent_22%),radial-gradient(circle_at_80%_20%,_rgba(59,130,246,0.10),_transparent_20%),linear-gradient(145deg,_#020617_0%,_#0f172a_40%,_#162033_100%)] text-white">
-      <section className="relative overflow-hidden border-b border-white/10">
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))]" />
-        <div className="relative mx-auto max-w-7xl px-6 py-20 sm:py-24 lg:px-8">
-          <div className="max-w-4xl">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-sky-200/20 bg-white/[0.08] px-4 py-2 text-sm font-medium text-sky-100 shadow-[0_10px_30px_rgba(15,23,42,0.22)] ring-1 ring-white/8 backdrop-blur-2xl">
-              <CpuChipIcon className="h-4 w-4" />
-              Proof of work, not portfolio theater
-            </div>
+    <main className="min-h-screen bg-[var(--color-canvas)]">
+      <section className="border-b border-[var(--color-border)] py-12 sm:py-16">
+        <div className="ss-container">
+          <div className="ss-panel p-6 sm:p-8 lg:p-11">
+            <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+              <div className="max-w-4xl">
+                <SignalBadge tone="orange">Proof of work</SignalBadge>
+                <h1 className="font-display mt-6 text-4xl font-extrabold leading-[1.05] tracking-normal text-[var(--color-text-primary)] sm:text-5xl">
+                  Projects, case studies, and live systems that show how I actually build.
+                </h1>
+                <p className="mt-6 max-w-3xl text-base leading-8 text-[var(--color-text-secondary)]">
+                  This page is evidence, not decoration. The strongest project records explain what was built, why it mattered, how it works, and what state it is actually in.
+                </p>
+              </div>
 
-            <h1 className="max-w-4xl text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Projects, case studies, and live systems that show how I actually build.
-            </h1>
-
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300 sm:text-xl">
-              This page should function like evidence, not decoration. The goal is to show what the work is, what problems it addresses, how it was built, and how it connects back to Luis Ruiz, ruizTechServices, and the broader founder-builder direction of the site.
-            </p>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              {projectFilters.map((label) => (
-                <span
-                  key={label}
-                  className="rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-sm text-slate-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl"
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href="/blog"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-[var(--color-border-strong)] bg-[var(--color-surface)] px-5 text-sm font-semibold text-[var(--color-text-primary)] transition hover:bg-[var(--color-canvas)]"
                 >
-                  {label}
-                </span>
-              ))}
-            </div>
-
-            <div className="mt-10 flex flex-wrap gap-4">
-              <Link
-                href="/blog"
-                className="inline-flex items-center gap-2 rounded-full border border-sky-100/15 bg-white/90 px-6 py-3 text-sm font-semibold text-slate-900 shadow-[0_16px_40px_rgba(148,163,184,0.18)] transition hover:bg-white"
-              >
-                <PencilSquareIcon className="h-4 w-4" />
-                Read Blog / Build Log
-              </Link>
-              <Link
-                href="/contact"
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-6 py-3 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl transition hover:bg-white/[0.1]"
-              >
-                <ArrowTopRightOnSquareIcon className="h-4 w-4" />
-                Start a Conversation
-              </Link>
+                  <BookOpen className="size-4" />
+                  Build Log
+                </Link>
+                <Link
+                  href="/contact"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] bg-[var(--color-action-primary)] px-5 text-sm font-semibold text-[var(--color-action-on-primary)] transition hover:bg-[var(--color-action-primary-hover)]"
+                >
+                  Start a Conversation
+                  <ArrowUpRight className="size-4" />
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
-        <div className="grid gap-5 md:grid-cols-3">
+      <section className="py-10">
+        <div className="ss-container grid gap-5 md:grid-cols-3">
           {proofPoints.map((item) => {
             const Icon = item.icon;
 
             return (
-              <div
-                key={item.title}
-                className="rounded-[1.75rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.04))] p-6 shadow-[0_24px_60px_rgba(2,6,23,0.26)] ring-1 ring-white/6 backdrop-blur-2xl"
-              >
-                <div className="mb-4 inline-flex rounded-2xl border border-sky-200/20 bg-white/[0.08] p-3 text-sky-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl">
-                  <Icon className="h-6 w-6" />
+              <article key={item.title} className="ss-panel p-6">
+                <div className="mb-5 inline-flex size-11 items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-canvas)]">
+                  <Icon className="size-5 text-[var(--color-text-primary)]" />
                 </div>
-                <h2 className="text-lg font-semibold text-white">{item.title}</h2>
-                <p className="mt-3 text-sm leading-7 text-slate-300">{item.description}</p>
-              </div>
+                <SignalBadge tone={item.tone}>0{proofPoints.indexOf(item) + 1}</SignalBadge>
+                <h2 className="mt-4 text-lg font-semibold text-[var(--color-text-primary)]">{item.title}</h2>
+                <p className="mt-3 text-sm leading-7 text-[var(--color-text-secondary)]">{item.description}</p>
+              </article>
             );
           })}
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 pb-12 lg:px-8">
-        <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-100/70">
-              Current public work
-            </p>
-            <h2 className="mt-2 text-3xl font-bold text-white">
-              {featuredProjects.length > 0
-                ? `${featuredProjects.length} featured ${featuredProjects.length === 1 ? "project" : "projects"} and the wider project index`
-                : "Current public work"}
-            </h2>
-          </div>
-
-          <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.05] px-5 py-4 shadow-[0_18px_45px_rgba(2,6,23,0.2)] ring-1 ring-white/6 backdrop-blur-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-100/70">Connected public execution</p>
-            <p className="mt-2 max-w-xl text-sm leading-7 text-slate-300">
-              The strongest signal here is the work itself, backed by public iteration in the build log.
-            </p>
-          </div>
-        </div>
-
-        {projects.length > 0 ? (
-          <div className="space-y-6">
-            {projects.map((project) => (
-              <Project key={project.id} {...project} />
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.06] p-10 text-center text-slate-300 backdrop-blur-lg">
-            No projects are published yet. That is fixable, and the next practical move is to seed the strongest entries with real case-study content.
-          </div>
-        )}
-      </section>
-
-      <section className="mx-auto max-w-7xl px-6 pb-20 lg:px-8">
-        <div className="rounded-[1.9rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.03))] p-8 shadow-[0_24px_65px_rgba(2,6,23,0.24)] ring-1 ring-white/6 backdrop-blur-2xl">
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-            <div className="max-w-3xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-100/70">Keep following the work</p>
-              <h2 className="mt-2 text-2xl font-bold text-white">The build log shows movement, not just outcomes.</h2>
-              <p className="mt-3 text-sm leading-7 text-slate-300">
-                If you want the ongoing thinking, iteration, and technical decisions behind these projects, the Blog / Build Log is where that shows up in public.
-              </p>
+      <section className="pb-[var(--space-section)]">
+        <div className="ss-container">
+          <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="ss-eyebrow">Current public work</p>
+              <h2 className="mt-2 text-3xl font-bold tracking-normal text-[var(--color-text-primary)]">
+                {featuredProjects.length > 0
+                  ? `${featuredProjects.length} featured ${featuredProjects.length === 1 ? "project" : "projects"} and the wider project index`
+                  : "Current public work"}
+              </h2>
             </div>
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-2 self-start rounded-full border border-white/15 bg-white/[0.07] px-5 py-3 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl transition hover:bg-white/[0.12]"
-            >
-              <PencilSquareIcon className="h-4 w-4" />
-              Open Blog / Build Log
-            </Link>
+            <StatusIndicator tone="mint">
+              {projects.length} {projects.length === 1 ? "published record" : "published records"}
+            </StatusIndicator>
           </div>
+
+          {projects.length > 0 ? (
+            <div className="grid gap-6">
+              {projects.map((project) => (
+                <Project key={project.id} {...project} />
+              ))}
+            </div>
+          ) : (
+            <div className="ss-panel border-dashed p-10 text-center text-[var(--color-text-secondary)]">
+              No projects are published yet. The next practical move is to seed the strongest entries with real case-study content.
+            </div>
+          )}
         </div>
       </section>
     </main>

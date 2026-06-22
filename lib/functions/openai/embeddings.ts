@@ -1,5 +1,15 @@
 import openaiClient from "@/lib/clients/openai/client";
 
+type OpenAIEmbeddingClient = {
+  embeddings: {
+    create(input: {
+      model: string;
+      input: string;
+      encoding_format: "float";
+    }): Promise<{ data: Array<{ embedding: number[] }> }>;
+  };
+};
+
 /**
  * Generates an embedding vector for a given text string using the shared OpenAI client.
  *
@@ -14,8 +24,9 @@ import openaiClient from "@/lib/clients/openai/client";
 export async function getTextEmbedding(
   text: string,
   model: string = "text-embedding-3-small",
+  client: OpenAIEmbeddingClient = openaiClient,
 ): Promise<number[]> {
-  const response = await openaiClient.embeddings.create({
+  const response = await client.embeddings.create({
     model,
     input: text,
     encoding_format: "float",
