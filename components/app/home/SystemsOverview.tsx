@@ -2,17 +2,15 @@ import { systems } from "./home-data";
 
 export function SystemsOverview() {
   return (
-    <section className="border-y border-slate-200/70 bg-white py-16 dark:border-white/10 dark:bg-slate-950">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+    <section className="border-y border-[var(--color-border)] bg-[var(--color-surface)] py-[var(--space-section)]">
+      <div className="ss-container">
         <div className="grid gap-10 lg:grid-cols-[0.86fr_1.14fr] lg:items-start">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700 dark:text-teal-200">
-              Operating systems
-            </p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 dark:text-white">
+            <p className="ss-eyebrow">Operating systems</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-normal text-[var(--color-text-primary)]">
               The public version of how the work is organized.
             </h2>
-            <p className="mt-4 text-base leading-8 text-slate-600 dark:text-slate-300">
+            <p className="mt-4 text-base leading-8 text-[var(--color-text-secondary)]">
               The site is becoming a practical hub: public proof in front,
               private operations behind it, and clear routes for services,
               products, experiments, and writing.
@@ -23,18 +21,18 @@ export function SystemsOverview() {
             {systems.map((system, index) => (
               <article
                 key={system.title}
-                className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-5 transition hover:border-teal-300 dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-teal-200/30"
+                className="ss-muted-panel relative overflow-hidden p-5 transition hover:border-[var(--color-action-primary)]"
               >
-                <p className="font-mono text-[11px] font-semibold tracking-[0.22em] text-teal-700 dark:text-teal-300">
-                  SYS · 0{index + 1}
+                <p className="font-technical text-[0.65rem] font-medium uppercase tracking-[0.08em] text-[var(--color-action-primary)]">
+                  SYS / 0{index + 1}
                 </p>
-                <h3 className="mt-2 text-lg font-semibold text-slate-950 dark:text-white">
+                <h3 className="mt-2 text-lg font-semibold text-[var(--color-text-primary)]">
                   {system.title}
                 </h3>
-                <p className="mt-2 text-sm leading-7 text-slate-600 dark:text-slate-300">
+                <p className="mt-2 text-sm leading-7 text-[var(--color-text-secondary)]">
                   {system.description}
                 </p>
-                <span className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-teal-300 via-sky-400 to-amber-400 opacity-70" />
+                <span className="absolute inset-x-0 bottom-0 h-0.5 bg-[var(--color-action-primary)] opacity-80" />
               </article>
             ))}
           </div>

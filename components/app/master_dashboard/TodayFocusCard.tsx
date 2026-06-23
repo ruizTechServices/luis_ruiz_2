@@ -1,4 +1,9 @@
 import { Target } from "lucide-react";
+import {
+  DashboardCard,
+  DashboardIconTile,
+  dashboardItemClassName,
+} from "@/components/design-system/DashboardPrimitives";
 import type {
   DashboardDecision,
   DashboardLead,
@@ -33,58 +38,40 @@ export function TodayFocusCard({ topProject, nextLead, latestDecision }: TodayFo
   const leadFollowUp = formatFollowUp(nextLead?.next_follow_up_at ?? null);
   const leadLine = leadName
     ? leadFollowUp
-      ? `${leadName} · ${leadFollowUp}`
-      : `${leadName} · status ${nextLead?.status ?? "open"}`
+      ? `${leadName} / ${leadFollowUp}`
+      : `${leadName} / status ${nextLead?.status ?? "open"}`
     : null;
 
   const decisionLine = latestDecision?.title || null;
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-950/70">
+    <DashboardCard>
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-slate-950 dark:text-white">Today Focus</h2>
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+          <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">Today Focus</h2>
+          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
             Derived from the highest-priority active project, soonest lead follow-up,
             and latest active decision.
           </p>
         </div>
-        <span className="rounded-md bg-violet-50 p-2 text-violet-800 dark:bg-violet-400/10 dark:text-violet-200">
+        <DashboardIconTile tone="violet">
           <Target className="h-5 w-5" />
-        </span>
+        </DashboardIconTile>
       </div>
 
       <div className="mt-5 grid gap-3">
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.04]">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
-            Primary focus
-          </p>
-          <p className="mt-2 text-sm font-semibold text-slate-950 dark:text-white">
-            {topProject?.name ?? "No active projects on file"}
-          </p>
-          {projectNext ? (
-            <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">{projectNext}</p>
-          ) : null}
-        </div>
-
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.04]">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
-            Soonest lead follow-up
-          </p>
-          <p className="mt-2 text-sm font-semibold text-slate-950 dark:text-white">
-            {leadLine ?? "No open leads to follow up on"}
-          </p>
-        </div>
-
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.04]">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
-            Active decision in focus
-          </p>
-          <p className="mt-2 text-sm font-semibold text-slate-950 dark:text-white">
-            {decisionLine ?? "No active decisions logged"}
-          </p>
-        </div>
+        {[
+          ["Primary focus", topProject?.name ?? "No active projects on file", projectNext],
+          ["Soonest lead follow-up", leadLine ?? "No open leads to follow up on", null],
+          ["Active decision in focus", decisionLine ?? "No active decisions logged", null],
+        ].map(([label, value, detail]) => (
+          <div key={label} className={dashboardItemClassName}>
+            <p className="ss-eyebrow text-[var(--color-text-subtle)]">{label}</p>
+            <p className="mt-2 text-sm font-semibold text-[var(--color-text-primary)]">{value}</p>
+            {detail ? <p className="mt-1 text-xs text-[var(--color-text-secondary)]">{detail}</p> : null}
+          </div>
+        ))}
       </div>
-    </section>
+    </DashboardCard>
   );
 }

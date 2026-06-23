@@ -1,9 +1,14 @@
-// c:\Users\giost\CascadeProjects\websites\luis-ruiz\luis_ruiz_2\app\gio_dash\blog\BlogPostsClient.tsx
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useTransition, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  DashboardCard,
+  DashboardEmptyState,
+  DashboardStatusBadge,
+} from "@/components/design-system/DashboardPrimitives";
 import type { BlogPostWithStats } from "@/lib/db/blog";
 
 interface BlogPostsClientProps {
@@ -39,94 +44,65 @@ export default function BlogPostsClient({ posts }: BlogPostsClientProps) {
 
   if (posts.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 text-center">
-        <p className="text-gray-500 dark:text-gray-400 mb-4">No blog posts yet.</p>
-        <Link
-          href="/gio_dash/blog/new"
-          className="text-blue-600 hover:underline font-medium"
-        >
-          Create your first post
-        </Link>
-      </div>
+      <DashboardEmptyState title="No blog posts yet">
+        <Button asChild className="mt-3">
+          <Link href="/gio_dash/blog/new">Create your first post</Link>
+        </Button>
+      </DashboardEmptyState>
     );
   }
 
   return (
     <div className="space-y-4">
       {posts.map((post) => (
-        <div
-          key={post.id}
-          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
-        >
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+        <DashboardCard key={post.id} as="article">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="min-w-0 flex-1">
+              <h2 className="truncate text-lg font-semibold text-[var(--color-text-primary)]">
                 {post.title || "Untitled"}
               </h2>
-              {post.summary && (
-                <p className="text-gray-600 dark:text-gray-400 text-sm mt-1 line-clamp-2">
+              {post.summary ? (
+                <p className="mt-1 line-clamp-2 text-sm text-[var(--color-text-secondary)]">
                   {post.summary}
                 </p>
-              )}
-              <div className="flex items-center gap-4 mt-3 text-sm text-gray-500 dark:text-gray-400">
+              ) : null}
+              <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-[var(--color-text-subtle)]">
                 <span>{new Date(post.created_at).toLocaleDateString()}</span>
-                {post.tags && (
-                  <span className="flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                    </svg>
-                    {post.tags}
+                {post.tags ? (
+                  <span className="flex min-w-0 items-center gap-1">
+                    <span aria-hidden="true">#</span>
+                    <span className="truncate">{post.tags}</span>
                   </span>
-                )}
+                ) : null}
               </div>
             </div>
 
-            {/* Stats */}
-            <div className="flex items-center gap-4 text-sm">
-              <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-                <span>{post.comment_count}</span>
-              </div>
-              <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                </svg>
-                <span>{post.up_votes}</span>
-              </div>
-              <div className="flex items-center gap-1 text-red-600 dark:text-red-400">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-                <span>{post.down_votes}</span>
-              </div>
+            <div className="flex flex-wrap items-center gap-2 text-sm">
+              <DashboardStatusBadge>{post.comment_count} comments</DashboardStatusBadge>
+              <DashboardStatusBadge tone="mint">{post.up_votes} up</DashboardStatusBadge>
+              <DashboardStatusBadge tone="danger">{post.down_votes} down</DashboardStatusBadge>
             </div>
 
-            {/* Actions */}
-            <div className="flex items-center gap-2">
-              <Link
-                href={`/blog/${post.id}`}
-                className="px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-              >
-                View
-              </Link>
-              <Link
-                href={`/gio_dash/blog/${post.id}/edit`}
-                className="px-3 py-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
-              >
-                Edit
-              </Link>
-              <button
+            <div className="flex flex-wrap items-center gap-2">
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/blog/${post.id}`}>View</Link>
+              </Button>
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/gio_dash/blog/${post.id}/edit`}>Edit</Link>
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
                 onClick={() => handleDelete(post.id, post.title)}
                 disabled={deletingId === post.id || isPending}
-                className="px-3 py-1.5 text-sm font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors disabled:opacity-50"
+                className="text-[var(--color-signal-danger)] hover:text-[var(--color-signal-danger)]"
               >
                 {deletingId === post.id ? "..." : "Delete"}
-              </button>
+              </Button>
             </div>
           </div>
-        </div>
+        </DashboardCard>
       ))}
     </div>
   );

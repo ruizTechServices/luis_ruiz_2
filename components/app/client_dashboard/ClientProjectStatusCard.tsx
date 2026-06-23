@@ -2,31 +2,31 @@ import { FolderKanban } from "lucide-react";
 
 export function ClientProjectStatusCard() {
   return (
-    <section className="h-full rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-950/70">
+    <section className="ss-panel h-full p-5">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-slate-950 dark:text-white">Project Status</h2>
-          <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">
+          <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">Project Status</h2>
+          <p className="mt-1 text-sm leading-6 text-[var(--color-text-secondary)]">
             No active client project is connected to this account yet.
           </p>
         </div>
-        <span className="rounded-md bg-teal-50 p-2 text-teal-800 dark:bg-teal-300/10 dark:text-teal-200">
+        <span className="rounded-md border border-[var(--color-border)] bg-[var(--color-canvas)] p-2 text-[var(--color-signal-mint)]">
           <FolderKanban className="h-5 w-5" />
         </span>
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.04]">
-          <p className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">Status</p>
-          <p className="mt-2 text-sm font-semibold text-slate-950 dark:text-white">Waiting for setup</p>
+        <div className="ss-muted-panel p-4">
+          <p className="font-technical text-[0.65rem] font-medium uppercase text-[var(--color-text-subtle)]">Status</p>
+          <p className="mt-2 text-sm font-semibold text-[var(--color-text-primary)]">Waiting for setup</p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.04]">
-          <p className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">Next step</p>
-          <p className="mt-2 text-sm font-semibold text-slate-950 dark:text-white">Project kickoff</p>
+        <div className="ss-muted-panel p-4">
+          <p className="font-technical text-[0.65rem] font-medium uppercase text-[var(--color-text-subtle)]">Next step</p>
+          <p className="mt-2 text-sm font-semibold text-[var(--color-text-primary)]">Project kickoff</p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.04]">
-          <p className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">Access</p>
-          <p className="mt-2 text-sm font-semibold text-slate-950 dark:text-white">Client-only</p>
+        <div className="ss-muted-panel p-4">
+          <p className="font-technical text-[0.65rem] font-medium uppercase text-[var(--color-text-subtle)]">Access</p>
+          <p className="mt-2 text-sm font-semibold text-[var(--color-text-primary)]">Client-only</p>
         </div>
       </div>
     </section>

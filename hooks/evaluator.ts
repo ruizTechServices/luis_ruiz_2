@@ -62,7 +62,12 @@ function buildFormatted(tone: string, analysis: string): string {
 
 export async function evaluateAnalysis(
   message: string,
-  opts?: { maxChars?: number; system?: string | false; model?: string }
+  opts?: {
+    maxChars?: number;
+    system?: string | false;
+    model?: string;
+    complete?: typeof getOpenAICompletion;
+  }
 ): Promise<Evaluation> {
   const maxChars = opts?.maxChars ?? DEFAULT_MAX_CHARS;
   const model = opts?.model ?? 'gpt-4o';
@@ -74,7 +79,8 @@ export async function evaluateAnalysis(
     ? { system, maxOutputTokens: approxMaxTokens }
     : { maxOutputTokens: approxMaxTokens } as const;
 
-  const raw = await getOpenAICompletion(message, model, callOpts);
+  const complete = opts?.complete ?? getOpenAICompletion;
+  const raw = await complete(message, model, callOpts);
 
   const { tone: parsedTone, analysis: parsedAnalysis } = parseEvaluation(raw);
   const tone = normalizeTone(parsedTone);
@@ -87,7 +93,10 @@ export async function evaluateAnalysis(
   return { tone, analysis, raw, formatted };
 }
 
-export const evaluator = async (message: string) => {
-  const { formatted } = await evaluateAnalysis(message);
+export const evaluator = async (
+  message: string,
+  complete?: typeof getOpenAICompletion,
+) => {
+  const { formatted } = await evaluateAnalysis(message, complete ? { complete } : undefined);
   return formatted;
 };

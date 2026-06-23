@@ -1,5 +1,12 @@
 import Link from "next/link";
 import { ExternalLink, FolderKanban, Github } from "lucide-react";
+import {
+  DashboardCard,
+  DashboardEmptyState,
+  DashboardIconTile,
+  dashboardItemClassName,
+} from "@/components/design-system/DashboardPrimitives";
+import { SignalBadge, type SignalTone } from "@/components/design-system/SignalBadge";
 import type { DashboardProject } from "@/lib/functions/master-dashboard/types";
 
 function formatTouched(value: string | null): string | null {
@@ -15,21 +22,13 @@ function formatTouched(value: string | null): string | null {
   }
 }
 
-function statusToneClasses(status: string): string {
+function statusTone(status: string): SignalTone {
   const normalized = status.toLowerCase();
-  if (normalized === "shipped" || normalized === "selling") {
-    return "bg-emerald-50 text-emerald-800 dark:bg-emerald-400/10 dark:text-emerald-200";
-  }
-  if (normalized === "building" || normalized === "testing") {
-    return "bg-sky-50 text-sky-800 dark:bg-sky-400/10 dark:text-sky-200";
-  }
-  if (normalized === "validated") {
-    return "bg-violet-50 text-violet-800 dark:bg-violet-400/10 dark:text-violet-200";
-  }
-  if (normalized === "idea") {
-    return "bg-amber-50 text-amber-800 dark:bg-amber-400/10 dark:text-amber-200";
-  }
-  return "bg-slate-100 text-slate-800 dark:bg-white/10 dark:text-slate-200";
+  if (normalized === "shipped" || normalized === "selling") return "mint";
+  if (normalized === "building" || normalized === "testing") return "info";
+  if (normalized === "validated") return "violet";
+  if (normalized === "idea") return "warning";
+  return "neutral";
 }
 
 export type ActiveProjectsCardProps = {
@@ -40,71 +39,66 @@ export function ActiveProjectsCard({ projects }: ActiveProjectsCardProps) {
   const visible = projects.slice(0, 5);
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-950/70">
+    <DashboardCard>
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-slate-950 dark:text-white">Active Projects</h2>
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+          <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">Active Projects</h2>
+          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
             {visible.length > 0
               ? "Top active items by priority and recent activity."
               : "Add active projects through the dashboard API."}
           </p>
         </div>
-        <span className="rounded-md bg-teal-50 p-2 text-teal-800 dark:bg-teal-300/10 dark:text-teal-200">
+        <DashboardIconTile tone="mint">
           <FolderKanban className="h-5 w-5" />
-        </span>
+        </DashboardIconTile>
       </div>
 
       {visible.length === 0 ? (
-        <div className="mt-5 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 dark:border-white/15 dark:bg-white/[0.04]">
-          <p className="text-sm font-semibold text-slate-900 dark:text-white">
-            No active projects yet
+        <DashboardEmptyState title="No active projects yet">
+          <p>
+            Post a project to{" "}
+            <code className="rounded bg-[var(--color-surface)] px-1 py-0.5 font-technical text-xs">
+              POST /api/dashboard/projects
+            </code>{" "}
+            with statuses idea, validated, building, testing, shipped, or selling.
           </p>
-          <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
-            Post a project to <code className="rounded bg-slate-100 px-1 py-0.5 text-xs dark:bg-white/10">POST /api/dashboard/projects</code>
-            {" "}with statuses idea, validated, building, testing, shipped, or selling.
-          </p>
-        </div>
+        </DashboardEmptyState>
       ) : (
         <div className="mt-5 space-y-3">
           {visible.map((project) => {
             const touched = formatTouched(project.last_touched_at);
             return (
-              <article
-                key={project.id}
-                className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.04]"
-              >
+              <article key={project.id} className={dashboardItemClassName}>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <h3 className="text-sm font-semibold text-slate-950 dark:text-white">
+                    <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">
                       {project.name}
                     </h3>
-                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    <p className="mt-1 text-xs text-[var(--color-text-subtle)]">
                       Priority {project.priority}
-                      {touched ? ` · Touched ${touched}` : ""}
+                      {touched ? ` / Touched ${touched}` : ""}
                     </p>
                   </div>
-                  <span
-                    className={`self-start rounded-md px-2 py-1 text-xs font-semibold ${statusToneClasses(project.status)}`}
-                  >
+                  <SignalBadge tone={statusTone(project.status)} className="self-start">
                     {project.status}
-                  </span>
+                  </SignalBadge>
                 </div>
 
                 {project.next_action ? (
-                  <p className="mt-2 text-sm leading-6 text-slate-700 dark:text-slate-200">
+                  <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
                     <span className="font-semibold">Next:</span> {project.next_action}
                   </p>
                 ) : null}
 
-                {(project.repo_url || project.live_url) ? (
+                {project.repo_url || project.live_url ? (
                   <div className="mt-3 flex flex-wrap gap-3 text-xs">
                     {project.live_url ? (
                       <Link
                         href={project.live_url}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1 font-semibold text-sky-700 hover:underline dark:text-sky-300"
+                        className="inline-flex items-center gap-1 font-semibold text-[var(--color-signal-info)] hover:underline"
                       >
                         <ExternalLink className="h-3 w-3" /> Live
                       </Link>
@@ -114,7 +108,7 @@ export function ActiveProjectsCard({ projects }: ActiveProjectsCardProps) {
                         href={project.repo_url}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1 font-semibold text-slate-700 hover:underline dark:text-slate-200"
+                        className="inline-flex items-center gap-1 font-semibold text-[var(--color-text-secondary)] hover:underline"
                       >
                         <Github className="h-3 w-3" /> Repo
                       </Link>
@@ -126,6 +120,6 @@ export function ActiveProjectsCard({ projects }: ActiveProjectsCardProps) {
           })}
         </div>
       )}
-    </section>
+    </DashboardCard>
   );
 }

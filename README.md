@@ -20,6 +20,7 @@ Gio builds practical AI, web, and automation systems for small businesses, creat
 
 - **Frontend**: Next.js 15 (App Router), React 19, TypeScript.
 - **Styling**: Tailwind CSS v4, shadcn/ui (Radix UI), `lucide-react`.
+- **Design system**: Signal & Structure semantic tokens in `app/globals.css`, shared primitives in `components/design-system/`, and persisted light/dark mode through `next-themes`.
 - **AI SDKs**: `openai`, `@anthropic-ai/sdk`, `@mistralai/mistralai`, `@google/generative-ai`, `@huggingface/inference`, xAI (OpenAI-compatible), & [new]`ollama`.
 - **Vector Database**: Pinecone JS v6; configured via env (`PINECONE_API_KEY`, `PINECONE_INDEX`). No default namespace is set in code.
 - **Supabase**: `@supabase/ssr` helpers (browser/server/middleware). Requires `NEXT_PUBLIC_SUPABASE_URL` and either `SUPABASE_SERVICE_ROLE_KEY` (preferred for server features) or `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
@@ -128,3 +129,12 @@ Gio builds practical AI, web, and automation systems for small businesses, creat
 - Supabase OAuth callback is handled in `app/auth/callback/route.ts` (exchanges provider code for a session).
 - Set `NEXT_PUBLIC_SITE_URL` or `SITE_URL` for accurate redirects in dev/prod (defaults to `http://localhost:5000`).
 - `/dashboard` redirects unauthenticated users to `/login`, redirects owner users to `/gio_dash`, and renders the client portal shell for signed-in non-owner users.
+
+## Signal & Structure Theme
+
+- Token source of truth: `app/globals.css`.
+- Theme provider: `components/design-system/ThemeProvider.tsx`.
+- Shared accessible toggle: `components/design-system/ThemeToggle.tsx`.
+- Public shell: `components/site/PublicHeader.tsx` and `components/site/SiteFooter.tsx`.
+- Dashboard shells keep role-specific navigation and do not render the public header/footer.
+- No generated design-system bundle was found in this refactor; do not hand-edit generated token artifacts if they are introduced later.

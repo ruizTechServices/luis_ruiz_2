@@ -225,21 +225,28 @@ AiToolsCard            lg:col-span-3
 
 ## Suggested Visual Style
 
-Use:
+The active visual system is now Signal & Structure. Use:
 
-- neutral/dark-friendly backgrounds
-- subtle gradients only where useful
+- semantic CSS variables from `app/globals.css`
+- warm masonry light mode and controlled technical dark mode
 - clean card borders
 - clear typography hierarchy
 - muted metadata
 - status badges
 - concise action buttons
 
-Suggested card class pattern:
+Current reusable primitives:
 
 ```txt
-rounded-2xl border border-slate-200/70 bg-white/80 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950/70
+components/design-system/Logo.tsx
+components/design-system/ThemeProvider.tsx
+components/design-system/ThemeToggle.tsx
+components/design-system/SignalBadge.tsx
+components/design-system/StatusIndicator.tsx
 ```
+
+Public routes use `components/site/PublicHeader.tsx` and `components/site/SiteFooter.tsx`.
+Dashboard routes suppress the public shell and use role-specific navigation/topbars.
 
 ## Status Badge Vocabulary
 

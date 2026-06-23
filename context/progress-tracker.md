@@ -93,6 +93,100 @@ The context files were created as empty placeholders and are now being populated
 
 ## Latest Log
 
+## 2026-06-22 - Signal & Structure Completion Pass
+
+Status: Stabilized with merge-readiness caveats
+
+### Files changed
+- `components/design-system/DashboardPrimitives.tsx`
+- `components/app/master_dashboard/*Card.tsx`
+- `components/app/master_dashboard/QuickActionsPanel.tsx`
+- `components/app/client_dashboard/ClientRoomCard.tsx`
+- `components/app/client_dashboard/Client*Card.tsx`
+- `hooks/evaluator.ts`
+- `lib/functions/openai/responses.ts`
+- `lib/functions/openai/embeddings.ts`
+- `scripts/run-tests.js`
+- `tests/testResponses.ts`
+- `tests/testEmbeddings.ts`
+- `tests/testEvaluator.ts`
+- `context/progress-tracker.md`
+
+### What changed
+- Isolated unrelated landing-page work in `stash@{0}` with `components/app/landing_page/about.tsx` and `components/app/landing_page/SkillGlobe.tsx`.
+- Inspected every requested Signal & Structure Figma reference node, including desktop/mobile and light/dark variants.
+- Converted the owner and client overview dashboard cards to shared Signal & Structure dashboard primitives.
+- Added deterministic OpenAI test seams and moved live provider smoke tests behind `RUN_INTEGRATION_TESTS=1`.
+- Verified unauthenticated `/dashboard` and `/gio_dash` redirects to `/login`.
+
+### Verification
+- `git diff --check`: pass; Git reported expected LF-to-CRLF working-copy warnings only.
+- `npm run lint`: pass; `next lint` reported the upstream deprecation notice only.
+- `npx tsc --noEmit`: pass.
+- `npm test -- --run`: pass; integration tests are skipped by default unless `RUN_INTEGRATION_TESTS=1`.
+- `npm run build`: pass.
+- Browser smoke on `localhost:3010`: `/`, `/projects`, `/login`, `/dashboard`, and `/gio_dash` loaded or redirected as expected with no console errors.
+- Theme toggle browser check: explicit light and explicit dark selections persisted after refresh with no console errors.
+
+### Known issues
+- Exact `document.documentElement.scrollWidth <= document.documentElement.clientWidth` measurements were not completed because the available browser automation policy blocked JavaScript URL execution and the exposed Playwright subset does not provide `evaluate`.
+- Authenticated owner/client browser sessions were not available, so authenticated boundary verification remains manual.
+- Legacy styling remains in deeper owner CRUD/tool routes such as `/gio_dash/blog`, `/gio_dash/chat`, `/gio_dash/photos`, `/gio_dash/projects`, `/gio_dash/leads`, `/gio_dash/money`, `/gio_dash/notes`, and `/gio_dash/systems`; the overview owner/client dashboard cards were completed.
+
+### Next recommended focus
+- Add a repository-supported browser measurement harness or Playwright dependency if exact overflow measurement must be automated.
+- Run authenticated owner and non-owner client browser checks with local test accounts.
+- Migrate deeper owner CRUD/tool routes to the same dashboard primitives in a separate scoped pass.
+
+## 2026-06-22 - Signal & Structure Design System Refactor
+
+Status: Implemented with validation caveat
+
+### Files changed
+- `app/globals.css`
+- `app/layout.tsx`
+- `app/page.tsx`
+- `app/projects/page.tsx`
+- `components/design-system/*`
+- `components/site/*`
+- `components/app/home/*`
+- `components/app/projects/project.tsx`
+- `components/app/master_dashboard/*`
+- `components/app/client_dashboard/*`
+- `components/ui/button.tsx`
+- `context/design-system.md`
+- `context/ui-context.md`
+- `README.md`
+- `tests/testSignalStructure.ts`
+
+### What changed
+- Added Signal & Structure semantic CSS variables and mapped shadcn variables to those roles.
+- Added `next-themes` provider wiring, shared accessible theme toggle, and reusable LR logo.
+- Replaced the forced dark root layout with system-first persisted theme behavior.
+- Refactored the public homepage and `/projects` case-study surface toward the approved Figma hierarchy while preserving existing data routes.
+- Added role-aware owner/client dashboard shells and kept existing server-side auth/data boundaries intact.
+- Documented that no generated design-system artifacts were found.
+
+### Verification
+- `git diff --check`: pass; Git reported expected LF-to-CRLF working-copy warnings only.
+- `npm run lint`: pass; `next lint` reported the upstream deprecation notice only.
+- `npx tsc --noEmit`: pass.
+- `npm run build`: pass after clearing stale generated `.next` output inside the workspace.
+- `npm test -- --run`: fail; existing OpenAI-dependent evaluator path returned `401 invalid_api_key` for the configured `OPENAI_API_KEY`.
+- Browser smoke checks on `localhost:3000`: `/` and `/projects` loaded directly; unauthenticated `/dashboard` and `/gio_dash` redirected to `/login`; no browser console errors were reported.
+- Responsive smoke checks on `/` at `320`, `360`, `390`, `768`, `1024`, `1280`, `1440`, and `1600` loaded with the expected mobile/desktop navigation breakpoint and no browser console errors.
+- Theme toggle browser check: accessible label changed after activation and persisted after reload once the mounted state resolved.
+
+### Known issues
+- Client dashboard remains a safe shell until project-scoped schema/RLS exists.
+- Some legacy cards under dashboard sections still use older internal styling and should be migrated in a follow-up pass.
+- Full authenticated owner/client mutation testing was not performed because this run did not use signed-in browser sessions.
+- Mechanical horizontal-overflow measurement was not performed because the available browser API did not expose page `scrollWidth`; responsive route smoke checks passed without console errors.
+
+### Next recommended focus
+- Replace or repair the local OpenAI API key, then rerun `npm test -- --run`.
+- Finish component-by-component dashboard card migration and run authenticated owner/client browser verification.
+
 ## 2026-05-20 - 007-cleanup-legacy-docs-context: Legacy Docs and Context Cleanup
 
 Status: Complete

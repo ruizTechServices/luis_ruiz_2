@@ -5,6 +5,13 @@ import { createClient as createServerClient } from "@/lib/clients/supabase/serve
 import { redirect } from "next/navigation";
 import { isOwner } from "@/lib/auth/ownership";
 import { getBlogPostsForAdmin, type BlogPostWithStats } from "@/lib/db/blog";
+import { Button } from "@/components/ui/button";
+import {
+  DashboardErrorState,
+  DashboardPageHeader,
+  DashboardPageShell,
+  DashboardStatusBadge,
+} from "@/components/design-system/DashboardPrimitives";
 import BlogPostsClient from "./BlogPostsClient";
 
 interface BlogAdminPageProps {
@@ -39,55 +46,43 @@ export default async function BlogAdminPage({ searchParams }: BlogAdminPageProps
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-slate-800 dark:to-indigo-900">
-      <div className="container mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-              Blog Admin
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300">
-              Manage blog posts, comments, and votes ({posts.length} posts)
-            </p>
-          </div>
-          <Link
-            href="/gio_dash/blog/new"
-            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            New Post
-          </Link>
-        </div>
+    <DashboardPageShell>
+      <DashboardPageHeader
+        title="Blog Admin"
+        description={`Manage blog posts, comments, and votes across ${posts.length} posts.`}
+        meta={<DashboardStatusBadge>{posts.length} posts</DashboardStatusBadge>}
+        actions={
+          <Button asChild>
+            <Link href="/gio_dash/blog/new">New Post</Link>
+          </Button>
+        }
+      />
 
-        {created && (
-          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4 mb-6">
-            <p className="text-green-700 dark:text-green-300 font-medium">Blog post published successfully.</p>
-            <p className="text-green-600 dark:text-green-400 text-sm mt-1">
-              The post was saved to Supabase and should now appear on the public blog page.
-            </p>
-          </div>
-        )}
+      {created && (
+        <DashboardErrorState className="border-[color-mix(in_srgb,var(--color-signal-mint),transparent_58%)] bg-[color-mix(in_srgb,var(--color-signal-mint),transparent_91%)]">
+          <p className="font-medium">Blog post published successfully.</p>
+          <p className="mt-1 text-[var(--color-text-secondary)]">
+            The post was saved to Supabase and should now appear on the public blog page.
+          </p>
+        </DashboardErrorState>
+      )}
 
-        {updated && (
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-6">
-            <p className="text-blue-700 dark:text-blue-300 font-medium">Blog post updated successfully.</p>
-            <p className="text-blue-600 dark:text-blue-400 text-sm mt-1">
-              The latest changes were saved to Supabase and the public blog was revalidated.
-            </p>
-          </div>
-        )}
+      {updated && (
+        <DashboardErrorState className="border-[color-mix(in_srgb,var(--color-signal-info),transparent_58%)] bg-[color-mix(in_srgb,var(--color-signal-info),transparent_91%)]">
+          <p className="font-medium">Blog post updated successfully.</p>
+          <p className="mt-1 text-[var(--color-text-secondary)]">
+            The latest changes were saved to Supabase and the public blog was revalidated.
+          </p>
+        </DashboardErrorState>
+      )}
 
-        {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6">
-            <p className="text-red-700 dark:text-red-300">{error}</p>
-          </div>
-        )}
+      {error && (
+        <DashboardErrorState>
+          <p>{error}</p>
+        </DashboardErrorState>
+      )}
 
-        <BlogPostsClient posts={posts} />
-      </div>
-    </div>
+      <BlogPostsClient posts={posts} />
+    </DashboardPageShell>
   );
 }

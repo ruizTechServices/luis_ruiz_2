@@ -1,16 +1,11 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import Link from "next/link";
+import { ArrowUpRight, Code2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  ArrowTopRightOnSquareIcon,
-  CheckBadgeIcon,
-  CodeBracketIcon,
-  PlayIcon,
-  SparklesIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
-import { cn } from "@/lib/utils";
+import { SignalBadge, type SignalTone } from "@/components/design-system/SignalBadge";
+import { StatusIndicator } from "@/components/design-system/StatusIndicator";
 import type { ProjectCategory, ProjectRow, ProjectStatus } from "@/lib/types/project";
 
 type ProjectProps = Pick<
@@ -37,11 +32,11 @@ type ProjectProps = Pick<
   | "relatedPosts"
 >;
 
-const statusTone: Record<ProjectStatus, string> = {
-  draft: "border-amber-200/30 bg-white/10 text-amber-100",
-  active: "border-emerald-200/30 bg-emerald-200/10 text-emerald-100",
-  complete: "border-sky-200/30 bg-sky-200/10 text-sky-100",
-  archived: "border-slate-200/20 bg-white/10 text-slate-200",
+const statusTone: Record<ProjectStatus, SignalTone> = {
+  draft: "warning",
+  active: "orange",
+  complete: "mint",
+  archived: "neutral",
 };
 
 const statusLabel: Record<ProjectStatus, string> = {
@@ -56,6 +51,16 @@ const categoryLabel: Record<ProjectCategory, string> = {
   product: "Product",
   client: "Client work",
   experiment: "Experiment",
+};
+
+const toneColor: Record<SignalTone, string> = {
+  neutral: "var(--color-text-secondary)",
+  orange: "var(--color-action-primary)",
+  mint: "var(--color-signal-mint)",
+  violet: "var(--color-signal-violet)",
+  warning: "var(--color-signal-warning)",
+  danger: "var(--color-signal-danger)",
+  info: "var(--color-signal-info)",
 };
 
 function compactParagraphs(value?: string | null): string[] {
@@ -81,185 +86,153 @@ export default function Project(props: ProjectProps) {
   const liveUrl = props.live_url || props.url;
   const stack = props.stack?.filter(Boolean) ?? [];
   const caseStudySections = [
-    { label: "Context", value: props.context },
-    { label: "Problem", value: props.problem },
-    { label: "Constraints", value: props.constraints },
-    { label: "Approach", value: props.approach },
-    { label: "Architecture", value: props.architecture },
-    { label: "Key decisions", value: props.decisions },
-    { label: "Outcomes", value: props.outcomes },
+    { label: "Context", value: props.context, tone: "info" as const },
+    { label: "Problem", value: props.problem, tone: "orange" as const },
+    { label: "Constraints", value: props.constraints, tone: "warning" as const },
+    { label: "Approach", value: props.approach, tone: "mint" as const },
+    { label: "Architecture", value: props.architecture, tone: "violet" as const },
+    { label: "Key decisions", value: props.decisions, tone: "violet" as const },
+    { label: "Outcomes", value: props.outcomes, tone: "mint" as const },
   ].filter((section) => Boolean(section.value));
 
   return (
-    <section className="w-full">
-      <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.04))] shadow-[0_28px_75px_rgba(2,6,23,0.24)] ring-1 ring-white/6 backdrop-blur-2xl transition-all hover:border-sky-200/20 hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05))] hover:shadow-[0_30px_85px_rgba(2,6,23,0.28)]">
-        <div className="p-6 sm:p-8">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-            <div className="flex-1">
-              <div className="mb-4 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.07] px-3 py-1 text-xs font-medium uppercase tracking-[0.22em] text-slate-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl">
-                  {categoryLabel[props.category]}
-                </span>
-                <span className={cn("inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium uppercase tracking-[0.22em]", statusTone[props.status])}>
-                  {statusLabel[props.status]}
-                </span>
-                {props.featured ? (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-sky-200/30 bg-white/[0.08] px-3 py-1 text-xs font-medium uppercase tracking-[0.22em] text-sky-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl">
-                    <SparklesIcon className="h-3.5 w-3.5" />
-                    Featured
-                  </span>
-                ) : null}
+    <article className="ss-panel overflow-hidden">
+      <div className="p-6 sm:p-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0 flex-1">
+            <div className="mb-4 flex flex-wrap items-center gap-2">
+              <SignalBadge tone={props.category === "experiment" ? "violet" : "neutral"}>
+                {categoryLabel[props.category]}
+              </SignalBadge>
+              <StatusIndicator tone={statusTone[props.status]}>
+                {statusLabel[props.status]}
+              </StatusIndicator>
+              {props.featured ? <SignalBadge tone="orange">Featured</SignalBadge> : null}
+            </div>
+
+            <h3 className="text-2xl font-bold tracking-normal text-[var(--color-text-primary)] sm:text-3xl">
+              {derivedTitle}
+            </h3>
+
+            <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--color-text-secondary)]">
+              {props.summary || props.description || "This project is live, but it still needs the case-study layer filled in with clearer context, tradeoffs, and outcomes."}
+            </p>
+
+            {props.current_status ? (
+              <div className="ss-muted-panel mt-5 p-4 text-sm leading-7 text-[var(--color-text-secondary)]">
+                <p className="ss-eyebrow text-[var(--color-signal-mint)]">Current state</p>
+                <p className="mt-2">{props.current_status}</p>
               </div>
-
-              <h3 className="mb-3 text-2xl font-semibold text-white sm:text-3xl">
-                <a
-                  href={liveUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-current transition-colors hover:text-sky-100"
-                >
-                  {derivedTitle}
-                  <ArrowTopRightOnSquareIcon className="h-5 w-5 opacity-70" />
-                </a>
-              </h3>
-
-              <p className={cn("max-w-3xl text-base leading-7 text-slate-300", !props.summary && !props.description && "italic text-slate-400")}>
-                {props.summary || props.description || "This project is live, but it still needs the case-study layer filled in with clearer context, tradeoffs, and outcomes."}
-              </p>
-
-              {props.current_status ? (
-                <div className="mt-5 rounded-[1.4rem] border border-emerald-200/20 bg-[linear-gradient(180deg,rgba(16,185,129,0.16),rgba(16,185,129,0.10))] p-4 text-sm leading-7 text-emerald-50 shadow-[0_16px_38px_rgba(6,78,59,0.18)] backdrop-blur-xl">
-                  <div className="mb-1 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-100/90">
-                    <CheckBadgeIcon className="h-4 w-4" />
-                    Current status
-                  </div>
-                  {props.current_status}
-                </div>
-              ) : null}
-
-              {stack.length > 0 ? (
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {stack.map((item) => (
-                    <span
-                      key={item}
-                      className="rounded-full border border-white/10 bg-white/[0.07] px-3 py-1 text-xs font-medium text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl"
-                    >
-                      {item}
-                    </span>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-
-            <div className="flex flex-wrap gap-3 lg:max-w-sm lg:justify-end">
-              <Button
-                variant={showPreview ? "secondary" : "default"}
-                size="sm"
-                onClick={() => setShowPreview(!showPreview)}
-                className="gap-2"
-              >
-                {showPreview ? (
-                  <>
-                    <XMarkIcon className="h-4 w-4" />
-                    Hide Preview
-                  </>
-                ) : (
-                  <>
-                    <PlayIcon className="h-4 w-4" />
-                    Show Preview
-                  </>
-                )}
-              </Button>
-              <Button variant="outline" size="sm" asChild>
-                <a href={liveUrl} target="_blank" rel="noopener noreferrer" className="gap-2">
-                  <ArrowTopRightOnSquareIcon className="h-4 w-4" />
-                  Open Live
-                </a>
-              </Button>
-              {props.repo_url ? (
-                <Button variant="outline" size="sm" asChild>
-                  <a href={props.repo_url} target="_blank" rel="noopener noreferrer" className="gap-2">
-                    <CodeBracketIcon className="h-4 w-4" />
-                    View Repo
-                  </a>
-                </Button>
-              ) : null}
-            </div>
+            ) : null}
           </div>
 
-          <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.9fr)]">
-            <div className="space-y-4">
-              {props.role ? (
-                <div className="rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.04))] p-5 shadow-[0_18px_42px_rgba(2,6,23,0.18)] ring-1 ring-white/6 backdrop-blur-2xl">
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-100/70">Role</p>
-                  <p className="mt-2 text-sm leading-7 text-slate-300">{props.role}</p>
-                </div>
-              ) : null}
-
-              {caseStudySections.length > 0 ? (
-                <div className="grid gap-4 md:grid-cols-2">
-                  {caseStudySections.map((section) => (
-                    <div key={section.label} className="rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.04))] p-5 shadow-[0_18px_42px_rgba(2,6,23,0.18)] ring-1 ring-white/6 backdrop-blur-2xl">
-                      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-100/70">{section.label}</p>
-                      <div className="mt-2 space-y-3 text-sm leading-7 text-slate-300">
-                        {compactParagraphs(section.value).map((paragraph, index) => (
-                          <p key={`${section.label}-${index}`}>{paragraph}</p>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="rounded-[1.5rem] border border-dashed border-white/15 bg-white/[0.05] p-5 text-sm leading-7 text-slate-300 shadow-[0_16px_36px_rgba(2,6,23,0.14)] ring-1 ring-white/5 backdrop-blur-xl">
-                  This entry still needs the full case-study layer. The schema can hold it now, but the content has to be written project by project.
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-4">
-              {props.relatedPosts && props.relatedPosts.length > 0 ? (
-                <div className="rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.04))] p-5 shadow-[0_18px_42px_rgba(2,6,23,0.18)] ring-1 ring-white/6 backdrop-blur-2xl">
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-100/70">Related build log posts</p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {props.relatedPosts.slice(0, 4).map((post) => (
-                      <a
-                        key={post.id}
-                        href={`/blog/${post.id}`}
-                        className="rounded-full border border-white/10 bg-white/[0.07] px-3 py-1 text-xs font-medium text-sky-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl transition hover:border-sky-200/30 hover:bg-white/[0.14]"
-                      >
-                        {post.title || `Post #${post.id}`}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-
-              <div className="rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.04))] p-5 shadow-[0_18px_42px_rgba(2,6,23,0.18)] ring-1 ring-white/6 backdrop-blur-2xl">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-100/70">Why this matters</p>
-                <p className="mt-2 text-sm leading-7 text-slate-300">
-                  The point is not to show a pile of links. It is to make the work legible, so a client, collaborator, or future partner can see what was built, why it mattered, and how decisions were made.
-                </p>
-              </div>
-            </div>
+          <div className="flex flex-wrap gap-3 lg:max-w-sm lg:justify-end">
+            <Button
+              variant={showPreview ? "secondary" : "outline"}
+              onClick={() => setShowPreview(!showPreview)}
+            >
+              {showPreview ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              {showPreview ? "Hide Preview" : "Show Preview"}
+            </Button>
+            <Button variant="default" asChild>
+              <a href={liveUrl} target="_blank" rel="noopener noreferrer">
+                Open Live
+                <ArrowUpRight className="size-4" />
+              </a>
+            </Button>
+            {props.repo_url ? (
+              <Button variant="secondary" asChild>
+                <a href={props.repo_url} target="_blank" rel="noopener noreferrer">
+                  <Code2 className="size-4" />
+                  View Repo
+                </a>
+              </Button>
+            ) : null}
           </div>
         </div>
 
-        {showPreview && (
-          <div className="border-t border-white/10 bg-slate-950/30 backdrop-blur-2xl">
-            <div className="relative w-full" style={{ aspectRatio: "16 / 9" }}>
-              <iframe
-                src={liveUrl}
-                title={derivedTitle}
-                loading="lazy"
-                referrerPolicy="no-referrer"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; microphone; camera; display-capture"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-                className="h-full w-full bg-white"
-              />
-            </div>
+        {stack.length > 0 ? (
+          <div className="mt-6 flex flex-wrap gap-2">
+            {stack.map((item) => (
+              <SignalBadge key={item} tone="neutral">
+                {item}
+              </SignalBadge>
+            ))}
           </div>
-        )}
+        ) : null}
+
+        <div className="mt-8 grid gap-5 lg:grid-cols-[minmax(0,1.3fr)_minmax(280px,0.7fr)]">
+          <div className="grid gap-4 md:grid-cols-2">
+            {props.role ? (
+              <section className="ss-muted-panel p-5 md:col-span-2">
+                <p className="ss-eyebrow">Role</p>
+                <p className="mt-2 text-sm leading-7 text-[var(--color-text-secondary)]">{props.role}</p>
+              </section>
+            ) : null}
+
+            {caseStudySections.length > 0 ? (
+              caseStudySections.map((section) => (
+                <section key={section.label} className="ss-muted-panel p-5">
+                  <p className="ss-eyebrow" style={{ color: toneColor[section.tone] }}>
+                    {section.label}
+                  </p>
+                  <div className="mt-2 space-y-3 text-sm leading-7 text-[var(--color-text-secondary)]">
+                    {compactParagraphs(section.value).map((paragraph, index) => (
+                      <p key={`${section.label}-${index}`}>{paragraph}</p>
+                    ))}
+                  </div>
+                </section>
+              ))
+            ) : (
+              <section className="ss-muted-panel border-dashed p-5 text-sm leading-7 text-[var(--color-text-secondary)] md:col-span-2">
+                This entry still needs the full case-study layer. The schema can hold it now, but the content has to be written project by project.
+              </section>
+            )}
+          </div>
+
+          <aside className="grid gap-4 content-start">
+            {props.relatedPosts && props.relatedPosts.length > 0 ? (
+              <section className="ss-muted-panel p-5">
+                <p className="ss-eyebrow">Related build log posts</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {props.relatedPosts.slice(0, 4).map((post) => (
+                    <Link
+                      key={post.id}
+                      href={`/blog/${post.id}`}
+                      className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1 text-xs font-medium text-[var(--color-text-primary)] transition hover:border-[var(--color-action-primary)]"
+                    >
+                      {post.title || `Post #${post.id}`}
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            ) : null}
+
+            <section className="ss-muted-panel p-5">
+              <p className="ss-eyebrow">Evidence</p>
+              <p className="mt-2 text-sm leading-7 text-[var(--color-text-secondary)]">
+                The point is not to show a pile of links. It is to make the work legible so a client, collaborator, or future partner can inspect what was built and why it mattered.
+              </p>
+            </section>
+          </aside>
+        </div>
       </div>
-    </section>
+
+      {showPreview ? (
+        <div className="border-t border-[var(--color-border)] bg-[var(--color-surface-raised)]">
+          <div className="relative w-full" style={{ aspectRatio: "16 / 9" }}>
+            <iframe
+              src={liveUrl}
+              title={derivedTitle}
+              loading="lazy"
+              referrerPolicy="no-referrer"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; microphone; camera; display-capture"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+              className="h-full w-full bg-[var(--color-surface)]"
+            />
+          </div>
+        </div>
+      ) : null}
+    </article>
   );
 }
