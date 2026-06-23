@@ -3,7 +3,6 @@
 import { useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
 
 interface EmbedInputProps {
   onSubmitText?: (text: string) => void;
@@ -40,7 +39,7 @@ export default function EmbedInput({ onSubmitText, disabled, loading }: EmbedInp
       />
       <Button onClick={submit} disabled={isDisabled}>Submit</Button>
       {loading && (
-        <Loader2 className="ml-2 h-4 w-4 animate-spin text-muted-foreground" aria-label="Submitting..." />
+        <span className="ml-2 text-sm text-muted-foreground" role="status">Submitting...</span>
       )}
     </div>
   );

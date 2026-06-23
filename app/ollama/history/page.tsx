@@ -25,26 +25,25 @@ export default async function ChatHistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-slate-800 dark:to-indigo-900">
-      <div className="container mx-auto px-6 py-8">
-        {/* Header */}
+    <main className="min-h-screen bg-background">
+      <div className="ss-container px-6 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+          <h1 className="mb-2 text-3xl font-semibold tracking-normal">
             Chat History
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            Your conversation history ({sessions.length} sessions)
+          <p className="text-muted-foreground">
+            {sessions.length} sessions
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6">
-            <p className="text-red-700 dark:text-red-300">{error}</p>
+          <div className="mb-6 rounded-md border p-4">
+            <p>{error}</p>
           </div>
         )}
 
         <ChatHistoryClient sessions={sessions} userId={user.id} />
       </div>
-    </div>
+    </main>
   );
 }

@@ -311,118 +311,103 @@ export default function OllamaChatPage() {
   }
 
   return (
-    <div className="rounded-[1.75rem] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.92),rgba(15,23,42,0.82))] p-3 text-white shadow-[0_24px_70px_rgba(2,6,23,0.35)] backdrop-blur-2xl sm:p-5 lg:p-6">
-      <Toaster richColors position="top-right" />
+    <div className="rounded-md border bg-card p-4">
+      <Toaster position="top-right" />
 
-      <div className="mb-5 rounded-[1.4rem] border border-white/10 bg-white/[0.04] p-4 sm:p-5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-sky-100/65">Ollama Lab</p>
-        <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <h3 className="text-2xl font-semibold tracking-tight text-white sm:text-[2rem]">Local chat workspace</h3>
-            <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-300 sm:text-[15px]">
-              A cleaner local model interface for prompt testing, streaming checks, and retrieval experiments without the muddy stacked-card feel.
-            </p>
-          </div>
-          <div className="inline-flex w-full flex-wrap gap-2 lg:w-auto lg:justify-end">
-            <div className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-200">
-              {error ? 'Needs attention' : isOnline ? 'Ollama ready' : 'Ollama offline'}
-            </div>
-            {dbPersist ? (
-              <div className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs font-medium text-slate-300">
-                DB persist: {dbPersist}
-              </div>
-            ) : null}
-          </div>
-        </div>
+      <div className="mb-4 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+        <span className="rounded-md border px-2 py-1">
+          {error ? 'Needs attention' : isOnline ? 'Ollama ready' : 'Ollama offline'}
+        </span>
+        {dbPersist ? <span className="rounded-md border px-2 py-1">DB persist: {dbPersist}</span> : null}
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(260px,320px)] lg:items-start">
-        <div className="space-y-4 order-2 lg:order-1">
-          <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.045] p-3 sm:p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-100/65">Conversation</p>
-                <p className="mt-1 text-sm text-slate-400">Stream responses here and keep space for actual back-and-forth.</p>
-              </div>
+        <div className="order-2 flex flex-col gap-4 lg:order-1">
+          <section className="rounded-md border p-4">
+            <h2 className="mb-3 text-lg font-semibold">Conversation</h2>
+            <div className="flex h-[420px] flex-col gap-3 overflow-y-auto rounded-md border bg-background p-3 lg:h-[520px]">
+              {messages.length === 0 ? (
+                <div className="text-sm text-muted-foreground">No messages yet.</div>
+              ) : (
+                messages.map((message, index) => (
+                  <div
+                    key={index}
+                    className={`max-w-[92%] rounded-md border p-3 text-sm ${
+                      message.role === 'user' ? 'ml-auto bg-muted' : 'mr-auto bg-card'
+                    }`}
+                  >
+                    <div className="mb-1 text-xs uppercase text-muted-foreground">{message.role}</div>
+                    <div className="whitespace-pre-wrap leading-7">{message.content}</div>
+                  </div>
+                ))
+              )}
             </div>
+          </section>
 
-            <div className="h-[360px] overflow-y-auto space-y-3 rounded-[1.2rem] border border-white/8 bg-slate-950/40 p-3 sm:h-[420px] sm:p-4 lg:h-[520px]">
-              {messages.length === 0 ? <div className="text-sm text-slate-400">No messages yet.</div> : messages.map((m, i) => (
-                <div key={i} className={`rounded-[1.15rem] border p-3 sm:p-4 text-sm shadow-[0_10px_25px_rgba(15,23,42,0.10)] ${m.role === 'user' ? 'ml-auto max-w-[92%] border-sky-300/15 bg-sky-300/10 text-sky-50 sm:max-w-[85%]' : 'mr-auto max-w-[96%] border-white/10 bg-white/[0.06] text-slate-100 sm:max-w-[90%]'}`}>
-                  <div className="mb-1 text-[10px] uppercase tracking-[0.2em] opacity-55">{m.role}</div>
-                  <div className="whitespace-pre-wrap leading-7">{m.content}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.045] p-3 sm:p-4">
+          <section className="rounded-md border p-4">
             <EmbedInput onSubmitText={sendPrompt} disabled={streaming} loading={streaming} />
             <div className="mt-3 flex flex-col gap-2 sm:flex-row">
               <Button variant="outline" onClick={() => controllerRef.current?.abort()} disabled={!streaming} className="w-full sm:w-auto">Stop</Button>
               <Button variant="outline" onClick={() => { setMessages([]); if (model) localStorage.removeItem(`ollama_chat_${model}`) }} className="w-full sm:w-auto">Clear</Button>
             </div>
-          </div>
+          </section>
         </div>
 
-        <div className="space-y-4 order-1 lg:order-2">
-          <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.045] p-4 sm:p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-100/65">Model settings</p>
-            <div className="mt-4 space-y-4">
-              <div>
-                <Label className="mb-2 block text-slate-200">Model</Label>
+        <div className="order-1 flex flex-col gap-4 lg:order-2">
+          <section className="rounded-md border p-4">
+            <h2 className="mb-4 text-lg font-semibold">Model settings</h2>
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <Label>Model</Label>
                 <Select value={model} onValueChange={setModel}>
-                  <SelectTrigger className="h-11 rounded-xl border-white/10 bg-slate-950/50"><SelectValue placeholder="Select model" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="Select model" /></SelectTrigger>
                   <SelectContent>
-                    {models.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                    {models.map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
-                <div className="mb-2 flex items-center justify-between text-sm text-slate-300">
-                  <Label className="text-slate-200">Temperature</Label>
+                <div className="mb-2 flex items-center justify-between text-sm text-muted-foreground">
+                  <Label>Temperature</Label>
                   <span>{temperature.toFixed(1)}</span>
                 </div>
-                <Slider value={[temperature]} min={0} max={1} step={0.1} onValueChange={([v]) => setTemperature(v)} />
+                <Slider value={[temperature]} min={0} max={1} step={0.1} onValueChange={([value]) => setTemperature(value)} />
               </div>
 
               <div>
-                <div className="mb-2 flex items-center justify-between text-sm text-slate-300">
-                  <Label className="text-slate-200">Top P</Label>
+                <div className="mb-2 flex items-center justify-between text-sm text-muted-foreground">
+                  <Label>Top P</Label>
                   <span>{topP.toFixed(1)}</span>
                 </div>
-                <Slider value={[topP]} min={0} max={1} step={0.1} onValueChange={([v]) => setTopP(v)} />
+                <Slider value={[topP]} min={0} max={1} step={0.1} onValueChange={([value]) => setTopP(value)} />
               </div>
             </div>
-          </div>
+          </section>
 
-          <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.045] p-4 sm:p-5">
+          <section className="rounded-md border p-4">
             <div className="mb-3 flex items-center justify-between gap-3">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-100/65">Retrieval</p>
-                <p className="mt-1 text-sm text-slate-400">Only use context when you actually want augmentation.</p>
-              </div>
+              <h2 className="text-lg font-semibold">Retrieval</h2>
               <Switch checked={useContext} onCheckedChange={setUseContext} />
             </div>
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div>
-                <Label className="mb-2 block text-slate-200">Top K</Label>
-                <NumberInput value={topK} onChange={(e) => setTopK(Number(e.target.value || 5))} className="h-11 rounded-xl border-white/10 bg-slate-950/50" />
+              <div className="flex flex-col gap-2">
+                <Label>Top K</Label>
+                <NumberInput value={topK} onChange={(event) => setTopK(Number(event.target.value || 5))} />
               </div>
-              <div>
-                <Label className="mb-2 block text-slate-200">Min similarity</Label>
-                <NumberInput value={minSim} onChange={(e) => setMinSim(Number(e.target.value || 0.75))} className="h-11 rounded-xl border-white/10 bg-slate-950/50" />
+              <div className="flex flex-col gap-2">
+                <Label>Min similarity</Label>
+                <NumberInput value={minSim} onChange={(event) => setMinSim(Number(event.target.value || 0.75))} />
               </div>
             </div>
-          </div>
+          </section>
 
-          <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.045] p-4 sm:p-5 text-sm text-slate-300">
-            {error ? <div className="text-red-300">{error}</div> : isOnline ? 'Ollama connection ready.' : 'Ollama appears offline.'}
-            {siteOrigin ? <div className="mt-2 text-xs text-slate-500">Origin: {siteOrigin}</div> : null}
-            {checkingOnline ? <div className="mt-2 text-xs text-slate-500">Checking Ollama...</div> : null}
-          </div>
+          <section className="rounded-md border p-4 text-sm text-muted-foreground">
+            {error ? <div>{error}</div> : isOnline ? 'Ollama connection ready.' : 'Ollama appears offline.'}
+            {siteOrigin ? <div className="mt-2 text-xs">Origin: {siteOrigin}</div> : null}
+            {checkingOnline ? <div className="mt-2 text-xs">Checking Ollama...</div> : null}
+          </section>
         </div>
       </div>
     </div>

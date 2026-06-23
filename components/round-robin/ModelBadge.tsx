@@ -18,11 +18,11 @@ export interface ModelBadgeProps {
 }
 
 const STATUS_COLORS: Record<ModelStatus, string> = {
-  active: "bg-emerald-500",
-  speaking: "bg-blue-500",
+  active: "bg-foreground",
+  speaking: "bg-foreground",
   waiting: "bg-muted-foreground/50",
-  error: "bg-destructive",
-  unavailable: "bg-zinc-500",
+  error: "bg-foreground",
+  unavailable: "bg-muted-foreground",
 };
 
 const SIZE_CLASSES: Record<BadgeSize, string> = {

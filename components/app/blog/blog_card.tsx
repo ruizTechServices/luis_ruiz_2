@@ -1,27 +1,13 @@
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 import { createClient as createServerClient } from "@/lib/clients/supabase/server";
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
-
-/*
-HOW TO USE THIS COMPONENT THROUGHOUT THE APP:
-
-1. BlogPostCard (Individual Post Card):
-   - Import: import { BlogPostCard } from "@/components/app/blog/blog_card";
-   - Usage: <BlogPostCard blogPost={blogPostObject} />
-   - Props: Requires a BlogPost object with id, title, summary, tags, etc.
-
-2. BlogCard (Carousel Slideshow):
-   - Import: import { BlogCard } from "@/components/app/blog/blog_card";
-   - Usage: <BlogCard />
-   - Server Component: Must be used in server components (fetches data from Supabase)
-   - Automatically displays latest 5 posts in a carousel format
-
-Examples:
-- Dashboard: <BlogCard /> (shows recent posts slideshow)
-- Blog listing: {posts.map(post => <BlogPostCard key={post.id} blogPost={post} />)}
-- Individual pages: <BlogPostCard blogPost={singlePost} />
-*/
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { Badge } from "@/components/ui/badge";
 
 interface BlogPost {
   id: number;
@@ -40,48 +26,39 @@ interface BlogCardProps {
 
 export function BlogPostCard({ blogPost }: BlogCardProps) {
   return (
-    <article className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-sm backdrop-blur-sm transition-all hover:border-violet-400/20 hover:bg-white/[0.07]">
-      <div className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-violet-200/70">
-        Blog / Build Log
-      </div>
-
+    <article className="rounded-md border bg-card p-6">
       <Link href={`/blog/${blogPost.id}`}>
-        <h2 className="mb-3 text-xl font-bold text-white hover:text-violet-200 transition-colors">
+        <h2 className="mb-3 text-xl font-semibold text-card-foreground hover:underline">
           {blogPost.title}
         </h2>
       </Link>
 
-      <p className="mb-4 leading-7 text-slate-300">{blogPost.summary}</p>
+      <p className="mb-4 leading-7 text-muted-foreground">{blogPost.summary}</p>
 
-      <div className="flex flex-wrap gap-2 mb-4">
-        {blogPost.tags &&
-          blogPost.tags.split(",").map((tag, index) => {
+      {blogPost.tags ? (
+        <div className="mb-4 flex flex-wrap gap-2">
+          {blogPost.tags.split(",").map((tag, index) => {
             const trimmedTag = tag.trim();
             return (
               <Link
-                key={index}
+                key={`${trimmedTag}-${index}`}
                 href={`/blog?tag=${encodeURIComponent(trimmedTag)}`}
-                className={cn(
-                  "rounded-full px-3 py-1 text-sm font-medium transition-all",
-                  "bg-violet-500/15 text-violet-200 hover:bg-violet-500/25",
-                  "border border-violet-400/20",
-                  "hover:scale-105 active:scale-95 cursor-pointer"
-                )}
               >
-                {trimmedTag}
+                <Badge variant="secondary">{trimmedTag}</Badge>
               </Link>
             );
           })}
-      </div>
+        </div>
+      ) : null}
 
-      <div className="flex flex-col gap-3 text-sm text-slate-400">
+      <div className="flex flex-col gap-3 text-sm text-muted-foreground">
         {blogPost.relatedProjects && blogPost.relatedProjects.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {blogPost.relatedProjects.slice(0, 3).map((project) => (
               <Link
                 key={project.id}
                 href="/projects"
-                className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-300 hover:border-violet-400/20 hover:text-violet-200"
+                className="rounded-md border px-3 py-1 text-xs hover:bg-muted"
               >
                 Related: {project.title || project.url}
               </Link>
@@ -95,8 +72,8 @@ export function BlogPostCard({ blogPost }: BlogCardProps) {
               ? new Date(blogPost.created_at).toLocaleDateString()
               : "No date"}
           </span>
-          <Link href="/projects" className="font-medium text-violet-300 hover:text-violet-200">
-            See project work →
+          <Link href="/projects" className="font-medium text-foreground hover:underline">
+            Projects
           </Link>
         </div>
       </div>
@@ -104,7 +81,6 @@ export function BlogPostCard({ blogPost }: BlogCardProps) {
   );
 }
 
-// Slideshow component: fetches posts and renders one-at-a-time carousel
 export async function BlogCard() {
   const supabase = await createServerClient();
 
@@ -119,7 +95,7 @@ export async function BlogCard() {
   }
 
   if (!posts?.length) {
-    return <div className="text-sm text-gray-500">No posts yet.</div>;
+    return <div className="text-sm text-muted-foreground">No posts yet.</div>;
   }
 
   const postIds = posts.map((post) => post.id);
@@ -132,9 +108,22 @@ export async function BlogCard() {
       .in("blog_post_id", postIds);
 
     if (!relationRes.error && relationRes.data) {
-      for (const row of relationRes.data as Array<{ blog_post_id: number; projects: { id: number; title: string | null; url: string } | { id: number; title: string | null; url: string }[] | null }>) {
-        const entries = row.projects ? (Array.isArray(row.projects) ? row.projects : [row.projects]) : [];
-        relationMap.set(row.blog_post_id, [...(relationMap.get(row.blog_post_id) ?? []), ...entries]);
+      for (const row of relationRes.data as Array<{
+        blog_post_id: number;
+        projects:
+          | { id: number; title: string | null; url: string }
+          | { id: number; title: string | null; url: string }[]
+          | null;
+      }>) {
+        const entries = row.projects
+          ? Array.isArray(row.projects)
+            ? row.projects
+            : [row.projects]
+          : [];
+        relationMap.set(row.blog_post_id, [
+          ...(relationMap.get(row.blog_post_id) ?? []),
+          ...entries,
+        ]);
       }
     }
   }
@@ -147,9 +136,9 @@ export async function BlogCard() {
   return (
     <Carousel opts={{ align: "start", loop: true }} className="w-full">
       <CarouselContent>
-        {normalizedPosts.map((p) => (
-          <CarouselItem key={p.id}>
-            <BlogPostCard blogPost={p} />
+        {normalizedPosts.map((post) => (
+          <CarouselItem key={post.id}>
+            <BlogPostCard blogPost={post} />
           </CarouselItem>
         ))}
       </CarouselContent>

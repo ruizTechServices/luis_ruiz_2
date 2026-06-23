@@ -17,6 +17,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Button } from "@/components/ui/button";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 export type ContactFormProps = {
@@ -208,13 +209,14 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
 
         <Collapsible open={showMoreDetails} onOpenChange={setShowMoreDetails}>
           <CollapsibleTrigger asChild>
-            <button
+            <Button
               type="button"
-              className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-white/10 bg-transparent px-3 py-2.5 text-sm font-medium text-slate-300 transition hover:border-teal-300/30 hover:bg-white/[0.03] hover:text-teal-200"
+              variant="outline"
+              className="w-full"
             >
               <span>{showMoreDetails ? "Hide" : "Add"} scope details</span>
-              <ChevronDownIcon className={`h-4 w-4 transition-transform ${showMoreDetails ? "rotate-180" : ""}`} />
-            </button>
+              <ChevronDownIcon className="size-4" />
+            </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-6 pt-4">
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -309,13 +311,13 @@ export function ContactForm({ onSuccess, onFailure }: ContactFormProps) {
         />
 
         <div className="pt-2">
-          <button
+          <Button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-[10px] bg-blue-600 text-[14px] font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full"
           >
             {isSubmitting ? "Sending..." : submitLabel}
-          </button>
+          </Button>
         </div>
       </form>
     </Form>

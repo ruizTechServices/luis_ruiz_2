@@ -24,8 +24,8 @@ const publicNav = [
 
 function navClass(active: boolean) {
   return cn(
-    "rounded-lg px-3 py-2 text-sm font-medium text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text-primary)]",
-    active && "text-[var(--color-text-primary)]"
+    "rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground",
+    active && "text-foreground"
   );
 }
 
@@ -37,8 +37,8 @@ export function PublicHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--color-border)] bg-[color-mix(in_srgb,var(--color-canvas),transparent_8%)] backdrop-blur-xl">
-      <div className="ss-container flex min-h-20 items-center justify-between gap-4">
+    <header className="border-b bg-background">
+      <div className="ss-container flex min-h-14 items-center justify-between gap-4">
         <Logo />
 
         <nav aria-label="Primary navigation" className="hidden items-center gap-1 md:flex">
@@ -55,9 +55,6 @@ export function PublicHeader() {
 
         <div className="hidden items-center gap-2 md:flex">
           <ThemeToggle />
-          <Button asChild>
-            <Link href="/contact">Start a Project</Link>
-          </Button>
         </div>
 
         <div className="flex items-center gap-2 md:hidden">
@@ -68,7 +65,7 @@ export function PublicHeader() {
                 <Menu className="size-4" aria-hidden="true" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="bg-[var(--color-surface)]">
+            <SheetContent side="right">
               <SheetHeader>
                 <SheetTitle>
                   <Logo />
@@ -80,16 +77,13 @@ export function PublicHeader() {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      "min-h-11 rounded-xl border border-[var(--color-border)] px-4 py-3 text-sm font-medium text-[var(--color-text-primary)]",
-                      pathname === item.href && "border-[var(--color-action-primary)]"
+                      "rounded-md border px-4 py-3 text-sm font-medium text-foreground",
+                      pathname === item.href && "bg-muted"
                     )}
                   >
                     {item.label}
                   </Link>
                 ))}
-                <Button asChild className="mt-3 min-h-11">
-                  <Link href="/contact">Start a Project</Link>
-                </Button>
               </nav>
             </SheetContent>
           </Sheet>

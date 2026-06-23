@@ -3,8 +3,10 @@
 import { useState, useTransition } from "react";
 import { z } from "zod";
 import type { Comment as BlogComment } from "@/lib/types/blog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
-// -------- Votes (optimistic) --------
 export function VoteControls({
   postId,
   initialUp,
@@ -21,24 +23,22 @@ export function VoteControls({
 
   const sendVote = (vote: "up" | "down") => {
     startTransition(async () => {
-      // optimistic update
       if (current === vote) {
-        return; // no change
+        return;
       } else if (current === null) {
         if (vote === "up") {
-          setUp((v) => v + 1);
+          setUp((value) => value + 1);
         } else {
-          setDown((v) => v + 1);
+          setDown((value) => value + 1);
         }
         setCurrent(vote);
       } else {
-        // switch vote
         if (vote === "up") {
-          setUp((v) => v + 1);
-          setDown((v) => Math.max(0, v - 1));
+          setUp((value) => value + 1);
+          setDown((value) => Math.max(0, value - 1));
         } else {
-          setDown((v) => v + 1);
-          setUp((v) => Math.max(0, v - 1));
+          setDown((value) => value + 1);
+          setUp((value) => Math.max(0, value - 1));
         }
         setCurrent(vote);
       }
@@ -50,31 +50,27 @@ export function VoteControls({
         const res = await fetch("/api/votes", {
           method: "POST",
           body: fd,
-          // Avoid following redirect response; treat 2xx/3xx as success
           redirect: "manual",
         });
         if (res.status >= 400) {
           throw new Error(`Vote failed (${res.status})`);
         }
       } catch (err) {
-        // rollback
         if (current === null) {
           if (vote === "up") {
-            setUp((v) => Math.max(0, v - 1));
+            setUp((value) => Math.max(0, value - 1));
           } else {
-            setDown((v) => Math.max(0, v - 1));
+            setDown((value) => Math.max(0, value - 1));
           }
           setCurrent(null);
         } else if (current !== vote) {
-          // we optimistically switched; revert back
           if (vote === "up") {
-            setUp((v) => Math.max(0, v - 1));
-            setDown((v) => v + 1);
+            setUp((value) => Math.max(0, value - 1));
+            setDown((value) => value + 1);
           } else {
-            setDown((v) => Math.max(0, v - 1));
-            setUp((v) => v + 1);
+            setDown((value) => Math.max(0, value - 1));
+            setUp((value) => value + 1);
           }
-          // keep current unchanged on rollback
         }
         console.error(err);
       }
@@ -83,28 +79,31 @@ export function VoteControls({
 
   return (
     <div className="mt-8 flex items-center gap-4">
-      <button
+      <Button
         type="button"
         onClick={() => sendVote("up")}
-        className="px-3 py-1 rounded bg-green-600 text-white disabled:opacity-50"
+        variant="outline"
+        size="sm"
         disabled={isPending}
       >
         Upvote
-      </button>
-      <button
+      </Button>
+      <Button
         type="button"
         onClick={() => sendVote("down")}
-        className="px-3 py-1 rounded bg-red-600 text-white disabled:opacity-50"
+        variant="outline"
+        size="sm"
         disabled={isPending}
       >
         Downvote
-      </button>
-      <span className="text-sm text-gray-600">👍 {up} | 👎 {down}</span>
+      </Button>
+      <span className="text-sm text-muted-foreground">
+        Up {up} / Down {down}
+      </span>
     </div>
   );
 }
 
-// -------- Comments (optimistic + zod) --------
 const CommentSchema = z.object({
   user_email: z.string().email("Valid email required"),
   content: z.string().min(1, "Comment cannot be empty"),
@@ -122,8 +121,8 @@ export function CommentsClient({
   const [content, setContent] = useState("");
   const [isPending, startTransition] = useTransition();
 
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
     const parsed = CommentSchema.safeParse({ user_email: email, content });
     if (!parsed.success) {
       console.error(parsed.error.flatten().fieldErrors);
@@ -138,7 +137,6 @@ export function CommentsClient({
       created_at: new Date().toISOString(),
     };
 
-    // optimistic add
     setComments((prev) => [optimistic, ...prev]);
     setContent("");
 
@@ -155,8 +153,7 @@ export function CommentsClient({
         });
         if (res.status >= 400) throw new Error(`Comment failed (${res.status})`);
       } catch (err) {
-        // rollback
-        setComments((prev) => prev.filter((c) => c.id !== optimistic.id));
+        setComments((prev) => prev.filter((comment) => comment.id !== optimistic.id));
         console.error(err);
       }
     });
@@ -167,40 +164,40 @@ export function CommentsClient({
       <h2>Comments</h2>
       <form onSubmit={onSubmit} className="mb-6">
         <div className="flex flex-col gap-2">
-          <input
+          <Input
             name="user_email"
             type="email"
             required
             placeholder="you@example.com"
-            className="border rounded px-3 py-2"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(event) => setEmail(event.target.value)}
           />
-          <textarea
+          <Textarea
             name="content"
             required
-            placeholder="Write a comment…"
-            className="border rounded px-3 py-2"
+            placeholder="Write a comment..."
             rows={3}
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(event) => setContent(event.target.value)}
           />
-          <button className="self-start px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50" type="submit" disabled={isPending}>
+          <Button className="self-start" type="submit" disabled={isPending}>
             Add Comment
-          </button>
+          </Button>
         </div>
       </form>
 
-      <ul className="space-y-4">
-        {comments.map((c) => (
-          <li key={c.id} className="border rounded p-3">
-            <div className="text-sm text-gray-500">
-              {c.user_email} · {new Date(c.created_at).toLocaleString()}
+      <ul className="flex flex-col gap-4">
+        {comments.map((comment) => (
+          <li key={comment.id} className="rounded-md border p-3">
+            <div className="text-sm text-muted-foreground">
+              {comment.user_email} / {new Date(comment.created_at).toLocaleString()}
             </div>
-            <div className="mt-1 whitespace-pre-wrap">{c.content}</div>
+            <div className="mt-1 whitespace-pre-wrap">{comment.content}</div>
           </li>
         ))}
-        {!comments.length && <li className="text-sm text-gray-500">No comments yet.</li>}
+        {!comments.length ? (
+          <li className="text-sm text-muted-foreground">No comments yet.</li>
+        ) : null}
       </ul>
     </section>
   );

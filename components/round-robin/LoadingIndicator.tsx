@@ -1,8 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { Loader2 } from "lucide-react";
-
 import { SUPPORTED_MODELS } from "@/lib/round-robin/constants";
 
 export interface LoadingIndicatorProps {
@@ -26,10 +24,9 @@ export function LoadingIndicator({
 
   return (
     <div className="mt-3 inline-flex items-center gap-3 rounded-md border bg-muted/60 px-3 py-2 text-sm text-muted-foreground">
-      <Loader2 className="h-4 w-4 animate-spin text-primary" />
       <div>
         <div>
-          {label} is thinking ({Math.round(elapsedSeconds)}s)
+          {label} is thinking ({Math.round(elapsedSeconds)}s)
         </div>
         <div className="text-[11px]">This is taking longer than expected.</div>
       </div>

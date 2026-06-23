@@ -18,7 +18,7 @@ export function BackToTop() {
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0 });
   };
 
   return (
@@ -27,10 +27,8 @@ export function BackToTop() {
       size="icon"
       onClick={scrollToTop}
       className={cn(
-        'fixed bottom-6 right-6 z-50 rounded-full shadow-lg transition-all duration-300',
-        'bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm',
-        'hover:scale-110 hover:shadow-xl',
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+        'fixed bottom-6 right-6 z-50',
+        isVisible ? 'opacity-100' : 'pointer-events-none opacity-0'
       )}
       aria-label="Back to top"
     >

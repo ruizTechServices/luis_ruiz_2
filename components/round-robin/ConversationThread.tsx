@@ -108,11 +108,7 @@ export function ConversationThread({
                 )}
               >
                 {msg.content}
-                {msg.isStreaming && (
-                  <span className="inline-block w-3 animate-pulse">
-                    
-                  </span>
-                )}
+                {msg.isStreaming ? <span className="inline-block w-3">...</span> : null}
               </div>
             </div>
           </React.Fragment>

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import {
   forwardRef,
   useState,
@@ -8,6 +8,10 @@ import {
   type InputHTMLAttributes,
   type ReactNode,
 } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 
 export function AuthField({
   id,
@@ -23,28 +27,24 @@ export function AuthField({
   children: ReactNode;
 }) {
   return (
-    <div>
-      <label
-        htmlFor={id}
-        className="mb-1.5 block text-[12px] font-medium text-slate-300"
-      >
+    <div className="flex flex-col gap-2">
+      <Label htmlFor={id}>
         {label}
         {optional ? (
-          <span className="ml-1 text-[11px] font-normal text-slate-500">(optional)</span>
+          <span className="ml-1 text-xs font-normal text-muted-foreground">
+            (optional)
+          </span>
         ) : null}
-      </label>
+      </Label>
       {children}
-      {hint ? <p className="mt-1.5 text-[11px] text-slate-500">{hint}</p> : null}
+      {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
     </div>
   );
 }
 
-const inputClasses =
-  "w-full rounded-[10px] border border-white/10 bg-slate-950/60 px-3.5 py-2.5 text-[14px] font-medium text-slate-50 placeholder:text-slate-600 transition focus:border-blue-600 focus:bg-slate-950/85 focus:outline-none focus:ring-[3px] focus:ring-blue-600/20";
-
 export const AuthInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(
   function AuthInput(props, ref) {
-    return <input ref={ref} {...props} className={`${inputClasses} ${props.className ?? ""}`.trim()} />;
+    return <Input ref={ref} {...props} />;
   },
 );
 
@@ -52,15 +52,17 @@ export function PasswordInput(props: InputHTMLAttributes<HTMLInputElement>) {
   const [shown, setShown] = useState(false);
   return (
     <div className="relative">
-      <AuthInput {...props} type={shown ? "text" : "password"} />
-      <button
+      <AuthInput {...props} type={shown ? "text" : "password"} className="pr-10" />
+      <Button
         type="button"
         aria-label={shown ? "Hide password" : "Show password"}
-        onClick={() => setShown((s) => !s)}
-        className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 transition hover:bg-white/5 hover:text-slate-100"
+        onClick={() => setShown((state) => !state)}
+        className="absolute right-1 top-1/2 -translate-y-1/2"
+        size="icon"
+        variant="ghost"
       >
-        {shown ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-      </button>
+        {shown ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
+      </Button>
     </div>
   );
 }
@@ -75,15 +77,14 @@ export function SubmitButton({
   loadingLabel?: string;
 }) {
   return (
-    <button
+    <Button
       type="submit"
       {...rest}
       disabled={rest.disabled || loading}
-      className="mt-1 inline-flex h-[46px] w-full items-center justify-center gap-2 rounded-[10px] bg-blue-600 text-[14px] font-semibold text-white transition hover:bg-blue-700 disabled:cursor-progress disabled:opacity-70"
+      className="mt-1 w-full"
     >
-      <span>{loading ? loadingLabel ?? "Working…" : children}</span>
-      {!loading ? <ArrowRight className="h-3.5 w-3.5" /> : null}
-    </button>
+      {loading ? loadingLabel ?? "Working..." : children}
+    </Button>
   );
 }
 
@@ -93,31 +94,24 @@ export function GoogleButton({
   ...rest
 }: ButtonHTMLAttributes<HTMLButtonElement> & { loading?: boolean; label: string }) {
   return (
-    <button
+    <Button
       type="button"
       {...rest}
       disabled={rest.disabled || loading}
-      className="inline-flex h-[46px] w-full items-center justify-center gap-2.5 rounded-[10px] border border-black/5 bg-white text-[14px] font-semibold text-slate-900 transition hover:bg-slate-100 disabled:cursor-progress disabled:opacity-70"
+      className="w-full"
+      variant="outline"
     >
-      <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" aria-hidden>
-        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.75h3.57c2.08-1.92 3.28-4.74 3.28-8.07z" />
-        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.75c-.99.66-2.25 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-        <path fill="#FBBC05" d="M5.84 14.12c-.22-.66-.35-1.36-.35-2.12s.13-1.46.35-2.12V7.04H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.96l3.66-2.84z" />
-        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.04l3.66 2.84c.87-2.6 3.3-4.5 6.16-4.5z" />
-      </svg>
-      <span>{loading ? "Redirecting…" : label}</span>
-    </button>
+      {loading ? "Redirecting..." : label}
+    </Button>
   );
 }
 
 export function AuthDivider() {
   return (
     <div className="my-4 flex items-center gap-3">
-      <hr className="flex-1 border-t border-white/10" />
-      <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-        or
-      </span>
-      <hr className="flex-1 border-t border-white/10" />
+      <Separator className="flex-1" />
+      <span className="text-xs text-muted-foreground">or</span>
+      <Separator className="flex-1" />
     </div>
   );
 }
@@ -129,13 +123,9 @@ export function AuthAlert({
   tone: "error" | "success";
   children: ReactNode;
 }) {
-  const palette =
-    tone === "error"
-      ? "border-red-500/30 bg-red-500/10 text-red-300"
-      : "border-emerald-500/30 bg-emerald-500/10 text-emerald-300";
   return (
     <div
-      className={`mb-3 rounded-[10px] border px-3.5 py-3 text-[12px] leading-relaxed ${palette}`}
+      className="mb-3 rounded-md border px-3.5 py-3 text-sm leading-relaxed"
       role={tone === "error" ? "alert" : "status"}
     >
       {children}

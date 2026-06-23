@@ -1,4 +1,3 @@
-// C:\Users\giost\CascadeProjects\websites\luis-ruiz\luis_ruiz_2\app\login\page.tsx
 "use client";
 
 import { useCallback, useMemo, useState, type FormEvent } from "react";
@@ -79,10 +78,7 @@ export default function LoginPage() {
   const busy = googleLoading || passwordLoading;
 
   return (
-    <AuthShell
-      title="Welcome back."
-      intro="Sign in to access the owner dashboard, your saved Ollama sessions, and build-log comments."
-    >
+    <AuthShell title="Sign in" intro="Use Google or email/password.">
       <GoogleButton
         onClick={signInWithGoogle}
         disabled={busy}
@@ -94,7 +90,7 @@ export default function LoginPage() {
 
       {error ? <AuthAlert tone="error">{error}</AuthAlert> : null}
 
-      <form onSubmit={signInWithPassword} className="flex flex-col gap-3.5" noValidate>
+      <form onSubmit={signInWithPassword} className="flex flex-col gap-4" noValidate>
         <AuthField id="email" label="Email">
           <AuthInput
             id="email"
@@ -113,35 +109,35 @@ export default function LoginPage() {
             id="password"
             name="password"
             autoComplete="current-password"
-            placeholder="••••••••"
+            placeholder="Password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </AuthField>
 
-        <div className="flex items-center justify-between text-[12px] text-slate-400">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
           <label className="inline-flex items-center gap-2">
             <input
               type="checkbox"
               defaultChecked
-              className="h-3.5 w-3.5 rounded border-white/20 bg-slate-950/60 text-blue-600 focus:ring-blue-600/30"
+              className="size-3.5 rounded border"
             />
             Remember me
           </label>
-          <Link href="/about" className="font-medium text-sky-300 hover:text-sky-200">
+          <Link href="/about" className="font-medium underline underline-offset-4">
             Forgot password?
           </Link>
         </div>
 
-        <SubmitButton loading={passwordLoading} loadingLabel="Signing in…" disabled={busy}>
+        <SubmitButton loading={passwordLoading} loadingLabel="Signing in..." disabled={busy}>
           Sign in with email
         </SubmitButton>
       </form>
 
-      <p className="mt-5 text-center text-[12px] text-slate-400">
+      <p className="mt-5 text-center text-xs text-muted-foreground">
         New here?{" "}
-        <Link href="/signup" className="font-semibold text-teal-200 hover:text-teal-100">
+        <Link href="/signup" className="font-semibold underline underline-offset-4">
           Create an account
         </Link>
       </p>

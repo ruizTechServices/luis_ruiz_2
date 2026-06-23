@@ -16,35 +16,19 @@ import {
 
 const strengthLabels = [
   "Add a longer password (min 6 characters)",
-  "Weak — at least 8 chars + a capital letter",
-  "Decent — add a number to strengthen",
+  "Weak",
+  "Decent",
   "Strong",
   "Excellent",
 ];
 
-const strengthSwatch = [
-  "bg-white/10",
-  "bg-red-500",
-  "bg-amber-500",
-  "bg-teal-300",
-  "bg-emerald-500",
-];
-
-const strengthText = [
-  "text-slate-400",
-  "text-red-400",
-  "text-amber-400",
-  "text-teal-300",
-  "text-emerald-400",
-];
-
-function scorePassword(v: string) {
-  let lvl = 0;
-  if (v.length >= 6) lvl = 1;
-  if (v.length >= 8 && /[A-Z]/.test(v)) lvl = 2;
-  if (v.length >= 10 && /\d/.test(v)) lvl = 3;
-  if (v.length >= 12 && /[!@#$%^&*]/.test(v)) lvl = 4;
-  return lvl;
+function scorePassword(value: string) {
+  let level = 0;
+  if (value.length >= 6) level = 1;
+  if (value.length >= 8 && /[A-Z]/.test(value)) level = 2;
+  if (value.length >= 10 && /\d/.test(value)) level = 3;
+  if (value.length >= 12 && /[!@#$%^&*]/.test(value)) level = 4;
+  return level;
 }
 
 export default function SignupPage() {
@@ -123,14 +107,11 @@ export default function SignupPage() {
     }
   }, [supabase]);
 
-  const lvl = scorePassword(password);
+  const level = scorePassword(password);
   const busy = loading || googleLoading;
 
   return (
-    <AuthShell
-      title="Create your account."
-      intro="One account unlocks the client dashboard, AI lab, and any future product surfaces. Email confirmation required."
-    >
+    <AuthShell title="Create account" intro="Email confirmation required.">
       <GoogleButton
         onClick={signUpWithGoogle}
         disabled={busy}
@@ -143,7 +124,7 @@ export default function SignupPage() {
       {error ? <AuthAlert tone="error">{error}</AuthAlert> : null}
       {success ? <AuthAlert tone="success">{success}</AuthAlert> : null}
 
-      <form onSubmit={handleSignup} className="flex flex-col gap-3.5" noValidate>
+      <form onSubmit={handleSignup} className="flex flex-col gap-4" noValidate>
         <AuthField id="username" label="Username" optional>
           <AuthInput
             id="username"
@@ -173,34 +154,34 @@ export default function SignupPage() {
             id="password"
             name="password"
             autoComplete="new-password"
-            placeholder="••••••••"
+            placeholder="Password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <div className="mt-2 flex gap-1">
-            {[0, 1, 2, 3].map((i) => (
+          <div className="mt-2 flex gap-1" aria-hidden="true">
+            {[0, 1, 2, 3].map((index) => (
               <span
-                key={i}
-                className={`h-1 flex-1 rounded-sm transition-colors ${
-                  i < lvl ? strengthSwatch[lvl] : "bg-white/10"
+                key={index}
+                className={`h-1 flex-1 rounded-sm ${
+                  index < level ? "bg-foreground" : "bg-muted"
                 }`}
               />
             ))}
           </div>
-          <p className={`mt-1 text-[11px] ${strengthText[lvl]}`}>
-            {strengthLabels[lvl]}
+          <p className="mt-1 text-xs text-muted-foreground">
+            {strengthLabels[level]}
           </p>
         </AuthField>
 
-        <SubmitButton loading={loading} loadingLabel="Creating account…" disabled={busy}>
+        <SubmitButton loading={loading} loadingLabel="Creating account..." disabled={busy}>
           Create account
         </SubmitButton>
       </form>
 
-      <p className="mt-5 text-center text-[12px] text-slate-400">
+      <p className="mt-5 text-center text-xs text-muted-foreground">
         Already have an account?{" "}
-        <Link href="/login" className="font-semibold text-teal-200 hover:text-teal-100">
+        <Link href="/login" className="font-semibold underline underline-offset-4">
           Sign in instead
         </Link>
       </p>

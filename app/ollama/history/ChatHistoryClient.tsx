@@ -1,10 +1,10 @@
-// c:\Users\giost\CascadeProjects\websites\luis-ruiz\luis_ruiz_2\app\ollama\history\ChatHistoryClient.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
 import { useTransition, useState } from "react";
 import Link from "next/link";
 import type { ChatSession } from "@/lib/db/chat";
+import { Button } from "@/components/ui/button";
 
 interface ChatHistoryClientProps {
   sessions: ChatSession[];
@@ -43,73 +43,61 @@ export default function ChatHistoryClient({ sessions, userId }: ChatHistoryClien
 
   if (sessions.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 text-center">
-        <p className="text-gray-500 dark:text-gray-400 mb-4">No chat history yet.</p>
-        <Link href="/ollama" className="text-blue-600 hover:underline font-medium">
-          Start a new chat
-        </Link>
+      <div className="rounded-md border bg-card p-8 text-center">
+        <p className="mb-4 text-muted-foreground">No chat history yet.</p>
+        <Button asChild variant="outline">
+          <Link href="/ollama">Start a new chat</Link>
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       {sessions.map((session) => (
-        <div
-          key={session.chat_id}
-          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden"
-        >
+        <div key={session.chat_id} className="overflow-hidden rounded-md border bg-card">
           <div
-            className="p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+            className="cursor-pointer p-4 hover:bg-muted"
             onClick={() => setExpandedId(expandedId === session.chat_id ? null : session.chat_id)}
           >
             <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <p className="text-gray-900 dark:text-white font-medium truncate">
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium">
                   {session.first_message || "Empty session"}
                 </p>
-                <div className="flex items-center gap-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
+                <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
                   <span>{new Date(session.last_message_at).toLocaleString()}</span>
                   <span>{session.message_count} messages</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(session.chat_id);
-                  }}
-                  disabled={deletingId === session.chat_id || isPending}
-                  className="px-3 py-1.5 text-sm font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors disabled:opacity-50"
-                >
-                  {deletingId === session.chat_id ? "..." : "Delete"}
-                </button>
-                <svg
-                  className={`w-5 h-5 text-gray-400 transition-transform ${expandedId === session.chat_id ? "rotate-180" : ""}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
+              <Button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleDelete(session.chat_id);
+                }}
+                disabled={deletingId === session.chat_id || isPending}
+                variant="outline"
+                size="sm"
+              >
+                {deletingId === session.chat_id ? "..." : "Delete"}
+              </Button>
             </div>
           </div>
 
-          {expandedId === session.chat_id && (
-            <div className="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-900/50">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+          {expandedId === session.chat_id ? (
+            <div className="border-t bg-muted p-4">
+              <p className="text-sm text-muted-foreground">
                 Session ID: {session.chat_id}
               </p>
-              <Link
-                href={`/ollama?chat_id=${session.chat_id}`}
-                className="inline-block mt-2 text-sm text-blue-600 hover:underline"
-              >
-                Continue this conversation →
-              </Link>
+              <Button asChild variant="outline" size="sm" className="mt-2">
+                <Link href={`/ollama?chat_id=${session.chat_id}`}>
+                  Continue this conversation
+                </Link>
+              </Button>
             </div>
-          )}
+          ) : null}
         </div>
       ))}
     </div>
