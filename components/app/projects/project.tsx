@@ -129,20 +129,19 @@ export default function Project(props: ProjectProps) {
           <div className="flex flex-wrap gap-3 lg:max-w-sm lg:justify-end">
             <Button
               variant={showPreview ? "secondary" : "outline"}
-              size="sm"
               onClick={() => setShowPreview(!showPreview)}
             >
               {showPreview ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
               {showPreview ? "Hide Preview" : "Show Preview"}
             </Button>
-            <Button variant="default" size="sm" asChild>
+            <Button variant="default" asChild>
               <a href={liveUrl} target="_blank" rel="noopener noreferrer">
                 Open Live
                 <ArrowUpRight className="size-4" />
               </a>
             </Button>
             {props.repo_url ? (
-              <Button variant="secondary" size="sm" asChild>
+              <Button variant="secondary" asChild>
                 <a href={props.repo_url} target="_blank" rel="noopener noreferrer">
                   <Code2 className="size-4" />
                   View Repo
@@ -229,7 +228,7 @@ export default function Project(props: ProjectProps) {
               referrerPolicy="no-referrer"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; microphone; camera; display-capture"
               sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-              className="h-full w-full bg-white"
+              className="h-full w-full bg-[var(--color-surface)]"
             />
           </div>
         </div>

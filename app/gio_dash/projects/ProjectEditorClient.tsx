@@ -1,6 +1,24 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  DashboardCard,
+  DashboardEmptyState,
+  dashboardItemClassName,
+} from "@/components/design-system/DashboardPrimitives";
+import { cn } from "@/lib/utils";
 import type { ProjectCategory, ProjectRow, ProjectStatus, ProjectVisibility } from "@/lib/types/project";
 
 const statusOptions: ProjectStatus[] = ["draft", "active", "complete", "archived"];
@@ -155,7 +173,7 @@ export default function ProjectEditorClient({ initialProjects }: { initialProjec
 
   const selectedProject = useMemo(
     () => projects.find((project) => project.id === selectedId) ?? null,
-    [projects, selectedId]
+    [projects, selectedId],
   );
 
   const loadProject = (value: number | "new") => {
@@ -202,20 +220,16 @@ export default function ProjectEditorClient({ initialProjects }: { initialProjec
   };
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
-      <aside className="rounded-2xl border border-white/35 bg-white/55 p-4 shadow-[0_18px_45px_rgba(148,163,184,0.18)] backdrop-blur-xl dark:border-white/10 dark:bg-white/10">
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Projects</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Pick an entry or start a new one.</p>
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
+      <DashboardCard as="aside" className="h-fit">
+        <div className="mb-4 flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">Projects</h2>
+            <p className="text-sm text-[var(--color-text-subtle)]">Pick an entry or start a new one.</p>
           </div>
-          <button
-            type="button"
-            onClick={() => loadProject("new")}
-            className="rounded-lg border border-white/40 bg-white/45 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white/70 dark:border-white/10 dark:bg-white/10 dark:text-gray-200 dark:hover:bg-white/15"
-          >
+          <Button type="button" variant="outline" size="sm" onClick={() => loadProject("new")}>
             New
-          </button>
+          </Button>
         </div>
 
         <div className="space-y-2">
@@ -224,176 +238,176 @@ export default function ProjectEditorClient({ initialProjects }: { initialProjec
               key={project.id}
               type="button"
               onClick={() => loadProject(project.id)}
-              className={`w-full rounded-xl border px-4 py-3 text-left transition backdrop-blur-lg ${selectedId === project.id ? "border-sky-200/60 bg-white/75 shadow-[0_14px_30px_rgba(148,163,184,0.18)] dark:border-sky-200/20 dark:bg-white/15" : "border-white/30 bg-white/40 hover:bg-white/60 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"}`}
+              className={cn(
+                "w-full rounded-[var(--radius-md)] border px-4 py-3 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus-ring)]",
+                selectedId === project.id
+                  ? "border-[var(--color-border-strong)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-card)]"
+                  : "border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-surface-raised)]",
+              )}
             >
-              <div className="text-sm font-semibold text-gray-900 dark:text-white">{project.title || project.slug || project.url}</div>
-              <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">{project.category} • {project.status}</div>
+              <div className="truncate text-sm font-semibold text-[var(--color-text-primary)]">
+                {project.title || project.slug || project.url}
+              </div>
+              <div className="mt-1 text-xs text-[var(--color-text-subtle)]">
+                {project.category} / {project.status}
+              </div>
             </button>
           ))}
           {projects.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-white/35 bg-white/30 px-4 py-6 text-sm text-gray-500 backdrop-blur-lg dark:border-white/10 dark:bg-white/5 dark:text-gray-400">
-              No projects loaded yet.
-            </div>
+            <DashboardEmptyState title="No projects loaded">
+              Create the first project case-study entry.
+            </DashboardEmptyState>
           ) : null}
         </div>
-      </aside>
+      </DashboardCard>
 
-      <section className="rounded-2xl border border-white/35 bg-white/55 p-6 shadow-[0_18px_45px_rgba(148,163,184,0.18)] backdrop-blur-xl dark:border-white/10 dark:bg-white/10">
-        <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+      <DashboardCard>
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="min-w-0">
+            <h2 className="text-2xl font-semibold text-[var(--color-text-primary)]">
               {selectedProject ? `Editing ${selectedProject.title || selectedProject.slug || selectedProject.url}` : "Create project case study"}
             </h2>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Fill this in like a case study, not marketing fluff.
+            <p className="mt-1 text-sm text-[var(--color-text-subtle)]">
+              Fill this in like a case study, not marketing copy.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={isPending}
-            className="rounded-lg border border-sky-100/40 bg-white/85 px-4 py-2 text-sm font-medium text-slate-800 shadow-[0_12px_28px_rgba(148,163,184,0.18)] transition hover:bg-white disabled:opacity-50 dark:border-white/10 dark:bg-white/15 dark:text-white dark:hover:bg-white/20"
-          >
+          <Button type="button" onClick={handleSave} disabled={isPending}>
             {isPending ? "Saving..." : "Save Project"}
-          </button>
+          </Button>
         </div>
 
         {message ? (
-          <div className="mb-6 rounded-xl border border-white/35 bg-white/45 px-4 py-3 text-sm text-slate-700 backdrop-blur-lg dark:border-white/10 dark:bg-white/10 dark:text-gray-200">
+          <div className={`${dashboardItemClassName} mb-6 text-sm text-[var(--color-text-secondary)]`}>
             {message}
           </div>
         ) : null}
 
         <div className="grid gap-6 lg:grid-cols-2">
-          <Field label="Project URL" required>
-            <input className="input" type="url" value={form.url} onChange={(e) => updateField("url", e.target.value)} />
+          <Field label="Project URL" htmlFor="project-url" required>
+            <Input id="project-url" type="url" value={form.url} onChange={(e) => updateField("url", e.target.value)} />
           </Field>
-          <Field label="Live URL">
-            <input className="input" type="url" value={form.live_url} onChange={(e) => updateField("live_url", e.target.value)} />
+          <Field label="Live URL" htmlFor="project-live-url">
+            <Input id="project-live-url" type="url" value={form.live_url} onChange={(e) => updateField("live_url", e.target.value)} />
           </Field>
-          <Field label="Title">
-            <input className="input" value={form.title} onChange={(e) => updateField("title", e.target.value)} />
+          <Field label="Title" htmlFor="project-title">
+            <Input id="project-title" value={form.title} onChange={(e) => updateField("title", e.target.value)} />
           </Field>
-          <Field label="Slug">
-            <input className="input" value={form.slug} onChange={(e) => updateField("slug", e.target.value)} />
+          <Field label="Slug" htmlFor="project-slug">
+            <Input id="project-slug" value={form.slug} onChange={(e) => updateField("slug", e.target.value)} />
           </Field>
           <Field label="Status">
-            <select className="input" value={form.status} onChange={(e) => updateField("status", e.target.value as ProjectStatus)}>
-              {statusOptions.map((option) => <option key={option} value={option}>{option}</option>)}
-            </select>
+            <OptionSelect<ProjectStatus> value={form.status} options={statusOptions} onValueChange={(value) => updateField("status", value)} />
           </Field>
           <Field label="Category">
-            <select className="input" value={form.category} onChange={(e) => updateField("category", e.target.value as ProjectCategory)}>
-              {categoryOptions.map((option) => <option key={option} value={option}>{option}</option>)}
-            </select>
+            <OptionSelect<ProjectCategory> value={form.category} options={categoryOptions} onValueChange={(value) => updateField("category", value)} />
           </Field>
           <Field label="Visibility">
-            <select className="input" value={form.visibility} onChange={(e) => updateField("visibility", e.target.value as ProjectVisibility)}>
-              {visibilityOptions.map((option) => <option key={option} value={option}>{option}</option>)}
-            </select>
+            <OptionSelect<ProjectVisibility> value={form.visibility} options={visibilityOptions} onValueChange={(value) => updateField("visibility", value)} />
           </Field>
-          <Field label="Repo URL">
-            <input className="input" type="url" value={form.repo_url} onChange={(e) => updateField("repo_url", e.target.value)} />
+          <Field label="Repo URL" htmlFor="project-repo-url">
+            <Input id="project-repo-url" type="url" value={form.repo_url} onChange={(e) => updateField("repo_url", e.target.value)} />
           </Field>
           <Field label="Featured">
-            <label className="flex h-11 items-center gap-3 rounded-xl border border-gray-200 px-3 text-sm text-gray-700 dark:border-gray-700 dark:text-gray-200">
-              <input type="checkbox" checked={form.featured} onChange={(e) => updateField("featured", e.target.checked)} />
+            <label className={`${dashboardItemClassName} flex min-h-11 items-center gap-3 text-sm text-[var(--color-text-secondary)]`}>
+              <Checkbox checked={form.featured} onCheckedChange={(checked) => updateField("featured", checked === true)} />
               Mark this as featured work
             </label>
           </Field>
-          <Field label="Tech stack (comma separated)">
-            <input className="input" value={form.stack} onChange={(e) => updateField("stack", e.target.value)} />
+          <Field label="Tech stack (comma separated)" htmlFor="project-stack">
+            <Input id="project-stack" value={form.stack} onChange={(e) => updateField("stack", e.target.value)} />
           </Field>
-          <Field label="Summary" full>
-            <textarea className="textarea" value={form.summary} onChange={(e) => updateField("summary", e.target.value)} />
+          <Field label="Summary" htmlFor="project-summary" full>
+            <Textarea id="project-summary" value={form.summary} onChange={(e) => updateField("summary", e.target.value)} />
           </Field>
-          <Field label="Description" full>
-            <textarea className="textarea" value={form.description} onChange={(e) => updateField("description", e.target.value)} />
+          <Field label="Description" htmlFor="project-description" full>
+            <Textarea id="project-description" value={form.description} onChange={(e) => updateField("description", e.target.value)} />
           </Field>
-          <Field label="Role" full>
-            <textarea className="textarea" value={form.role} onChange={(e) => updateField("role", e.target.value)} />
+          <Field label="Role" htmlFor="project-role" full>
+            <Textarea id="project-role" value={form.role} onChange={(e) => updateField("role", e.target.value)} />
           </Field>
-          <Field label="Current status" full>
-            <textarea className="textarea" value={form.current_status} onChange={(e) => updateField("current_status", e.target.value)} />
+          <Field label="Current status" htmlFor="project-current-status" full>
+            <Textarea id="project-current-status" value={form.current_status} onChange={(e) => updateField("current_status", e.target.value)} />
           </Field>
-          <Field label="Context" full>
-            <textarea className="textarea tall" value={form.context} onChange={(e) => updateField("context", e.target.value)} />
+          <Field label="Context" htmlFor="project-context" full>
+            <Textarea id="project-context" className="min-h-40" value={form.context} onChange={(e) => updateField("context", e.target.value)} />
           </Field>
-          <Field label="Problem" full>
-            <textarea className="textarea tall" value={form.problem} onChange={(e) => updateField("problem", e.target.value)} />
+          <Field label="Problem" htmlFor="project-problem" full>
+            <Textarea id="project-problem" className="min-h-40" value={form.problem} onChange={(e) => updateField("problem", e.target.value)} />
           </Field>
-          <Field label="Constraints" full>
-            <textarea className="textarea tall" value={form.constraints} onChange={(e) => updateField("constraints", e.target.value)} />
+          <Field label="Constraints" htmlFor="project-constraints" full>
+            <Textarea id="project-constraints" className="min-h-40" value={form.constraints} onChange={(e) => updateField("constraints", e.target.value)} />
           </Field>
-          <Field label="Approach" full>
-            <textarea className="textarea tall" value={form.approach} onChange={(e) => updateField("approach", e.target.value)} />
+          <Field label="Approach" htmlFor="project-approach" full>
+            <Textarea id="project-approach" className="min-h-40" value={form.approach} onChange={(e) => updateField("approach", e.target.value)} />
           </Field>
-          <Field label="Architecture" full>
-            <textarea className="textarea tall" value={form.architecture} onChange={(e) => updateField("architecture", e.target.value)} />
+          <Field label="Architecture" htmlFor="project-architecture" full>
+            <Textarea id="project-architecture" className="min-h-40" value={form.architecture} onChange={(e) => updateField("architecture", e.target.value)} />
           </Field>
-          <Field label="Key decisions" full>
-            <textarea className="textarea tall" value={form.decisions} onChange={(e) => updateField("decisions", e.target.value)} />
+          <Field label="Key decisions" htmlFor="project-decisions" full>
+            <Textarea id="project-decisions" className="min-h-40" value={form.decisions} onChange={(e) => updateField("decisions", e.target.value)} />
           </Field>
-          <Field label="Outcomes" full>
-            <textarea className="textarea tall" value={form.outcomes} onChange={(e) => updateField("outcomes", e.target.value)} />
+          <Field label="Outcomes" htmlFor="project-outcomes" full>
+            <Textarea id="project-outcomes" className="min-h-40" value={form.outcomes} onChange={(e) => updateField("outcomes", e.target.value)} />
           </Field>
-          <Field label="Cover image URL">
-            <input className="input" type="url" value={form.cover_image_url} onChange={(e) => updateField("cover_image_url", e.target.value)} />
+          <Field label="Cover image URL" htmlFor="project-cover-image-url">
+            <Input id="project-cover-image-url" type="url" value={form.cover_image_url} onChange={(e) => updateField("cover_image_url", e.target.value)} />
           </Field>
-          <Field label="Started at">
-            <input className="input" type="datetime-local" value={form.started_at} onChange={(e) => updateField("started_at", e.target.value)} />
+          <Field label="Started at" htmlFor="project-started-at">
+            <Input id="project-started-at" type="datetime-local" value={form.started_at} onChange={(e) => updateField("started_at", e.target.value)} />
           </Field>
-          <Field label="Completed at">
-            <input className="input" type="datetime-local" value={form.completed_at} onChange={(e) => updateField("completed_at", e.target.value)} />
+          <Field label="Completed at" htmlFor="project-completed-at">
+            <Input id="project-completed-at" type="datetime-local" value={form.completed_at} onChange={(e) => updateField("completed_at", e.target.value)} />
           </Field>
         </div>
-
-        <style jsx>{`
-          .input {
-            width: 100%;
-            height: 2.75rem;
-            border-radius: 0.75rem;
-            border: 1px solid rgba(255,255,255,0.38);
-            background: rgba(255,255,255,0.42);
-            backdrop-filter: blur(16px);
-            padding: 0.625rem 0.875rem;
-            font-size: 0.875rem;
-            color: rgb(30 41 59);
-          }
-          .textarea {
-            min-height: 7rem;
-            width: 100%;
-            border-radius: 0.75rem;
-            border: 1px solid rgba(255,255,255,0.38);
-            background: rgba(255,255,255,0.42);
-            backdrop-filter: blur(16px);
-            padding: 0.75rem 0.875rem;
-            font-size: 0.875rem;
-            line-height: 1.65;
-            color: rgb(30 41 59);
-          }
-          .textarea.tall {
-            min-height: 10rem;
-          }
-          :global(.dark) .input,
-          :global(.dark) .textarea {
-            border-color: rgba(255,255,255,0.12);
-            background: rgba(255,255,255,0.06);
-            color: white;
-          }
-        `}</style>
-      </section>
+      </DashboardCard>
     </div>
   );
 }
 
-function Field({ label, children, required, full = false }: { label: string; children: React.ReactNode; required?: boolean; full?: boolean }) {
+function Field({
+  label,
+  children,
+  required,
+  full = false,
+  htmlFor,
+}: {
+  label: string;
+  children: React.ReactNode;
+  required?: boolean;
+  full?: boolean;
+  htmlFor?: string;
+}) {
   return (
-    <label className={`${full ? "lg:col-span-2" : ""} block`}>
-      <div className="mb-2 text-sm font-medium text-gray-800 dark:text-gray-200">
-        {label} {required ? <span className="text-red-500">*</span> : null}
-      </div>
+    <div className={cn(full ? "lg:col-span-2" : "", "min-w-0 space-y-2")}>
+      <Label htmlFor={htmlFor}>
+        {label} {required ? <span className="text-[var(--color-signal-danger)]">*</span> : null}
+      </Label>
       {children}
-    </label>
+    </div>
+  );
+}
+
+function OptionSelect<T extends string>({
+  value,
+  options,
+  onValueChange,
+}: {
+  value: T;
+  options: readonly T[];
+  onValueChange: (value: T) => void;
+}) {
+  return (
+    <Select value={value} onValueChange={(next) => onValueChange(next as T)}>
+      <SelectTrigger className="min-h-11 w-full">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {options.map((option) => (
+          <SelectItem key={option} value={option}>
+            {option}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }

@@ -2,6 +2,11 @@ import { cookies } from "next/headers";
 import { createServerClient as createSupabaseServerClient } from "@supabase/ssr";
 import DeepHealthButton from "@/components/app/gio_dashboard/DeepHealthButton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  DashboardCard,
+  DashboardIconTile,
+  DashboardStatusBadge,
+} from "@/components/design-system/DashboardPrimitives";
 
 type ServiceStatus = "operational" | "down" | "not_configured";
 
@@ -315,9 +320,9 @@ async function getTier0(): Promise<Tier0Result> {
 
 function overallIndicator(services: Record<string, ServiceStatus>) {
   const values = Object.values(services);
-  if (values.includes("down")) return { color: "bg-red-500", text: "Issues detected" };
-  if (values.includes("not_configured")) return { color: "bg-yellow-500", text: "Some services not configured" };
-  return { color: "bg-green-500", text: "All systems operational" };
+  if (values.includes("down")) return { tone: "danger" as const, text: "Issues detected" };
+  if (values.includes("not_configured")) return { tone: "warning" as const, text: "Some services not configured" };
+  return { tone: "mint" as const, text: "All systems operational" };
 }
 
 export default async function SystemHealthCard() {
@@ -335,12 +340,11 @@ export default async function SystemHealthCard() {
   const envOk = envEntries.filter(([, s]) => s === "operational").length;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow cursor-pointer">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">System Health</h3>
-      <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">Monitor server status and performance</p>
+    <DashboardCard>
+      <h3 className="mb-2 text-lg font-semibold text-[var(--color-text-primary)]">System Health</h3>
+      <p className="mb-4 text-sm text-[var(--color-text-secondary)]">Monitor server status and performance</p>
       <div className="flex items-center gap-2">
-        <div className={`w-3 h-3 ${indicator.color} rounded-full animate-pulse`}></div>
-        <span className="text-gray-800 dark:text-gray-200 text-sm font-medium">{indicator.text}</span>
+        <DashboardStatusBadge tone={indicator.tone}>{indicator.text}</DashboardStatusBadge>
       </div>
 
       {/* Minimal details with drawers */}
@@ -348,17 +352,17 @@ export default async function SystemHealthCard() {
         <AccordionItem value="services">
           <AccordionTrigger className="text-sm">Core services</AccordionTrigger>
           <AccordionContent>
-            <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 dark:text-gray-400">
+            <div className="grid grid-cols-1 gap-2 text-xs text-[var(--color-text-secondary)] sm:grid-cols-2">
               {(["Supabase", "Pinecone", "Ollama"] as const).map((key) => (
                 <div key={key} className="flex items-center gap-2">
-                  <span className={`inline-block w-2 h-2 rounded-full ${
-                    services[key] === "operational" ? "bg-green-500" : services[key] === "down" ? "bg-red-500" : "bg-yellow-500"}
-                  `} />
+                  <DashboardIconTile tone={services[key] === "operational" ? "mint" : services[key] === "down" ? "danger" : "warning"}>
+                    <span className="size-2 rounded-full bg-current" />
+                  </DashboardIconTile>
                   <span>{key}: {services[key]}</span>
                 </div>
               ))}
             </div>
-            <div className="mt-3 text-xs text-gray-600 dark:text-gray-400 space-y-1">
+            <div className="mt-3 space-y-1 text-xs text-[var(--color-text-secondary)]">
               {typeof results.supabase.latencyMs === "number" && (
                 <div>DB latency: ~{results.supabase.latencyMs} ms</div>
               )}
@@ -399,12 +403,12 @@ export default async function SystemHealthCard() {
         <AccordionItem value="routes">
           <AccordionTrigger className="text-sm">API routes</AccordionTrigger>
           <AccordionContent>
-            <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 dark:text-gray-400">
+            <div className="grid grid-cols-1 gap-2 text-xs text-[var(--color-text-secondary)] sm:grid-cols-2">
               {(["API /embeddings", "API /chat"] as const).map((key) => (
                 <div key={key} className="flex items-center gap-2">
-                  <span className={`inline-block w-2 h-2 rounded-full ${
-                    services[key] === "operational" ? "bg-green-500" : services[key] === "down" ? "bg-red-500" : "bg-yellow-500"}
-                  `} />
+                  <DashboardIconTile tone={services[key] === "operational" ? "mint" : services[key] === "down" ? "danger" : "warning"}>
+                    <span className="size-2 rounded-full bg-current" />
+                  </DashboardIconTile>
                   <span>{key.replace("API ", "")}: {services[key]}</span>
                 </div>
               ))}
@@ -415,12 +419,12 @@ export default async function SystemHealthCard() {
         <AccordionItem value="envs">
           <AccordionTrigger className="text-sm">Environment config ({envOk}/{envEntries.length})</AccordionTrigger>
           <AccordionContent>
-            <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 dark:text-gray-400">
+            <div className="grid grid-cols-1 gap-2 text-xs text-[var(--color-text-secondary)] sm:grid-cols-2">
               {envEntries.map(([name, status]) => (
                 <div key={name} className="flex items-center gap-2">
-                  <span className={`inline-block w-2 h-2 rounded-full ${
-                    status === "operational" ? "bg-green-500" : status === "down" ? "bg-red-500" : "bg-yellow-500"}
-                  `} />
+                  <DashboardIconTile tone={status === "operational" ? "mint" : status === "down" ? "danger" : "warning"}>
+                    <span className="size-2 rounded-full bg-current" />
+                  </DashboardIconTile>
                   <span>{name}: {status}</span>
                 </div>
               ))}
@@ -433,7 +437,7 @@ export default async function SystemHealthCard() {
       <div className="mt-4">
         <DeepHealthButton />
       </div>
-    </div>
+    </DashboardCard>
   );
 }
 // I need to check the status of all systems and show a red dot if any are not operational
@@ -445,4 +449,3 @@ export default async function SystemHealthCard() {
 // - Monitor API response times and error rates
 // - Implement health check endpoints for each service
 // - And MORE!!!
-

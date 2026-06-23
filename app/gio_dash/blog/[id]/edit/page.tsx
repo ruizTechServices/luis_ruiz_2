@@ -9,9 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { getProjectsForSelection } from "@/lib/db/projects";
 import { getRelatedProjectIdsForPost, replaceRelatedProjectsForPost } from "@/lib/db/blog";
+import {
+  DashboardCard,
+  DashboardEmptyState,
+  DashboardPageHeader,
+  DashboardPageShell,
+} from "@/components/design-system/DashboardPrimitives";
 
 export const dynamic = "force-dynamic";
 
@@ -91,19 +96,16 @@ export default async function EditBlogPostPage({ params }: EditBlogPostPageProps
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-slate-800 dark:to-indigo-900">
-      <div className="container mx-auto px-6 py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Edit Blog Post
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300 mt-1">
-            Update the selected blog post in Supabase and refresh the public blog.
-          </p>
-        </div>
+    <DashboardPageShell>
+      <DashboardPageHeader
+        title="Edit Blog Post"
+        description="Update the selected blog post in Supabase and refresh the public blog."
+        backHref="/gio_dash/blog"
+        backLabel="Back to blog admin"
+      />
 
-        <Card className="p-6">
-          <form action={updatePostAction} className="space-y-5">
+      <DashboardCard>
+        <form action={updatePostAction} className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="title">Title</Label>
               <Input id="title" name="title" defaultValue={post.title ?? ""} placeholder="Post title" required />
@@ -133,9 +135,9 @@ export default async function EditBlogPostPage({ params }: EditBlogPostPageProps
             <div className="space-y-3">
               <Label>Related Projects</Label>
               {projects.length > 0 ? (
-                <div className="grid grid-cols-1 gap-3 rounded-xl border p-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 md:grid-cols-2">
                   {projects.map((project) => (
-                    <label key={project.id} className="flex items-start gap-3 rounded-lg border p-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                    <label key={project.id} className="flex cursor-pointer items-start gap-3 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-3 transition hover:border-[var(--color-border-strong)]">
                       <input
                         type="checkbox"
                         name="relatedProjectIds"
@@ -143,30 +145,28 @@ export default async function EditBlogPostPage({ params }: EditBlogPostPageProps
                         defaultChecked={relatedProjectIds.includes(project.id)}
                         className="mt-1"
                       />
-                      <div>
-                        <div className="font-medium">{project.title || project.url}</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 break-all">{project.url}</div>
+                      <div className="min-w-0">
+                        <div className="font-medium text-[var(--color-text-primary)]">{project.title || project.url}</div>
+                        <div className="break-all text-xs text-[var(--color-text-subtle)]">{project.url}</div>
                       </div>
                     </label>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-500 dark:text-gray-400">No projects available yet to link.</p>
+                <DashboardEmptyState title="No projects available yet">
+                  No projects are available to link.
+                </DashboardEmptyState>
               )}
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <Button type="submit">Save Changes</Button>
-              <Link
-                href="/gio_dash/blog"
-                className="text-sm text-gray-600 dark:text-gray-300 hover:underline"
-              >
-                Cancel and go back
-              </Link>
+              <Button asChild variant="outline">
+                <Link href="/gio_dash/blog">Cancel and go back</Link>
+              </Button>
             </div>
           </form>
-        </Card>
-      </div>
-    </div>
+      </DashboardCard>
+    </DashboardPageShell>
   );
 }

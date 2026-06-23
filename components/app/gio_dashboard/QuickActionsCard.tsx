@@ -2,13 +2,21 @@
 
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
-import { Switch } from "@/components/ui/switch";
+import { ChevronDown } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  DashboardCard,
+  DashboardStatusBadge,
+  dashboardItemClassName,
+} from "@/components/design-system/DashboardPrimitives";
 
 const AVAILABILITY_ENDPOINT = "/api/site_settings/availability";
 const DEFAULT_AVAILABILITY_TEXT = "Available for hire";
@@ -60,7 +68,7 @@ export default function QuickActionsCard() {
       { href: "/gio_dash/photos", label: "Photos", ariaLabel: "List photos" },
       { href: "/gio_dash/photos/upload", label: "Upload Photos", ariaLabel: "Upload photos" },
     ],
-    []
+    [],
   );
 
   useEffect(() => {
@@ -104,7 +112,7 @@ export default function QuickActionsCard() {
         }
       });
     },
-    [available, availabilityText]
+    [available, availabilityText],
   );
 
   const submitProject = useCallback(() => {
@@ -136,33 +144,26 @@ export default function QuickActionsCard() {
   }, [projectDescription, projectTitle, projectUrl]);
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow cursor-pointer">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Quick Actions</h3>
-      <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">Create posts, moderate content, send notifications</p>
-      <div className="flex gap-2 mb-4">
+    <DashboardCard>
+      <h3 className="mb-2 text-lg font-semibold text-[var(--color-text-primary)]">Quick Actions</h3>
+      <p className="mb-4 text-sm text-[var(--color-text-secondary)]">Create posts, moderate content, and manage common owner tasks.</p>
+      <div className="mb-4 flex flex-wrap gap-2">
         {quickLinks.map(({ href, label, ariaLabel }) => (
-          <Link
-            key={href}
-            href={href}
-            aria-label={ariaLabel}
-            className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full text-xs hover:bg-blue-200 dark:hover:bg-blue-800"
-          >
-            {label}
-          </Link>
+          <Button key={href} asChild variant="outline" size="sm">
+            <Link href={href} aria-label={ariaLabel}>
+              {label}
+            </Link>
+          </Button>
         ))}
       </div>
 
-      <Collapsible
-        open={availabilityOpen}
-        onOpenChange={setAvailabilityOpen}
-        className="mt-2 p-3 rounded-lg border border-gray-200 dark:border-gray-700"
-      >
-        <div className="flex items-center justify-between">
+      <Collapsible open={availabilityOpen} onOpenChange={setAvailabilityOpen} className={`${dashboardItemClassName} mt-2`}>
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="text-sm font-medium text-gray-800 dark:text-gray-200">Availability</div>
-            <span className={`text-xs ${available ? "text-green-600" : "text-red-500"}`}>
+            <div className="text-sm font-medium text-[var(--color-text-primary)]">Availability</div>
+            <DashboardStatusBadge tone={available ? "mint" : "danger"}>
               {available ? "Available" : "Booked"}
-            </span>
+            </DashboardStatusBadge>
           </div>
           <div className="flex items-center gap-2">
             <Switch
@@ -174,92 +175,79 @@ export default function QuickActionsCard() {
                 save({ availability: checked }, { revertAvailabilityTo: prev });
               }}
             />
-            <CollapsibleTrigger
-              className="text-xs text-gray-600 dark:text-gray-300 inline-flex items-center gap-1 rounded-md border border-gray-200 dark:border-gray-700 px-2 py-1 transition hover:bg-gray-50 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-              aria-label={`${availabilityOpen ? "Hide" : "Show"} availability`}
-            >
-              <span>{availabilityOpen ? "Hide" : "Show"}</span>
-              <ChevronDown
-                className={`size-4 transition-transform ${availabilityOpen ? "rotate-180" : ""}`}
-              />
+            <CollapsibleTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                aria-label={`${availabilityOpen ? "Hide" : "Show"} availability`}
+              >
+                {availabilityOpen ? "Hide" : "Show"}
+                <ChevronDown className={`size-4 transition-transform ${availabilityOpen ? "rotate-180" : ""}`} />
+              </Button>
             </CollapsibleTrigger>
           </div>
         </div>
-        <CollapsibleContent className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden">
-          <div className="flex items-center gap-2 mt-3">
-            <input
+        <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
+            <Input
               type="text"
-              className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-transparent text-sm"
               value={availabilityText}
               onChange={(e) => setAvailabilityText(e.target.value)}
               placeholder="Availability text"
               disabled={!loaded || isPending}
+              className="min-h-11"
             />
-            <button
-              onClick={() => save()}
-              disabled={!loaded || isPending}
-              className="px-3 py-2 rounded-md border text-xs hover:bg-gray-50 disabled:opacity-50"
-            >
+            <Button type="button" variant="outline" onClick={() => save()} disabled={!loaded || isPending}>
               {isPending ? "Saving..." : "Save"}
-            </button>
-            {message && <div className="text-xs text-gray-500">{message}</div>}
+            </Button>
+            {message ? <div className="text-xs text-[var(--color-text-subtle)]">{message}</div> : null}
           </div>
         </CollapsibleContent>
       </Collapsible>
 
-      <Collapsible
-        open={projectOpen}
-        onOpenChange={setProjectOpen}
-        className="mt-4 p-3 rounded-lg border border-gray-200 dark:border-gray-700"
-      >
-        <div className="flex items-center justify-between">
-          <div className="text-sm font-medium text-gray-800 dark:text-gray-200">Add Project</div>
-          <CollapsibleTrigger
-            className="text-xs text-gray-600 dark:text-gray-300 inline-flex items-center gap-1 rounded-md border border-gray-200 dark:border-gray-700 px-2 py-1 transition hover:bg-gray-50 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-            aria-label={`${projectOpen ? "Hide" : "Show"} add project`}
-          >
-            <span>{projectOpen ? "Hide" : "Show"}</span>
-            <ChevronDown className={`size-4 transition-transform ${projectOpen ? "rotate-180" : ""}`} />
+      <Collapsible open={projectOpen} onOpenChange={setProjectOpen} className={`${dashboardItemClassName} mt-4`}>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="text-sm font-medium text-[var(--color-text-primary)]">Add Project</div>
+          <CollapsibleTrigger asChild>
+            <Button type="button" variant="outline" size="sm" aria-label={`${projectOpen ? "Hide" : "Show"} add project`}>
+              {projectOpen ? "Hide" : "Show"}
+              <ChevronDown className={`size-4 transition-transform ${projectOpen ? "rotate-180" : ""}`} />
+            </Button>
           </CollapsibleTrigger>
         </div>
-        <CollapsibleContent className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden">
-          <div className="flex flex-col gap-2 mt-2">
-            <input
+        <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+          <div className="mt-3 flex flex-col gap-2">
+            <Input
               type="url"
               placeholder="https://example.com"
-              className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-transparent text-sm"
               value={projectUrl}
               onChange={(e) => setProjectUrl(e.target.value)}
               disabled={isPending}
             />
-            <input
+            <Input
               type="text"
               placeholder="Title (optional)"
-              className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-transparent text-sm"
               value={projectTitle}
               onChange={(e) => setProjectTitle(e.target.value)}
               disabled={isPending}
             />
-            <textarea
+            <Textarea
               placeholder="Description (optional)"
-              className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 bg-transparent text-sm min-h-20"
+              className="min-h-20"
               value={projectDescription}
               onChange={(e) => setProjectDescription(e.target.value)}
               disabled={isPending}
             />
-            <div className="flex items-center gap-2">
-              <button
-                onClick={submitProject}
-                disabled={isPending || !projectUrl}
-                className="px-3 py-2 rounded-md border text-xs hover:bg-gray-50 disabled:opacity-50"
-              >
+            <div className="flex flex-wrap items-center gap-2">
+              <Button type="button" variant="outline" onClick={submitProject} disabled={isPending || !projectUrl}>
                 {isPending ? "Saving..." : "Upload Project"}
-              </button>
-              {projectMsg && <span className="text-xs text-gray-500">{projectMsg}</span>}
+              </Button>
+              {projectMsg ? <span className="text-xs text-[var(--color-text-subtle)]">{projectMsg}</span> : null}
             </div>
           </div>
         </CollapsibleContent>
       </Collapsible>
-    </div>
+    </DashboardCard>
   );
 }
